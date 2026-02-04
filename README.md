@@ -17,7 +17,7 @@ The Prmission Protocol is a set of rules for how **businesses, customers, and AI
 
 It connects three open-source projects:
 
-- **Cos-Prmission** — The app/interface where you say "yes" or "no" to sharing specific data, and where payments happen. Includes both an SDK (for developers) and a GUI (for everyone else).
+- **Prmission** — The app/interface where you say "yes" or "no" to sharing specific data, and where payments happen. Includes both an SDK (for developers) and a GUI (for everyone else).
 - **OpenClaw** — Your personal AI assistant that talks to businesses on your behalf across messaging apps (WhatsApp, Telegram, etc.).
 - **ECCO** — The behind-the-scenes network that helps businesses and your AI assistant find each other, negotiate deals, and settle payments.
 
@@ -39,7 +39,7 @@ This replaces cookie banners and fine-print privacy policies with something bett
 
 ## Related repos
 
-- **Cos-Prmission** — SDK and GUI for consent and payment management — https://github.com/marcosbenaim-hub/Cos-Prmission
+- **Prmission** — SDK and GUI for consent and payment management — https://github.com/marcosbenaim-hub/Cos-Prmission
 - **OpenClaw** — Personal AI assistant gateway — https://github.com/mvdileet/openclaw
 - **ECCO** — Peer-to-peer discovery, negotiation and settlement mesh — https://github.com/mvdileet/ecco
 
