@@ -1,16 +1,14 @@
+require("dotenv/config");
 const hre = require("hardhat");
 
 async function main() {
-  const [deployer] = await hre.ethers.getSigners();
-  console.log("Deploying with:", deployer.address);
+  const wallet = new hre.ethers.Wallet(process.env.DEPLOYER_PRIVATE_KEY, hre.ethers.provider);
+  console.log("Deploying with:", wallet.address);
 
-  const PAYMENT_TOKEN = process.env.PAYMENT_TOKEN_ADDRESS
-    || "0x036CbD53842c5426634e7929541eC2318f3dCF7e"; // USDC on Base Sepolia
-  const TREASURY = process.env.TREASURY_ADDRESS || deployer.address;
-  const IDENTITY_REGISTRY = process.env.IDENTITY_REGISTRY_ADDRESS || "";
-  const REPUTATION_REGISTRY = process.env.REPUTATION_REGISTRY_ADDRESS || "";
+  const PAYMENT_TOKEN = process.env.PAYMENT_TOKEN_ADDRESS;
+  const TREASURY = process.env.TREASURY_ADDRESS;
 
-  const Prmission = await hre.ethers.getContractFactory("Prmission");
+  const Prmission = await hre.ethers.getContractFactory("Prmission", wallet);
   const prmission = await Prmission.deploy(PAYMENT_TOKEN, TREASURY);
   await prmission.waitForDeployment();
 
@@ -18,26 +16,14 @@ async function main() {
   console.log("Prmission deployed to:", addr);
   console.log("Treasury:", TREASURY);
 
-  if (IDENTITY_REGISTRY) {
-    await prmission.setIdentityRegistry(IDENTITY_REGISTRY);
-    console.log("Identity Registry set:", IDENTITY_REGISTRY);
-  }
-
-  if (REPUTATION_REGISTRY) {
-    await prmission.setReputationRegistry(REPUTATION_REGISTRY);
-    console.log("Reputation Registry set:", REPUTATION_REGISTRY);
-  }
-
   const fs = require("fs");
   fs.writeFileSync("deployment.json", JSON.stringify({
     network: hre.network.name,
     prmission: addr,
     paymentToken: PAYMENT_TOKEN,
     treasury: TREASURY,
-    identityRegistry: IDENTITY_REGISTRY || "not set",
-    reputationRegistry: REPUTATION_REGISTRY || "not set",
     deployedAt: new Date().toISOString(),
-    deployer: deployer.address
+    deployer: wallet.address
   }, null, 2));
   console.log("Saved to deployment.json");
 }
