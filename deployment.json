@@ -1,0 +1,8 @@
+{
+  "network": "base",
+  "prmission": "0xa40557E5414d70fa6C2109427604ef45748c16dB",
+  "paymentToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  "treasury": "0xc787aB0648DA8511C7D6CFB6Ff51079E41fEE45d",
+  "deployedAt": "2026-02-05T08:02:47.757Z",
+  "deployer": "0xc787aB0648DA8511C7D6CFB6Ff51079E41fEE45d"
+}
