@@ -1,0 +1,19 @@
+{
+  "name": "prmission-protocol",
+  "version": "1.0.0",
+  "description": "Prmission Protocol — Consent-gated data exchange with 3% protocol fee. The smart contract.",
+  "private": true,
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "deploy:testnet": "npx hardhat run scripts/deploy.js --network base-sepolia",
+    "deploy:mainnet": "npx hardhat run scripts/deploy.js --network base",
+    "verify": "npx hardhat verify --network base-sepolia"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "dotenv": "^16.4.0",
+    "hardhat": "^2.22.0"
+  }
+}
