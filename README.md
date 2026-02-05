@@ -1,78 +1,57 @@
-# Prmission Protocol — Smart Contract
+# PRMISSION PROTOCOL
 
-The thing that collects the 3%.
+**Consent-Based Data Exchange for AI Agent Networks**
 
-## What This Does
+Interoperability Specification
+**Cos-Prmission × OpenClaw × ECCO**
 
-One Solidity contract that implements the entire Prmission Protocol:
+Version 1.0 | February 2026
 
-- **Users** grant granular permissions (data category, purpose, compensation terms, expiry)
-- **Agents** deposit USDC escrow to access user data
-- **Agents** report outcomes (what they did with the data, transaction value)
-- **24-hour dispute window** protects both parties
-- **Settlement** splits payment automatically:
-  - User gets their compensation (e.g., 2%)
-  - **Protocol gets 3% — always, every transaction**
-  - Agent gets the remainder back
+> **CONFIDENTIAL DRAFT**
 
-## Deploy to Base Sepolia Testnet
+---
 
-```bash
-# 1. Install
-npm install
+## What is this?
 
-# 2. Configure
-cp .env.example .env
-# Edit .env with your private key and treasury address
+The Prmission Protocol is a set of rules for how **businesses, customers, and AI assistants** share personal data with each other — where **you, the person, are always in control**.
 
-# 3. Get testnet ETH
-# Go to https://www.coinbase.com/faucets/base-ethereum-goerli-faucet
-# Or https://faucet.quicknode.com/base/sepolia
+It connects three open-source projects:
 
-# 4. Compile
-npm run compile
+- **Prmission** — The app/interface where you say "yes" or "no" to sharing specific data, and where payments happen. Includes both an SDK (for developers) and a GUI (for everyone else).
+- **OpenClaw** — Your personal AI assistant that talks to businesses on your behalf across messaging apps (WhatsApp, Telegram, etc.).
+- **ECCO** — The behind-the-scenes network that helps businesses and your AI assistant find each other, negotiate deals, and settle payments.
 
-# 5. Test
-npm run test
+---
 
-# 6. Deploy
-npm run deploy:testnet
+## The core idea
 
-# 7. Verify on Basescan (optional)
-npx hardhat verify --network base-sepolia <CONTRACT_ADDRESS> "<USDC_ADDRESS>" "<TREASURY_ADDRESS>"
-```
+**No one can collect, use, or share your data without your clear, specific permission — and you can take that permission back at any time.**
 
-## Contract Functions
+Right now, when you shop online, companies quietly collect your data behind the scenes (cookies, trackers, etc.). This protocol flips that model. Every time a business wants something from you — your email, your purchase history, your preferences — they have to **ask you directly**, explain exactly what they want it for, and **pay you for it**.
 
-| Function | Who Calls | What It Does |
-|----------|-----------|--------------|
-| `grantPermission()` | User | Creates a permission with terms |
-| `revokePermission()` | User | Revokes consent, triggers 60s data deletion |
-| `depositEscrow()` | Agent | Locks USDC, pays upfront fee to user |
-| `reportOutcome()` | Agent | Reports what happened, starts dispute window |
-| `disputeSettlement()` | User or Agent | Files dispute during 24hr window |
-| `settle()` | Anyone | Executes payment split after window closes |
-| `checkAccess()` | Anyone (view) | Checks if permission is valid for an agent |
-| `previewSettlement()` | Anyone (view) | Shows what each party will receive |
+---
 
-## The Math
+## Why it matters
 
-On a $500 flight booking where user terms are 2% compensation:
+This replaces cookie banners and fine-print privacy policies with something better. It is designed to comply with **GDPR** (Europe) and **CCPA** (California) by default, because consent is built into the foundation — not bolted on as an afterthought.
 
-```
-User gets:     2% × $500 = $10.00
-Protocol gets: 3% × $500 = $15.00  ← this is the business
-Agent gets:    $50.00 escrow - $10.00 - $15.00 = $25.00 back
-```
+---
 
-## Files
+## Related repos
 
-```
-contracts/
-  Prmission.sol     ← The contract. ~300 lines. The whole protocol.
-  MockUSDC.sol       ← Test token
-scripts/
-  deploy.js          ← Deployment script for Base
-test/
-  Prmission.test.js  ← 20+ tests covering every flow
-```
+- **Prmission** — SDK and GUI for consent and payment management — https://github.com/marcosbenaim-hub/Cos-Prmission
+- **OpenClaw** — Personal AI assistant gateway — https://github.com/mvdileet/openclaw
+- **ECCO** — Peer-to-peer discovery, negotiation and settlement mesh — https://github.com/mvdileet/ecco
+
+---
+
+## Getting started
+
+Start with this overview, then dive into the [Full Protocol Spec](docs/PROTOCOL.md) for the technical details.
+
+---
+
+## License
+
+See [LICENSE](LICENSE) for details.
+
