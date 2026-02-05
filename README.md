@@ -1,57 +1,107 @@
-# PRMISSION PROTOCOL
+# Prmission Protocol — Smart Contract
 
-**Consent-Based Data Exchange for AI Agent Networks**
+The thing that collects the 3%. Now with ERC-8004 trust verification.
 
-Interoperability Specification
-**Cos-Prmission × OpenClaw × ECCO**
+## What Changed (v2)
 
-Version 1.0 | February 2026
+Same escrow, same settlement, same 3% fee. Now the contract can verify agents
+against the ERC-8004 Identity and Reputation registries before letting them
+access user data.
 
-> **CONFIDENTIAL DRAFT**
+**Two modes:**
 
----
+- **Backward compatible** (default) — Any address can deposit escrow. Works exactly like v1.
+- **ERC-8004 enforced** — Only registered agents with sufficient reputation can deposit.
 
-## What is this?
+You flip the switch when Ecco's registries are deployed. Nothing breaks in the meantime.
 
-The Prmission Protocol is a set of rules for how **businesses, customers, and AI assistants** share personal data with each other — where **you, the person, are always in control**.
+## ERC-8004 Integration
 
-It connects three open-source projects:
+ERC-8004 provides three registries: Identity, Reputation, Validation.
+Prmission reads Identity and Reputation:
 
-- **Prmission** — The app/interface where you say "yes" or "no" to sharing specific data, and where payments happen. Includes both an SDK (for developers) and a GUI (for everyone else).
-- **OpenClaw** — Your personal AI assistant that talks to businesses on your behalf across messaging apps (WhatsApp, Telegram, etc.).
-- **ECCO** — The behind-the-scenes network that helps businesses and your AI assistant find each other, negotiate deals, and settle payments.
+| Registry | What Prmission Checks | When |
+|----------|----------------------|------|
+| Identity | Is this agent registered? Is the caller the owner or wallet? | `depositEscrow()` |
+| Reputation | Does this agent meet minimum trust score from trusted reviewers? | `depositEscrow()` |
 
----
+### New Functions
 
-## The core idea
+| Function | Who Calls | What It Does |
+|----------|-----------|--------------|
+| `setIdentityRegistry()` | Owner | Point at deployed ERC-8004 Identity Registry |
+| `setReputationRegistry()` | Owner | Point at deployed ERC-8004 Reputation Registry |
+| `setIdentityEnforcement()` | Owner | Toggle identity verification on/off |
+| `setReputationEnforcement()` | Owner | Toggle reputation gating + set minimum score |
+| `setTrustedReviewers()` | Owner | Set which reviewer addresses count for reputation |
+| `checkAgentTrust()` | Anyone (view) | Pre-check an agent's trust status without depositing |
 
-**No one can collect, use, or share your data without your clear, specific permission — and you can take that permission back at any time.**
+### depositEscrow() Change
 
-Right now, when you shop online, companies quietly collect your data behind the scenes (cookies, trackers, etc.). This protocol flips that model. Every time a business wants something from you — your email, your purchase history, your preferences — they have to **ask you directly**, explain exactly what they want it for, and **pay you for it**.
+Now takes a third parameter: `agentId` (the ERC-8004 token ID).
 
----
+```solidity
+// v1 (still works when identity not enforced)
+depositEscrow(permissionId, amount, 0)
 
-## Why it matters
+// v2 with ERC-8004
+depositEscrow(permissionId, amount, agentId)
+```
 
-This replaces cookie banners and fine-print privacy policies with something better. It is designed to comply with **GDPR** (Europe) and **CCPA** (California) by default, because consent is built into the foundation — not bolted on as an afterthought.
+## Quick Start
 
----
+```bash
+npm install
+npx hardhat test        # run all 30+ tests
+```
 
-## Related repos
+## Deploy
 
-- **Prmission** — SDK and GUI for consent and payment management — https://github.com/marcosbenaim-hub/Cos-Prmission
-- **OpenClaw** — Personal AI assistant gateway — https://github.com/mvdileet/openclaw
-- **ECCO** — Peer-to-peer discovery, negotiation and settlement mesh — https://github.com/mvdileet/ecco
+```bash
+cp .env.example .env
+# Edit .env with your private key and treasury address
 
----
+npx hardhat compile
+npx hardhat test
+npx hardhat run scripts/deploy.js --network base-sepolia
+```
 
-## Getting started
+## Enable ERC-8004 (after Ecco deploys registries)
 
-Start with this overview, then dive into the [Full Protocol Spec](docs/PROTOCOL.md) for the technical details.
+```javascript
+// From your deployer wallet:
+await prmission.setIdentityRegistry("0x...ecco_identity_registry...");
+await prmission.setReputationRegistry("0x...ecco_reputation_registry...");
+await prmission.setTrustedReviewers(["0x...reviewer1...", "0x...reviewer2..."]);
 
----
+// Flip the switches:
+await prmission.setIdentityEnforcement(true);
+await prmission.setReputationEnforcement(true, 50, 0); // min score 50, 0 decimals
+```
 
-## License
+## The Math (unchanged)
 
-See [LICENSE](LICENSE) for details.
+On a $500 flight booking where user terms are 2% compensation:
 
+```
+User gets:     2% × $500 = $10.00
+Protocol gets: 3% × $500 = $15.00  ← this is the business
+Agent gets:    $50.00 escrow - $10.00 - $15.00 = $25.00 back
+```
+
+## Files
+
+```
+contracts/
+  Prmission.sol                    ← The contract. ~380 lines. Consent + escrow + ERC-8004.
+  interfaces/
+    IERC8004Identity.sol           ← Interface to read ERC-8004 Identity Registry
+    IERC8004Reputation.sol         ← Interface to read ERC-8004 Reputation Registry
+  MockUSDC.sol                     ← Test token
+  MockIdentityRegistry.sol         ← Test mock of ERC-8004 Identity
+  MockReputationRegistry.sol       ← Test mock of ERC-8004 Reputation
+scripts/
+  deploy.js                        ← Deployment script for Base
+test/
+  Prmission.test.js                ← 30+ tests covering both modes
+```

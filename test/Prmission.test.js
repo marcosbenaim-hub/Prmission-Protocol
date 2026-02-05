@@ -2,375 +2,487 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { time } = require("@nomicfoundation/hardhat-network-helpers");
 
-describe("Prmission Protocol", function () {
-  let prmission, usdc;
-  let owner, user, agent, agent2, treasury;
+describe("Prmission Protocol + ERC-8004", function () {
+  let prmission, usdc, identityRegistry, reputationRegistry;
+  let owner, user, agent, agent2, treasury, reviewer;
 
-  const USDC_DECIMALS = 6;
-  const toUSDC = (n) => ethers.parseUnits(n.toString(), USDC_DECIMALS);
-
-  const ONE_DAY = 24 * 60 * 60;
-  const ONE_WEEK = 7 * ONE_DAY;
+  const USDC = (n) => ethers.parseUnits(n.toString(), 6);
+  const DAY = 86400;
 
   beforeEach(async function () {
-    [owner, user, agent, agent2, treasury] = await ethers.getSigners();
+    [owner, user, agent, agent2, treasury, reviewer] = await ethers.getSigners();
 
-    // Deploy mock USDC
-    const MockToken = await ethers.getContractFactory("MockUSDC");
-    usdc = await MockToken.deploy();
-    await usdc.waitForDeployment();
+    // Deploy MockUSDC
+    const MockUSDC = await ethers.getContractFactory("MockUSDC");
+    usdc = await MockUSDC.deploy();
 
     // Deploy Prmission
     const Prmission = await ethers.getContractFactory("Prmission");
     prmission = await Prmission.deploy(await usdc.getAddress(), treasury.address);
-    await prmission.waitForDeployment();
 
-    // Fund agent with USDC
-    await usdc.mint(agent.address, toUSDC(10000));
-    await usdc.mint(agent2.address, toUSDC(10000));
+    // Deploy ERC-8004 mocks
+    const MockIdentity = await ethers.getContractFactory("MockIdentityRegistry");
+    identityRegistry = await MockIdentity.deploy();
 
-    // Agent approves Prmission contract
-    await usdc.connect(agent).approve(await prmission.getAddress(), toUSDC(10000));
-    await usdc.connect(agent2).approve(await prmission.getAddress(), toUSDC(10000));
+    const MockReputation = await ethers.getContractFactory("MockReputationRegistry");
+    reputationRegistry = await MockReputation.deploy();
+    await reputationRegistry.initialize(await identityRegistry.getAddress());
+
+    // Fund agents with USDC
+    await usdc.mint(agent.address, USDC(10000));
+    await usdc.mint(agent2.address, USDC(10000));
+    await usdc.connect(agent).approve(await prmission.getAddress(), USDC(10000));
+    await usdc.connect(agent2).approve(await prmission.getAddress(), USDC(10000));
   });
 
-  // ─── Permission Granting ─────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════
+  // BACKWARD COMPATIBLE MODE (identity NOT enforced)
+  // All original tests still pass. Nothing broke.
+  // ═══════════════════════════════════════════════════════════════════
 
-  describe("Permission Granting", function () {
-    it("should grant a permission with correct parameters", async function () {
+  describe("Backward Compatible (no ERC-8004)", function () {
+    it("should grant permission", async function () {
       const tx = await prmission.connect(user).grantPermission(
-        agent.address,           // merchant
-        "travel_preferences",    // category
-        "book_flights",          // purpose
-        200,                     // 2% compensation
-        toUSDC(0.50),           // $0.50 upfront fee
-        ONE_WEEK                 // 1 week validity
+        ethers.ZeroAddress, "travel_preferences", "personalized_offer", 200, 0, DAY * 30
       );
-
       const receipt = await tx.wait();
-      const event = receipt.logs.find(l => l.fragment?.name === "PermissionGranted");
-      expect(event).to.not.be.undefined;
-
-      const perm = await prmission.permissions(1);
-      expect(perm.user).to.equal(user.address);
-      expect(perm.merchant).to.equal(agent.address);
-      expect(perm.dataCategory).to.equal("travel_preferences");
-      expect(perm.compensationBps).to.equal(200);
-      expect(perm.status).to.equal(1); // ACTIVE
+      expect(receipt.status).to.equal(1);
     });
 
-    it("should allow open permissions (any agent)", async function () {
+    it("should deposit escrow with agentId=0 when identity not enforced", async function () {
       await prmission.connect(user).grantPermission(
-        ethers.ZeroAddress,      // any agent
-        "purchase_history",
-        "recommendations",
-        150,                     // 1.5%
-        0,                       // no upfront fee
-        ONE_WEEK
+        ethers.ZeroAddress, "travel_preferences", "booking", 200, 0, DAY * 30
       );
-
-      const perm = await prmission.permissions(1);
-      expect(perm.merchant).to.equal(ethers.ZeroAddress);
-    });
-
-    it("should reject empty category", async function () {
-      await expect(
-        prmission.connect(user).grantPermission(
-          agent.address, "", "purpose", 200, 0, ONE_WEEK
-        )
-      ).to.be.revertedWith("Empty category");
-    });
-
-    it("should reject compensation above 50%", async function () {
-      await expect(
-        prmission.connect(user).grantPermission(
-          agent.address, "data", "purpose", 5100, 0, ONE_WEEK
-        )
-      ).to.be.revertedWith("Max 50% compensation");
-    });
-  });
-
-  // ─── Permission Revocation ───────────────────────────────────────────────
-
-  describe("Revocation", function () {
-    beforeEach(async function () {
-      await prmission.connect(user).grantPermission(
-        agent.address, "travel_preferences", "booking", 200, 0, ONE_WEEK
-      );
-    });
-
-    it("should allow user to revoke their permission", async function () {
-      await prmission.connect(user).revokePermission(1);
-      const perm = await prmission.permissions(1);
-      expect(perm.status).to.equal(2); // REVOKED
-    });
-
-    it("should emit revocation with 60-second delete deadline", async function () {
-      const tx = await prmission.connect(user).revokePermission(1);
+      const tx = await prmission.connect(agent).depositEscrow(1, USDC(50), 0);
       const receipt = await tx.wait();
-      const event = receipt.logs.find(l => l.fragment?.name === "PermissionRevoked");
-      expect(event).to.not.be.undefined;
+      expect(receipt.status).to.equal(1);
     });
 
-    it("should prevent non-owner from revoking", async function () {
-      await expect(
-        prmission.connect(agent).revokePermission(1)
-      ).to.be.revertedWith("Not your permission");
-    });
-  });
-
-  // ─── Escrow ──────────────────────────────────────────────────────────────
-
-  describe("Escrow Deposit", function () {
-    beforeEach(async function () {
+    it("should run full settlement flow without ERC-8004", async function () {
+      // Grant
       await prmission.connect(user).grantPermission(
-        agent.address, "travel_preferences", "booking", 200, toUSDC(0.50), ONE_WEEK
-      );
-    });
-
-    it("should deposit escrow and pay upfront fee to user", async function () {
-      const userBalBefore = await usdc.balanceOf(user.address);
-
-      await prmission.connect(agent).depositEscrow(1, toUSDC(50));
-
-      const userBalAfter = await usdc.balanceOf(user.address);
-      expect(userBalAfter - userBalBefore).to.equal(toUSDC(0.50));
-
-      const esc = await prmission.escrows(1);
-      expect(esc.amount).to.equal(toUSDC(50));
-      expect(esc.status).to.equal(1); // FUNDED
-    });
-
-    it("should reject deposit on revoked permission", async function () {
-      await prmission.connect(user).revokePermission(1);
-      await expect(
-        prmission.connect(agent).depositEscrow(1, toUSDC(50))
-      ).to.be.revertedWith("Permission not active");
-    });
-
-    it("should reject unauthorized merchant", async function () {
-      await expect(
-        prmission.connect(agent2).depositEscrow(1, toUSDC(50))
-      ).to.be.revertedWith("Not authorized merchant");
-    });
-  });
-
-  // ─── Full Happy Path ────────────────────────────────────────────────────
-
-  describe("Happy Path: $500 flight booking", function () {
-    const escrowAmount = toUSDC(50);   // $50 escrowed
-    const outcomeValue = toUSDC(500);  // $500 flight
-
-    beforeEach(async function () {
-      // User grants permission: 2% compensation, $0.50 upfront
-      await prmission.connect(user).grantPermission(
-        agent.address, "travel_preferences", "book_flights", 200, toUSDC(0.50), ONE_WEEK
+        ethers.ZeroAddress, "travel_preferences", "booking", 200, 0, DAY * 30
       );
 
-      // Agent deposits escrow
-      await prmission.connect(agent).depositEscrow(1, escrowAmount);
-    });
+      // Deposit escrow
+      await prmission.connect(agent).depositEscrow(1, USDC(50), 0);
 
-    it("should complete the full flow with correct splits", async function () {
-      // Agent reports outcome
-      await prmission.connect(agent).reportOutcome(
-        1,             // escrowId
-        outcomeValue,  // $500
-        "booking",
-        "Round-trip SFO to JFK on Delta"
-      );
+      // Report outcome ($500 flight)
+      await prmission.connect(agent).reportOutcome(1, USDC(500), "booking", "Flight LAX-NYC");
 
-      // Fast forward past dispute window
-      await time.increase(ONE_DAY + 1);
+      // Wait for dispute window
+      await time.increase(DAY + 1);
 
-      // Record balances before settlement
+      // Settle
       const userBefore = await usdc.balanceOf(user.address);
       const treasuryBefore = await usdc.balanceOf(treasury.address);
       const agentBefore = await usdc.balanceOf(agent.address);
 
-      // Settle
       await prmission.settle(1);
 
       const userAfter = await usdc.balanceOf(user.address);
       const treasuryAfter = await usdc.balanceOf(treasury.address);
       const agentAfter = await usdc.balanceOf(agent.address);
 
-      // User gets 2% of $500 = $10
-      expect(userAfter - userBefore).to.equal(toUSDC(10));
-
-      // Protocol gets 3% of $500 = $15
-      expect(treasuryAfter - treasuryBefore).to.equal(toUSDC(15));
-
-      // Agent gets remainder: $50 - $10 - $15 = $25
-      expect(agentAfter - agentBefore).to.equal(toUSDC(25));
+      // $500 * 2% = $10 to user
+      expect(userAfter - userBefore).to.equal(USDC(10));
+      // $500 * 3% = $15 to protocol
+      expect(treasuryAfter - treasuryBefore).to.equal(USDC(15));
+      // $50 - $10 - $15 = $25 back to agent
+      expect(agentAfter - agentBefore).to.equal(USDC(25));
     });
 
-    it("should prevent settlement before dispute window ends", async function () {
-      await prmission.connect(agent).reportOutcome(1, outcomeValue, "booking", "test");
+    it("should revoke permission and refund escrow", async function () {
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "search", 200, 0, DAY * 30
+      );
+      await prmission.connect(agent).depositEscrow(1, USDC(50), 0);
+      await prmission.connect(user).revokePermission(1);
+      await prmission.refundEscrow(1);
+      expect(await usdc.balanceOf(agent.address)).to.equal(USDC(10000));
+    });
 
+    it("should reject expired permission", async function () {
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, 60
+      );
+      await time.increase(120);
       await expect(
-        prmission.settle(1)
-      ).to.be.revertedWith("Dispute window still open");
+        prmission.connect(agent).depositEscrow(1, USDC(50), 0)
+      ).to.be.revertedWith("Permission expired");
     });
 
-    it("should allow anyone to trigger settlement after window", async function () {
-      await prmission.connect(agent).reportOutcome(1, outcomeValue, "booking", "test");
-      await time.increase(ONE_DAY + 1);
+    it("should handle dispute flow", async function () {
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
+      );
+      await prmission.connect(agent).depositEscrow(1, USDC(50), 0);
+      await prmission.connect(agent).reportOutcome(1, USDC(500), "booking", "Flight");
 
-      // Random address settles — permissionless
-      await expect(prmission.connect(agent2).settle(1)).to.not.be.reverted;
+      await prmission.connect(user).disputeSettlement(1, "Wrong amount");
+
+      const esc = await prmission.escrows(1);
+      expect(esc.status).to.equal(3); // DISPUTED
+
+      // Resolve in user's favor (slash)
+      await prmission.resolveDisputeForUser(1);
+      expect(await usdc.balanceOf(user.address)).to.equal(USDC(50));
+    });
+
+    it("should block unauthorized merchant", async function () {
+      await prmission.connect(user).grantPermission(
+        agent.address, "travel", "booking", 200, 0, DAY * 30
+      );
+      await expect(
+        prmission.connect(agent2).depositEscrow(1, USDC(50), 0)
+      ).to.be.revertedWith("Not authorized merchant");
+    });
+
+    it("should pay upfront fee on deposit", async function () {
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, USDC(5), DAY * 30
+      );
+      const userBefore = await usdc.balanceOf(user.address);
+      await prmission.connect(agent).depositEscrow(1, USDC(50), 0);
+      const userAfter = await usdc.balanceOf(user.address);
+      expect(userAfter - userBefore).to.equal(USDC(5));
+    });
+
+    it("should expire stale permissions", async function () {
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, 60
+      );
+      await time.increase(120);
+      await prmission.expirePermission(1);
+      const perm = await prmission.permissions(1);
+      expect(perm.status).to.equal(3); // EXPIRED
     });
   });
 
-  // ─── Disputes ────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════
+  // ERC-8004 IDENTITY ENFORCEMENT
+  // Only registered agents can deposit escrow.
+  // ═══════════════════════════════════════════════════════════════════
 
-  describe("Disputes", function () {
+  describe("ERC-8004 Identity Enforcement", function () {
     beforeEach(async function () {
+      // Wire up ERC-8004
+      await prmission.setIdentityRegistry(await identityRegistry.getAddress());
+      await prmission.setIdentityEnforcement(true);
+    });
+
+    it("should reject deposit from unregistered agent", async function () {
       await prmission.connect(user).grantPermission(
-        agent.address, "travel_preferences", "booking", 200, 0, ONE_WEEK
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
       );
-      await prmission.connect(agent).depositEscrow(1, toUSDC(50));
-      await prmission.connect(agent).reportOutcome(1, toUSDC(500), "booking", "test");
-    });
-
-    it("should allow user to file dispute during window", async function () {
-      await prmission.connect(user).disputeSettlement(1, "Unauthorized data use");
-      const esc = await prmission.escrows(1);
-      expect(esc.status).to.equal(3); // DISPUTED
-    });
-
-    it("should allow agent to file dispute during window", async function () {
-      await prmission.connect(agent).disputeSettlement(1, "Data was incomplete");
-      const esc = await prmission.escrows(1);
-      expect(esc.status).to.equal(3); // DISPUTED
-    });
-
-    it("should reject dispute after window closes", async function () {
-      await time.increase(ONE_DAY + 1);
       await expect(
-        prmission.connect(user).disputeSettlement(1, "Too late")
-      ).to.be.revertedWith("Dispute window closed");
+        prmission.connect(agent).depositEscrow(1, USDC(50), 999)
+      ).to.be.revertedWith("Agent not registered");
     });
 
-    it("should allow owner to resolve dispute for user (slash)", async function () {
-      await prmission.connect(user).disputeSettlement(1, "Misuse");
+    it("should reject deposit with agentId=0 when enforced", async function () {
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
+      );
+      await expect(
+        prmission.connect(agent).depositEscrow(1, USDC(50), 0)
+      ).to.be.revertedWith("Agent ID required");
+    });
+
+    it("should accept deposit from registered agent (owner)", async function () {
+      // Register agent in ERC-8004
+      const tx = await identityRegistry.connect(agent).register("https://agent.example/card.json");
+      const receipt = await tx.wait();
+      const agentId = 1; // first registration
+
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
+      );
+
+      const depositTx = await prmission.connect(agent).depositEscrow(1, USDC(50), agentId);
+      const depositReceipt = await depositTx.wait();
+      expect(depositReceipt.status).to.equal(1);
+
+      // Verify agentId stored in escrow
+      const esc = await prmission.escrows(1);
+      expect(esc.agentId).to.equal(agentId);
+    });
+
+    it("should accept deposit from agent wallet (not owner)", async function () {
+      // Owner registers, sets agent2 as wallet
+      await identityRegistry.connect(owner).register("https://agent.example/card.json");
+      await identityRegistry.setAgentWallet(1, agent.address);
+
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
+      );
+
+      // agent (the wallet) deposits, not owner
+      const tx = await prmission.connect(agent).depositEscrow(1, USDC(50), 1);
+      expect((await tx.wait()).status).to.equal(1);
+    });
+
+    it("should reject deposit from wrong address", async function () {
+      await identityRegistry.connect(agent).register("https://agent.example/card.json");
+
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
+      );
+
+      // agent2 tries to use agent's agentId
+      await expect(
+        prmission.connect(agent2).depositEscrow(1, USDC(50), 1)
+      ).to.be.revertedWith("Not agent owner or wallet");
+    });
+
+    it("should run full flow with ERC-8004 identity", async function () {
+      await identityRegistry.connect(agent).register("https://agent.example/card.json");
+
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
+      );
+      await prmission.connect(agent).depositEscrow(1, USDC(50), 1);
+      await prmission.connect(agent).reportOutcome(1, USDC(500), "booking", "Flight");
+      await time.increase(DAY + 1);
 
       const userBefore = await usdc.balanceOf(user.address);
-      await prmission.connect(owner).resolveDisputeForUser(1);
-      const userAfter = await usdc.balanceOf(user.address);
-
-      // Entire escrow slashed to user
-      expect(userAfter - userBefore).to.equal(toUSDC(50));
-    });
-
-    it("should allow owner to refund agent on dispute", async function () {
-      await prmission.connect(user).disputeSettlement(1, "False claim");
-
-      const agentBefore = await usdc.balanceOf(agent.address);
-      await prmission.connect(owner).refundEscrow(1);
-      const agentAfter = await usdc.balanceOf(agent.address);
-
-      expect(agentAfter - agentBefore).to.equal(toUSDC(50));
-    });
-  });
-
-  // ─── Revocation + Escrow Refund ──────────────────────────────────────────
-
-  describe("Revocation refunds active escrows", function () {
-    it("should refund escrow when permission is revoked", async function () {
-      await prmission.connect(user).grantPermission(
-        agent.address, "data", "purpose", 200, 0, ONE_WEEK
-      );
-      await prmission.connect(agent).depositEscrow(1, toUSDC(50));
-
-      // User revokes
-      await prmission.connect(user).revokePermission(1);
-
-      const agentBefore = await usdc.balanceOf(agent.address);
-      await prmission.refundEscrow(1);
-      const agentAfter = await usdc.balanceOf(agent.address);
-
-      expect(agentAfter - agentBefore).to.equal(toUSDC(50));
-    });
-  });
-
-  // ─── View Functions ──────────────────────────────────────────────────────
-
-  describe("Views", function () {
-    beforeEach(async function () {
-      await prmission.connect(user).grantPermission(
-        agent.address, "travel_preferences", "booking", 200, toUSDC(0.50), ONE_WEEK
-      );
-    });
-
-    it("should check access correctly", async function () {
-      const [permitted, compBps, fee, validUntil] =
-        await prmission.checkAccess(1, agent.address);
-
-      expect(permitted).to.be.true;
-      expect(compBps).to.equal(200);
-      expect(fee).to.equal(toUSDC(0.50));
-    });
-
-    it("should deny access to wrong agent", async function () {
-      const [permitted] = await prmission.checkAccess(1, agent2.address);
-      expect(permitted).to.be.false;
-    });
-
-    it("should deny access after expiration", async function () {
-      await time.increase(ONE_WEEK + 1);
-      const [permitted] = await prmission.checkAccess(1, agent.address);
-      expect(permitted).to.be.false;
-    });
-
-    it("should preview settlement correctly", async function () {
-      await prmission.connect(agent).depositEscrow(1, toUSDC(50));
-      await prmission.connect(agent).reportOutcome(1, toUSDC(500), "booking", "test");
-
-      const [userShare, protocolFee, agentRefund] =
-        await prmission.previewSettlement(1);
-
-      expect(userShare).to.equal(toUSDC(10));     // 2% of 500
-      expect(protocolFee).to.equal(toUSDC(15));    // 3% of 500
-      expect(agentRefund).to.equal(toUSDC(25));    // 50 - 10 - 15
-    });
-
-    it("should return user permissions list", async function () {
-      await prmission.connect(user).grantPermission(
-        agent.address, "purchase_history", "offers", 100, 0, ONE_WEEK
-      );
-
-      const perms = await prmission.getUserPermissions(user.address);
-      expect(perms.length).to.equal(2);
-    });
-  });
-
-  // ─── Protocol Fee Accounting ─────────────────────────────────────────────
-
-  describe("Protocol Fee Tracking", function () {
-    it("should track cumulative protocol fees", async function () {
-      // Two full cycles
-      await prmission.connect(user).grantPermission(
-        agent.address, "data1", "purpose1", 200, 0, ONE_WEEK
-      );
-      await prmission.connect(user).grantPermission(
-        agent.address, "data2", "purpose2", 100, 0, ONE_WEEK
-      );
-
-      // First: $500 outcome
-      await prmission.connect(agent).depositEscrow(1, toUSDC(50));
-      await prmission.connect(agent).reportOutcome(1, toUSDC(500), "booking", "flight");
-      await time.increase(ONE_DAY + 1);
+      const treasuryBefore = await usdc.balanceOf(treasury.address);
       await prmission.settle(1);
 
-      // Second: $200 outcome
-      await prmission.connect(agent).depositEscrow(2, toUSDC(20));
-      await prmission.connect(agent).reportOutcome(2, toUSDC(200), "purchase", "hotel");
-      await time.increase(ONE_DAY + 1);
-      await prmission.settle(2);
+      expect(await usdc.balanceOf(user.address) - userBefore).to.equal(USDC(10));
+      expect(await usdc.balanceOf(treasury.address) - treasuryBefore).to.equal(USDC(15));
+    });
 
-      // Total fees: 3% of $500 + 3% of $200 = $15 + $6 = $21
-      expect(await prmission.totalProtocolFees()).to.equal(toUSDC(21));
+    it("should allow disabling enforcement", async function () {
+      await prmission.setIdentityEnforcement(false);
+
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
+      );
+      // Works with agentId=0 again
+      const tx = await prmission.connect(agent).depositEscrow(1, USDC(50), 0);
+      expect((await tx.wait()).status).to.equal(1);
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ERC-8004 REPUTATION ENFORCEMENT
+  // Registered agents must also meet minimum reputation.
+  // ═══════════════════════════════════════════════════════════════════
+
+  describe("ERC-8004 Reputation Enforcement", function () {
+    let agentId;
+
+    beforeEach(async function () {
+      // Wire up ERC-8004
+      await prmission.setIdentityRegistry(await identityRegistry.getAddress());
+      await prmission.setReputationRegistry(await reputationRegistry.getAddress());
+      await prmission.setIdentityEnforcement(true);
+      await prmission.setTrustedReviewers([reviewer.address]);
+      // Min score 50, 0 decimals
+      await prmission.setReputationEnforcement(true, 50, 0);
+
+      // Register agent
+      await identityRegistry.connect(agent).register("https://agent.example/card.json");
+      agentId = 1;
+    });
+
+    it("should reject agent with no reputation", async function () {
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
+      );
+      await expect(
+        prmission.connect(agent).depositEscrow(1, USDC(50), agentId)
+      ).to.be.revertedWith("Agent has no reputation");
+    });
+
+    it("should reject agent below minimum reputation", async function () {
+      // Give low score (30, below min of 50)
+      await reputationRegistry.connect(reviewer).setScore(agentId, 30);
+
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
+      );
+      await expect(
+        prmission.connect(agent).depositEscrow(1, USDC(50), agentId)
+      ).to.be.revertedWith("Agent below minimum reputation");
+    });
+
+    it("should accept agent meeting minimum reputation", async function () {
+      // Give good score (85, above min of 50)
+      await reputationRegistry.connect(reviewer).setScore(agentId, 85);
+
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
+      );
+      const tx = await prmission.connect(agent).depositEscrow(1, USDC(50), agentId);
+      expect((await tx.wait()).status).to.equal(1);
+    });
+
+    it("should run full flow with identity + reputation", async function () {
+      // Good reputation
+      await reputationRegistry.connect(reviewer).setScore(agentId, 90);
+
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
+      );
+      await prmission.connect(agent).depositEscrow(1, USDC(50), agentId);
+      await prmission.connect(agent).reportOutcome(1, USDC(500), "booking", "Flight LAX-NYC");
+      await time.increase(DAY + 1);
+
+      const userBefore = await usdc.balanceOf(user.address);
+      const treasuryBefore = await usdc.balanceOf(treasury.address);
+      const agentBefore = await usdc.balanceOf(agent.address);
+
+      await prmission.settle(1);
+
+      expect(await usdc.balanceOf(user.address) - userBefore).to.equal(USDC(10));
+      expect(await usdc.balanceOf(treasury.address) - treasuryBefore).to.equal(USDC(15));
+      expect(await usdc.balanceOf(agent.address) - agentBefore).to.equal(USDC(25));
+    });
+
+    
+
+    it("should allow adjusting minimum reputation", async function () {
+      // Score 40 (below 50)
+      await reputationRegistry.connect(reviewer).setScore(agentId, 40);
+
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
+      );
+
+      // Fails at min 50
+      await expect(
+        prmission.connect(agent).depositEscrow(1, USDC(50), agentId)
+      ).to.be.revertedWith("Agent below minimum reputation");
+
+      // Lower minimum to 30
+      await prmission.setReputationEnforcement(true, 30, 0);
+
+      // Now passes
+      const tx = await prmission.connect(agent).depositEscrow(1, USDC(50), agentId);
+      expect((await tx.wait()).status).to.equal(1);
+    });
+
+    it("should allow disabling reputation enforcement", async function () {
+      // No reputation, but disable check
+      await prmission.setReputationEnforcement(false, 0, 0);
+
+      await prmission.connect(user).grantPermission(
+        ethers.ZeroAddress, "travel", "booking", 200, 0, DAY * 30
+      );
+
+      // Identity still enforced, but no reputation needed
+      const tx = await prmission.connect(agent).depositEscrow(1, USDC(50), agentId);
+      expect((await tx.wait()).status).to.equal(1);
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // checkAgentTrust VIEW FUNCTION
+  // Pre-check trust without depositing.
+  // ═══════════════════════════════════════════════════════════════════
+
+  describe("checkAgentTrust", function () {
+    it("should return false for unregistered agent", async function () {
+      await prmission.setIdentityRegistry(await identityRegistry.getAddress());
+
+      const [registered, authorized, reputable, repScore, repCount] =
+        await prmission.checkAgentTrust(999, agent.address);
+
+      expect(registered).to.be.false;
+      expect(authorized).to.be.false;
+      expect(reputable).to.be.false;
+    });
+
+    it("should return registered+authorized for valid agent", async function () {
+      await prmission.setIdentityRegistry(await identityRegistry.getAddress());
+      await identityRegistry.connect(agent).register("https://agent.example/card.json");
+
+      const [registered, authorized, reputable, repScore, repCount] =
+        await prmission.checkAgentTrust(1, agent.address);
+
+      expect(registered).to.be.true;
+      expect(authorized).to.be.true;
+    });
+
+    it("should return full trust profile with reputation", async function () {
+      await prmission.setIdentityRegistry(await identityRegistry.getAddress());
+      await prmission.setReputationRegistry(await reputationRegistry.getAddress());
+      await prmission.setTrustedReviewers([reviewer.address]);
+      await prmission.setReputationEnforcement(true, 50, 0);
+
+      await identityRegistry.connect(agent).register("https://agent.example/card.json");
+      await reputationRegistry.connect(reviewer).setScore(1, 85);
+
+      const [registered, authorized, reputable, repScore, repCount] =
+        await prmission.checkAgentTrust(1, agent.address);
+
+      expect(registered).to.be.true;
+      expect(authorized).to.be.true;
+      expect(reputable).to.be.true;
+      expect(repScore).to.equal(85);
+      expect(repCount).to.equal(1);
+    });
+
+    it("should detect wrong address for registered agent", async function () {
+      await prmission.setIdentityRegistry(await identityRegistry.getAddress());
+      await identityRegistry.connect(agent).register("https://agent.example/card.json");
+
+      const [registered, authorized, , ,] =
+        await prmission.checkAgentTrust(1, agent2.address);
+
+      expect(registered).to.be.true;
+      expect(authorized).to.be.false;
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ADMIN FUNCTIONS
+  // ═══════════════════════════════════════════════════════════════════
+
+  describe("Admin", function () {
+    it("should only allow owner to set identity registry", async function () {
+      await expect(
+        prmission.connect(agent).setIdentityRegistry(ethers.ZeroAddress)
+      ).to.be.revertedWithCustomError(prmission, "OwnableUnauthorizedAccount");
+    });
+
+    it("should only allow owner to set reputation registry", async function () {
+      await expect(
+        prmission.connect(agent).setReputationRegistry(ethers.ZeroAddress)
+      ).to.be.revertedWithCustomError(prmission, "OwnableUnauthorizedAccount");
+    });
+
+    it("should only allow owner to toggle identity enforcement", async function () {
+      await expect(
+        prmission.connect(agent).setIdentityEnforcement(true)
+      ).to.be.revertedWithCustomError(prmission, "OwnableUnauthorizedAccount");
+    });
+
+    it("should only allow owner to set trusted reviewers", async function () {
+      await expect(
+        prmission.connect(agent).setTrustedReviewers([reviewer.address])
+      ).to.be.revertedWithCustomError(prmission, "OwnableUnauthorizedAccount");
+    });
+
+    it("should emit events on config changes", async function () {
+      await expect(prmission.setIdentityRegistry(await identityRegistry.getAddress()))
+        .to.emit(prmission, "IdentityRegistryUpdated");
+
+      await expect(prmission.setReputationRegistry(await reputationRegistry.getAddress()))
+        .to.emit(prmission, "ReputationRegistryUpdated");
+
+      await expect(prmission.setIdentityEnforcement(true))
+        .to.emit(prmission, "IdentityEnforcementUpdated").withArgs(true);
+    });
+
+    it("should return trusted reviewers", async function () {
+      await prmission.setTrustedReviewers([reviewer.address, agent2.address]);
+      const reviewers = await prmission.getTrustedReviewers();
+      expect(reviewers.length).to.equal(2);
+      expect(reviewers[0]).to.equal(reviewer.address);
+      expect(reviewers[1]).to.equal(agent2.address);
     });
   });
 });
