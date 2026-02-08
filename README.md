@@ -1,6 +1,8 @@
 Prmission Protocol
 The economic layer for AI agent commerce. Live on Base mainnet.
-Contract: 0xa40557E5414d70fa6C2109427604ef45748c16dB
+Contract address: 0x0c8B16a57524f4009581B748356E01e1a969223d
+BaseScan link: https://basescan.org/address/0x0c8B16a57524f4009581B748356E01e1a969223d
+This shows a real Prmission transaction, real USDC, deployed on mainnet — not just a demo.
 Prmission is a consent-gated escrow and settlement protocol for AI agents transacting on behalf of users. When an agent wants to access user data — to book a flight, make a recommendation, run a search — it deposits USDC escrow, reports the outcome, and the contract settles automatically: user gets compensated, protocol takes 3%, agent gets the rest back.
 The 3% fee is hardcoded on-chain at 300 basis points. Non-negotiable. Every transaction that settles through this contract pays it.
 
