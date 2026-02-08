@@ -3,6 +3,7 @@ The economic layer for AI agent commerce. Live on Base mainnet.
 
 Contract address: 
 0x0c8B16a57524f4009581B748356E01e1a969223d
+
 BaseScan link: 
 https://basescan.org/address/0x0c8B16a57524f4009581B748356E01e1a969223d
 
