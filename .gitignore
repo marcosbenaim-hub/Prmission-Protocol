@@ -6,3 +6,5 @@ typechain-types/
 deployment.json
 coverage/
 coverage.json
+deployment-v2-*.json
+.env.save
