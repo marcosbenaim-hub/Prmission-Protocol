@@ -1,96 +1,201 @@
-# Cos-Prmission
+# Prmission Protocol V2
 
-Prmission SDK on the Dileet/Ecco repo
+**Consent-gated data exchange with atomic escrow settlement and ERC-8004 trust verification.**
 
-## "Prmission"
-
-### Executive Truths for Shopify / Major Brands
-
-- **"Permission is the product — data is the by-product."**
-
-- **"Merchants already pay for customers; Prmission lets them pay the right customers directly."**
-
-- **"Lower CAC comes from certainty, not scale — explicit permission replaces guesswork."**
-
-- **"Paying customers directly eliminates wasted spend and improves conversion immediately."**
-
-- **"This is not a new ad channel; it's a reallocation of existing ad spend."**
-
-- **"Consent built into the transaction removes compliance risk by design."**
-
-- **"ECCO provides trust, enforcement, and scale — without platforms owning data."**
-
-- **"When customers are compensated, engagement becomes voluntary and durable."**
-
-- **"If merchants can lower CAC by paying customers directly, the ad market becomes optional — not mandatory."**
+Prmission is a smart contract protocol that puts users in control of their personal data. Instead of companies harvesting data for free, Prmission creates a marketplace where users grant explicit, revocable permission — and get compensated when their data generates value.
 
 ---
 
-## About
+## 🔗 Live Deployment
 
-Prmission SDK/GUI MVP DEMO on the Repo Dileet/Ecco
+| Network | Contract Address | Status |
+|---------|-----------------|--------|
+| **Base Mainnet** | [`0x0c8B16a57524f4009581B748356E01e1a969223d`](https://basescan.org/address/0x0c8B16a57524f4009581B748356E01e1a969223d#code) | ✅ Verified |
 
-## Architecture
+- **Payment Token:** USDC on Base ([`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`](https://basescan.org/address/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913))
+- **Protocol Fee:** 3%
+- **Solidity Version:** 0.8.24
+- **Framework:** Hardhat
+
+---
+
+## How It Works
+
+### The Flow
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         PRMISSION SYSTEM                        │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   ┌───────────┐     ┌───────────┐     ┌───────────────────┐    │
-│   │  MERCHANT │────▶│  PRMISSION│────▶│     CUSTOMER      │    │
-│   │ (Shopify) │     │    SDK    │     │  (Compensated)    │    │
-│   └───────────┘     └───────────┘     └───────────────────┘    │
-│         │                 │                     │               │
-│         │                 ▼                     │               │
-│         │         ┌───────────────┐             │               │
-│         └────────▶│     ECCO      │◀────────────┘               │
-│                   │ (Trust Layer) │                             │
-│                   └───────────────┘                             │
-│                          │                                      │
-│                          ▼                                      │
-│                   ┌───────────────┐                             │
-│                   │   CONSENT &   │                             │
-│                   │  ENFORCEMENT  │                             │
-│                   └───────────────┘                             │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+User grants permission → Agent deposits escrow (USDC)
+→ Agent uses data & reports outcome → 24hr dispute window
+→ Settlement: User gets paid, protocol takes 3% fee, agent gets remainder
 ```
 
-## SDK Installation
+### Step by Step
 
-```bash
-pip install prmission-sdk
-```
+1. **User Grants Permission** — A user decides what data to share, with whom, for how long, and at what price (compensation %).
 
-## Quick Start
+2. **Agent Deposits Escrow** — An agent (company/merchant) locks USDC into escrow to access the user's data. The user receives any upfront fee immediately.
 
-```python
-from prmission import PrmissionClient
+3. **Outcome Reporting** — The agent reports what value was generated from the data (e.g., a booking, a conversion, an ad impression).
 
-# Initialize client
-client = PrmissionClient(api_key="your_api_key")
+4. **Dispute Window** — Both parties have 24 hours to dispute the outcome if something seems wrong.
 
-# Create a permission request
-permission = client.create_permission(
-    merchant_id="merchant_123",
-    customer_email="customer@example.com",
-    compensation_amount=5.00,
-    data_scope=["email", "purchase_history"]
-)
+5. **Settlement** — After the dispute window, funds are distributed:
+   - **User** receives their compensation share
+   - **Protocol** takes a 3% fee
+   - **Agent** gets back the remainder
 
-# Check permission status
-status = client.get_permission_status(permission.id)
-```
+---
 
 ## Key Features
 
-- **Direct Customer Compensation** - Pay customers for their data permissions
-- **Consent Management** - Built-in GDPR/CCPA compliant consent flows
-- **ECCO Integration** - Trust and enforcement layer
-- **Shopify Ready** - Native integration with Shopify stores
-- **Lower CAC** - Reduce customer acquisition costs through certainty
+### V2 Improvements (from audit)
+
+- **Fair Payouts** — User share is calculated from the escrowed amount, not the agent-reported outcome value. This prevents agents from gaming the system.
+- **Outcome Value Capping** — Reported outcome values are capped at the escrow amount to prevent fund locks.
+- **Flexible Dispute Resolution** — Owner can resolve disputes with custom splits (e.g., 50/50, 70/30, full refund).
+- **Revocation Grace Period** — When a user revokes permission, active escrows get a 60-second grace period to complete.
+- **Pausable** — Emergency stop mechanism for the entire protocol.
+- **Token Rescue** — Recover accidentally sent tokens (except the payment token).
+- **Pagination** — Efficient querying of user permissions.
+- **Multiple Escrows** — Track multiple escrows per permission.
+
+### ERC-8004 Trust Verification
+
+Prmission integrates with [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) for optional identity and reputation gating:
+
+- **Identity Verification** — Agents can be required to hold an ERC-8004 identity NFT.
+- **Reputation Gating** — Agents must meet a minimum reputation score from trusted reviewers before accessing user data.
+
+---
+
+## Contract Architecture
+
+```
+PrmissionV2
+├── ReentrancyGuard    (OpenZeppelin - prevents reentrancy attacks)
+├── Pausable           (OpenZeppelin - emergency stop)
+├── Ownable            (OpenZeppelin - admin functions)
+├── IERC8004Identity   (ERC-8004 identity verification)
+└── IERC8004Reputation (ERC-8004 reputation gating)
+```
+
+### Core Functions
+
+| Function | Who Calls It | What It Does |
+|----------|-------------|--------------|
+| `grantPermission()` | User | Grant an agent permission to access data |
+| `revokePermission()` | User | Revoke a previously granted permission |
+| `depositEscrow()` | Agent | Lock USDC to access user data |
+| `reportOutcome()` | Agent | Report what value the data generated |
+| `disputeSettlement()` | User or Agent | Challenge the reported outcome |
+| `settle()` | User, Agent, or Owner | Distribute funds after dispute window |
+| `resolveDispute()` | Owner | Resolve a disputed escrow with custom split |
+| `refundEscrow()` | Agent or Owner | Refund escrow after revocation/dispute |
+
+### Admin Functions
+
+| Function | What It Does |
+|----------|--------------|
+| `setTreasury()` | Update the protocol treasury address |
+| `setIdentityRegistry()` | Set the ERC-8004 identity contract |
+| `setReputationRegistry()` | Set the ERC-8004 reputation contract |
+| `setIdentityEnforcement()` | Toggle identity verification on/off |
+| `setReputationEnforcement()` | Toggle reputation gating on/off |
+| `setTrustedReviewers()` | Set trusted reviewer addresses (max 50) |
+| `pause() / unpause()` | Emergency stop the protocol |
+| `rescueTokens()` | Recover accidentally sent tokens |
+
+---
+
+## Constants
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `PROTOCOL_FEE_BPS` | 300 (3%) | Fee taken by the protocol on every settlement |
+| `DISPUTE_WINDOW` | 24 hours | Time for either party to dispute an outcome |
+| `REVOCATION_GRACE` | 60 seconds | Grace period after permission revocation |
+| `MAX_REVIEWERS` | 50 | Maximum trusted reviewers for reputation |
+| `MAX_COMPENSATION_BPS` | 5000 (50%) | Maximum user compensation percentage |
+
+---
+
+## Development
+
+### Prerequisites
+
+- Node.js (v18-v22 recommended)
+- npm
+
+### Setup
+
+```bash
+git clone https://github.com/marcosbenaim-hub/Prmission-Protocol.git
+cd Prmission-Protocol
+npm install
+```
+
+### Environment Variables
+
+Create a `.env` file:
+
+```env
+DEPLOYER_PRIVATE_KEY=your_private_key_here
+PAYMENT_TOKEN_ADDRESS=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+TREASURY_ADDRESS=your_treasury_address_here
+```
+
+### Compile
+
+```bash
+npx hardhat compile
+```
+
+### Test
+
+```bash
+npx hardhat test
+```
+
+51 tests passing covering all core flows, edge cases, and V2 improvements.
+
+### Deploy
+
+```bash
+npx hardhat run scripts/deployV2.js --network base
+```
+
+### Verify on BaseScan
+
+```bash
+npx hardhat verify --network base <CONTRACT_ADDRESS> "<PAYMENT_TOKEN>" "<TREASURY>"
+```
+
+---
+
+## Security
+
+- **ReentrancyGuard** on all functions that transfer tokens
+- **SafeERC20** for all token transfers
+- **Custom errors** for gas-efficient reverts
+- **Pausable** emergency stop
+- **Compensation cap** at 50% to prevent mathematical edge cases
+- **Escrow math sanity check** ensures compensation + fee never exceeds 100%
+- **Grace period enforcement** on revocation to protect active escrows
+
+---
 
 ## License
 
-MIT License
+MIT
+
+---
+
+## Links
+
+- **BaseScan (Verified):** [View Contract](https://basescan.org/address/0x0c8B16a57524f4009581B748356E01e1a969223d#code)
+- **ERC-8004 Specification:** [EIP-8004](https://eips.ethereum.org/EIPS/eip-8004)
+- **Base Network:** [base.org](https://base.org)
+
+---
+
+Built by [Marcos Benaim](https://github.com/marcosbenaim-hub)
