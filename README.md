@@ -1,8 +1,6 @@
-# Prmission Protocol V2
+# Prmission V2
 
-**Consent-gated data exchange with atomic escrow settlement and ERC-8004 trust verification.**
-
-Prmission is a smart contract protocol that puts users in control of their personal data. Instead of companies harvesting data for free, Prmission creates a marketplace where users grant explicit, revocable permission — and get compensated when their data generates value.
+Prmission Protocol V2 is a consent-gated data exchange protocol built for the AI agent economy. As autonomous agents increasingly need access to personal data — for bookings, recommendations, purchases, and more — Prmission ensures every data interaction requires explicit, revocable user permission with atomic escrow settlement and ERC-8004 trust verification. Users stay in control. Agents pay for access. Everything settles onchain.
 
 ---
 
