@@ -15,5 +15,8 @@ module.exports = {
       url: "https://mainnet.base.org",
       accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : []
     }
+  },
+  etherscan: {
+    apiKey: "DGGURIXD16H7P4HIRXAP35W4SHEJSE918E"
   }
 };
