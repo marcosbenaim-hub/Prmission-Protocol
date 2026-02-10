@@ -1,6 +1,6 @@
-# Prmission V2
+# Prmission 
 
-Prmission Protocol V2 is a consent-gated data exchange protocol built for the AI agent economy. As autonomous agents increasingly need access to personal data — for bookings, recommendations, purchases, and more — Prmission ensures every data interaction requires explicit, revocable user permission with atomic escrow settlement and ERC-8004 trust verification. Users stay in control. Agents pay for access. Everything settles onchain.
+Prmission Protocol is a consent-gated data exchange protocol built for the AI agent economy. As autonomous agents increasingly need access to personal data — for bookings, recommendations, purchases, and more — Prmission ensures every data interaction requires explicit, revocable user permission with atomic escrow settlement and ERC-8004 trust verification. Users stay in control. Agents pay for access. Everything settles onchain.
 
 ---
 
@@ -46,7 +46,7 @@ User grants permission → Agent deposits escrow (USDC)
 
 ## Key Features
 
-### V2 Improvements (from audit)
+### Prmisson Improvements (from audit)
 
 - **Fair Payouts** — User share is calculated from the escrowed amount, not the agent-reported outcome value. This prevents agents from gaming the system.
 - **Outcome Value Capping** — Reported outcome values are capped at the escrow amount to prevent fund locks.
@@ -69,7 +69,7 @@ Prmission integrates with [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) fo
 ## Contract Architecture
 
 ```
-PrmissionV2
+Prmission
 ├── ReentrancyGuard    (OpenZeppelin - prevents reentrancy attacks)
 ├── Pausable           (OpenZeppelin - emergency stop)
 ├── Ownable            (OpenZeppelin - admin functions)
