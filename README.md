@@ -184,7 +184,7 @@ npx hardhat verify --network base <CONTRACT_ADDRESS> "<PAYMENT_TOKEN>" "<TREASUR
 
 ## License
 
-MIT
+Business Source License
 
 ---
 
