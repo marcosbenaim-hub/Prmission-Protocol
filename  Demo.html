@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prmission Protocol — Live Demo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;scrollbar-width:none;-ms-overflow-style:none}
+*::-webkit-scrollbar{display:none}
+body{background:#0d0f14;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;padding:16px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes npulse{0%,100%{box-shadow:0 4px 24px rgba(0,229,160,.2)}50%{box-shadow:0 4px 32px rgba(0,229,160,.5)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script>
+var h=React.createElement;
+var useState=React.useState,useEffect=React.useEffect,useRef=React.useRef;
+var G="#00E5A0",BG="#0a0e17",CD="#111827",BD="#1e293b",DM="#ffffff",TX="#e2e8f0",RD="#FF4444";
+var mn="ui-monospace,'SF Mono','Cascadia Code',monospace";
+var sn="-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif";
+var STEPS=[
+  {fn:"grantPermission()",d:"User defines access terms & fee"},
+  {fn:"depositEscrow()",d:"Agent deposits $25.00 USDC"},
+  {fn:"reportOutcome()",d:"Outcome value: $500.00"},
+  {fn:"disputeSettlement()",d:"24hr window — no disputes"},
+  {fn:"settle()",d:"Fees distributed on-chain"},
+];
+var WTX=[
+  {a:"TravelBot v3.2",m:12.5,t:"2h ago",i:"\u2708\uFE0F",tr:94,r:false},
+  {a:"HealthSync",m:15.0,t:"3h ago",i:"\uD83E\uDE7A",tr:87,r:false},
+  {a:"DineAI",m:8.4,t:"5h ago",i:"\uD83C\uDF7D\uFE0F",tr:91,r:false},
+  {a:"ShopAgent",m:5.2,t:"8h ago",i:"\uD83D\uDED2",tr:78,r:false},
+  {a:"SocialPulse",m:6.8,t:"1d ago",i:"\uD83D\uDCF1",tr:82,r:true},
+  {a:"StreamMatch",m:3.5,t:"1d ago",i:"\uD83C\uDFAC",tr:89,r:true},
+  {a:"CarrierIQ",m:5.0,t:"2d ago",i:"\uD83D\uDCF6",tr:76,r:true},
+];
+var CATS=[
+  {id:"travel",i:"\u2708\uFE0F",l:"Travel",f:2},
+  {id:"health",i:"\uD83E\uDE7A",l:"Health",f:5},
+  {id:"food",i:"\uD83C\uDF7D\uFE0F",l:"Dining",f:1},
+  {id:"social",i:"\uD83D\uDCF1",l:"Social Media",f:2},
+  {id:"streaming",i:"\uD83C\uDFAC",l:"Streaming",f:1},
+  {id:"phone",i:"\uD83D\uDCF6",l:"Phone Carrier",f:1},
+  {id:"creditcard",i:"\uD83D\uDCB3",l:"Credit Card",f:3},
+];
+var DLS=[
+  {a:"DineAI",i:"\uD83C\uDF7D\uFE0F",d:"Dining",tr:91},
+  {a:"TravelBot v3.2",i:"\u2708\uFE0F",d:"Travel",tr:94},
+  {a:"HealthSync",i:"\uD83E\uDE7A",d:"Health",tr:87},
+  {a:"SocialPulse",i:"\uD83D\uDCF1",d:"Social Media",tr:82},
+  {a:"StreamMatch",i:"\uD83C\uDFAC",d:"Streaming",tr:89},
+  {a:"CarrierIQ",i:"\uD83D\uDCF6",d:"Phone Carrier",tr:76},
+  {a:"RewardBot",i:"\uD83D\uDCB3",d:"Credit Card",tr:90},
+  {a:"ShopAgent",i:"\uD83D\uDED2",d:"Dining",tr:78},
+];
+var ETX=[
+  {a:"HealthSync",m:15.0,i:"\uD83E\uDE7A",pf:0.45},
+  {a:"TravelBot v3.2",m:12.5,i:"\u2708\uFE0F",pf:0.38},
+  {a:"DineAI",m:8.4,i:"\uD83C\uDF7D\uFE0F",pf:0.25},
+  {a:"ShopAgent",m:5.2,i:"\uD83D\uDED2",pf:0.15},
+];
+var ATX=[
+  {a:"TravelBot v3.2",m:12.5,t:"2h ago",i:"\u2708\uFE0F",r:false},
+  {a:"HealthSync",m:15.0,t:"3h ago",i:"\uD83E\uDE7A",r:false},
+  {a:"DineAI",m:8.4,t:"5h ago",i:"\uD83C\uDF7D\uFE0F",r:false},
+  {a:"ShopAgent",m:5.2,t:"8h ago",i:"\uD83D\uDED2",r:false},
+  {a:"SocialPulse",m:6.8,t:"1d ago",i:"\uD83D\uDCF1",r:true},
+  {a:"StreamMatch",m:3.5,t:"2d ago",i:"\uD83C\uDFAC",r:true},
+  {a:"CarrierIQ",m:5.0,t:"2d ago",i:"\uD83D\uDCF6",r:true},
+];
+var MSG="TravelBot v3.2 wants access to your Travel Preferences for flight booking optimization. Outcome value: $500.00 USDC. Your fee: 2% ($10.00).";
+var CMP={Travel:"travel",Health:"health",Dining:"food","Social Media":"social",Streaming:"streaming","Phone Carrier":"phone","Credit Card":"creditcard"};
+var DAMT={Travel:2.50,Health:5.00,Dining:1.20,"Social Media":2.00,Streaming:1.00,"Phone Carrier":1.00,"Credit Card":3.00};
+
+function App(){
+  var _vw=useState("home"),vw=_vw[0],setVw=_vw[1];
+  var _pm=useState({travel:false,food:false,health:false,social:false,streaming:false,phone:false,creditcard:false}),pm=_pm[0],setPm=_pm[1];
+  var _st=useState(-1),st=_st[0],setSt=_st[1];
+  var _ea=useState(41.10),ea=_ea[0],setEa=_ea[1];
+  var _nf=useState(false),nf=_nf[0],setNf=_nf[1];
+  var _tp=useState(""),tp=_tp[0],setTp=_tp[1];
+  var _dm=useState(false),dm=_dm[0],setDm=_dm[1];
+  var _pa=useState(false),pa=_pa[0],setPa=_pa[1];
+  var _sd=useState(false),sd=_sd[0],setSd=_sd[1];
+  var _vd=useState([]),vd=_vd[0],setVd=_vd[1];
+  var _pr=useState(1.23),pr=_pr[0],setPr=_pr[1];
+  var _sc=useState(4),sc=_sc[0],setSc=_sc[1];
+  var _ws=useState("idle"),ws=_ws[0],setWs=_ws[1];
+  var _wa=useState(0),wa=_wa[0],setWa=_wa[1];
+  var _dealing=useState(false),dealing=_dealing[0],setDealing=_dealing[1];
+  var tr=useRef([]);
+  var dealRef=useRef(null);
+  var pmRef=useRef(pm);
+  pmRef.current=pm;
+
+  useEffect(function(){
+    if(st!==0||!dm||pa)return;
+    var x=0;setTp("");
+    var iv=setInterval(function(){if(x<MSG.length){x++;setTp(MSG.slice(0,x))}else clearInterval(iv)},18);
+    return function(){clearInterval(iv)};
+  },[st,dm,pa]);
+
+  useEffect(function(){
+    if(!dealing||pa){if(dealRef.current)clearTimeout(dealRef.current);return}
+    var idx=0,speed=2000;
+    var tick=function(){
+      var dl=DLS[idx%DLS.length];
+      var cid=CMP[dl.d];
+      var isOn=pmRef.current[cid];
+      var amt=DAMT[dl.d];
+      var pFee=+(amt*0.03).toFixed(2);
+      setVd(function(p){return [{...dl,rv:!isOn,amt}].concat(p).slice(0,50)});
+      if(isOn){
+        setEa(function(x){return +(x+amt).toFixed(2)});
+        setPr(function(x){return +(x+pFee).toFixed(2)});
+        setSc(function(x){return x+1});
+      }
+      idx++;
+      speed=Math.max(50,Math.floor(speed*0.85));
+      dealRef.current=setTimeout(tick,speed);
+    };
+    dealRef.current=setTimeout(tick,speed);
+    return function(){if(dealRef.current)clearTimeout(dealRef.current)};
+  },[dealing,pa]);
+
+  var clr=function(){tr.current.forEach(clearTimeout);tr.current=[]};
+  var tm=function(fn,ms){tr.current.push(setTimeout(fn,ms))};
+  var run=function(){
+    clr();setDm(true);setPa(false);setVw("home");setSt(-1);setSd(false);setTp("");setDealing(false);setVd([]);
+    tm(function(){setNf(true)},600);
+    tm(function(){setNf(false);setVw("request");setSt(0)},2600);
+    tm(function(){setSt(1)},5200);
+    tm(function(){setSt(2)},7200);
+    tm(function(){setSt(3)},9200);
+    tm(function(){setSt(4);setSd(true);setEa(function(x){return +(x+10).toFixed(2)});setPr(function(x){return +(x+0.30).toFixed(2)});setSc(function(x){return x+1})},11200);
+    tm(function(){setVw("home");setSt(-1);setDm(false);setDealing(true)},14000);
+  };
+  var stop=function(){clr();setDm(false);setPa(false);setSt(-1);setSd(false);setTp("");setNf(false);setVw("home");setDealing(false);setVd([])};
+  var reset=function(){stop();setEa(41.10);setPr(1.23);setSc(4);setPm({travel:false,food:false,health:false,social:false,streaming:false,phone:false,creditcard:false})};
+  var cv=vw==="request"?"home":vw;
+  var tc=function(t){return t>=90?G:t>=80?"#FFD700":"#FF8C00"};
+  var active=dm||dealing;
+
+  var autoStarted=useRef(false);
+  useEffect(function(){
+    if(autoStarted.current)return;
+    autoStarted.current=true;
+    setTimeout(function(){
+      setPm({travel:true,food:true,health:true,social:true,streaming:true,phone:true,creditcard:true});
+      setTimeout(function(){run()},500);
+    },2000);
+  },[]);
+
+  var DealFeed=function(){
+    return vd.length>0?
+      h("div",{style:{marginBottom:8}},
+        h("div",{style:{fontSize:9,fontFamily:mn,color:G,letterSpacing:1,textTransform:"uppercase",marginBottom:6,display:"flex",alignItems:"center",gap:6}},
+          h("div",{style:{width:5,height:5,borderRadius:"50%",background:G,boxShadow:"0 0 6px "+G,animation:"pulse 1s ease-in-out infinite"}}),
+          "Live Settlements"
+        ),
+        vd.map(function(d,i){
+          return h("div",{key:i,style:{display:"flex",alignItems:"center",gap:8,padding:"5px 10px",background:d.rv?RD+"08":G+"08",border:"1px solid "+(d.rv?RD+"20":G+"20"),borderRadius:8,marginBottom:3}},
+            h("span",{style:{fontSize:14,opacity:d.rv?.5:1}},d.i),
+            h("div",{style:{flex:1}},
+              h("div",{style:{fontSize:10,fontWeight:600,color:d.rv?DM:TX}},d.a),
+              h("div",{style:{fontSize:7,color:d.rv?RD:DM,fontFamily:mn}},d.rv?"REVOKED":"+$"+d.amt.toFixed(2))
+            ),
+            h("div",{style:{fontSize:10,fontWeight:700,color:d.rv?RD:G,fontFamily:mn,textDecoration:d.rv?"line-through":"none"}},"$"+d.amt.toFixed(2))
+          );
+        })
+      ):null;
+  };
+
+  return h("div",{style:{display:"flex",flexWrap:"wrap",alignItems:"flex-start",justifyContent:"center",gap:24,maxWidth:700}},
+
+    h("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:12}},
+      h("div",{style:{fontSize:14,fontWeight:800,color:G,fontFamily:mn,letterSpacing:2}},"PRMISSION"),
+      h("div",{style:{fontSize:10,color:DM,fontFamily:mn,marginTop:-8}},"The economic layer for AI agent commerce"),
+
+      h("div",{style:{width:300,height:600,borderRadius:36,background:"#000",padding:3,boxShadow:"0 0 0 2px #333,0 20px 60px rgba(0,0,0,.6)"}},
+        h("div",{style:{width:"100%",height:"100%",borderRadius:33,background:BG,overflow:"hidden",display:"flex",flexDirection:"column",position:"relative"}},
+
+          h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 20px 2px",fontSize:12,fontWeight:600,color:TX,position:"relative"}},
+            h("span",null,"9:41"),
+            h("div",{style:{position:"absolute",left:"50%",top:4,transform:"translateX(-50%)",width:72,height:22,background:"#000",borderRadius:11}}),
+            h("span",{style:{fontSize:10}},"\uD83D\uDD0B")
+          ),
+
+          nf?h("div",{style:{position:"absolute",top:34,left:8,right:8,zIndex:100,background:"#1a2332ee",border:"1px solid "+G+"40",borderRadius:12,padding:"8px 10px",animation:"slideDown .3s ease,npulse 1.5s ease-in-out infinite",display:"flex",alignItems:"center",gap:8}},
+            h("div",{style:{width:28,height:28,borderRadius:7,background:G+"20",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}},"\u2708\uFE0F"),
+            h("div",{style:{flex:1}},
+              h("div",{style:{fontSize:10,fontWeight:700,color:TX}},"TravelBot v3.2"),
+              h("div",{style:{fontSize:8,color:DM}},"Requesting Travel data...")
+            ),
+            h("div",{style:{fontSize:8,color:G,fontFamily:mn}},"now")
+          ):null,
+
+          h("div",{style:{padding:"10px 16px 8px",display:"flex",alignItems:"center",justifyContent:"space-between"}},
+            h("span",{style:{fontSize:17,fontWeight:700,color:TX}},vw==="home"?"Wallet":vw==="request"?"Permission Request":vw==="locker"?"Data Locker":vw==="earnings"?"Earnings":"Activity"),
+            h("span",{style:{fontSize:13,fontWeight:800,color:G,fontFamily:mn}},"Prmission")
+          ),
+
+          vw==="home"?h("div",{style:{flex:1,overflowY:"auto",padding:"0 14px 14px"}},
+            h("div",{style:{textAlign:"center",padding:"14px 0"}},
+              h("div",{style:{fontSize:9,fontFamily:mn,color:DM,letterSpacing:1.5,textTransform:"uppercase",marginBottom:2}},"Total Earned"),
+              h("div",{style:{fontSize:36,fontWeight:800,color:TX,lineHeight:1,transition:"all .3s"}},"$"+ea.toFixed(2)),
+              h("div",{style:{fontSize:10,color:G,fontFamily:mn,marginTop:3}},"USDC on Base")
+            ),
+            h("div",{style:{display:"flex",gap:6,marginBottom:12}},
+              [{l:"LIVE",s:"Base Mainnet"},{l:"3%",s:"Protocol Fee"},{l:"~3s",s:"Settlement"}].map(function(x,i){
+                return h("div",{key:i,style:{flex:1,background:CD,border:"1px solid "+BD,borderRadius:8,padding:"7px 4px",textAlign:"center"}},
+                  h("div",{style:{fontSize:12,fontWeight:800,color:G,fontFamily:mn}},x.l),
+                  h("div",{style:{fontSize:7,color:"#fff",fontFamily:mn,marginTop:1,letterSpacing:.5,textTransform:"uppercase"}},x.s)
+                );
+              })
+            ),
+            dealing?h(DealFeed):null,
+            !dealing?h(React.Fragment,null,
+              h("div",{style:{fontSize:9,fontFamily:mn,color:DM,letterSpacing:1,textTransform:"uppercase",marginBottom:6}},"Recent Settlements"),
+              WTX.map(function(tx,i){
+                return h("div",{key:i,style:{display:"flex",alignItems:"center",gap:10,padding:"8px 10px",background:tx.r?RD+"08":CD,border:"1px solid "+(tx.r?RD+"20":BD),borderRadius:8,marginBottom:4}},
+                  h("span",{style:{fontSize:16,opacity:tx.r?.5:1}},tx.i),
+                  h("div",{style:{flex:1}},
+                    h("div",{style:{fontSize:11,fontWeight:600,color:tx.r?DM:TX}},tx.a),
+                    h("div",{style:{display:"flex",alignItems:"center",gap:4}},
+                      h("div",{style:{width:36,height:3,borderRadius:2,background:BD,overflow:"hidden"}},
+                        h("div",{style:{width:tx.tr+"%",height:"100%",background:tc(tx.tr),borderRadius:2}})
+                      ),
+                      h("span",{style:{fontSize:8,color:tc(tx.tr),fontFamily:mn}},tx.tr),
+                      h("span",{style:{fontSize:7,color:DM,fontFamily:mn}},"ERC-8004")
+                    )
+                  ),
+                  h("div",{style:{textAlign:"right"}},
+                    h("div",{style:{fontSize:11,fontWeight:700,color:tx.r?RD:G,fontFamily:mn}},(tx.r?"\u2718":"+")+(" $"+tx.m.toFixed(2))),
+                    h("div",{style:{fontSize:7,color:tx.r?RD:DM,fontFamily:mn}},tx.r?"REVOKED":"USDC")
+                  )
+                );
+              })
+            ):null,
+            h("div",{style:{marginTop:8,padding:"7px 10px",background:G+"08",border:"1px solid "+G+"20",borderRadius:8,display:"flex",alignItems:"center",gap:6}},
+              h("div",{style:{width:5,height:5,borderRadius:"50%",background:G,boxShadow:"0 0 6px "+G,animation:"pulse 2s ease-in-out infinite"}}),
+              h("span",{style:{fontSize:8,fontFamily:mn,color:G+"bb"}},"Live on Base Mainnet \u00b7 0x0c8B...223d")
+            )
+          ):null,
+
+          vw==="request"?h("div",{style:{flex:1,overflowY:"auto",padding:"0 14px 14px"}},
+            h("div",{style:{textAlign:"center",padding:"10px 0"}},
+              h("div",{style:{width:40,height:40,borderRadius:10,background:G+"15",border:"1px solid "+G+"30",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 6px",fontSize:20}},"\u2708\uFE0F"),
+              h("div",{style:{fontSize:13,fontWeight:700,color:TX}},"TravelBot v3.2"),
+              h("div",{style:{fontSize:8,color:DM,fontFamily:mn,marginTop:2}},"Trust: 94 \u00b7 ERC-8004")
+            ),
+            h("div",{style:{background:CD,border:"1px solid "+BD,borderRadius:10,padding:12,marginBottom:8}},
+              h("div",{style:{fontSize:9,fontFamily:mn,color:DM,letterSpacing:1,textTransform:"uppercase",marginBottom:6}},"Permission Request"),
+              h("div",{style:{fontSize:11,color:TX,lineHeight:1.5,minHeight:40}},
+                tp||h("span",{style:{color:DM}},"Loading request..."),
+                tp.length<MSG.length&&tp.length>0?h("span",{style:{display:"inline-block",width:2,height:12,background:G,marginLeft:1,animation:"blink .8s step-end infinite"}}):null
+              )
+            ),
+            h("div",{style:{background:CD,border:"1px solid "+BD,borderRadius:10,padding:10,marginBottom:8}},
+              h("div",{style:{fontSize:9,fontFamily:mn,color:DM,letterSpacing:1,textTransform:"uppercase",marginBottom:6}},"Fee Breakdown"),
+              [{l:"User (2%)",v:"$10.00",c:G},{l:"Protocol (3%)",v:"$0.30",c:G},{l:"Agent pays",v:"$10.30",c:TX}].map(function(r,i){
+                return h("div",{key:i,style:{display:"flex",justifyContent:"space-between",padding:"3px 0",borderBottom:i<2?"1px solid "+BD:"none"}},
+                  h("span",{style:{fontSize:10,color:DM,fontFamily:mn}},r.l),
+                  h("span",{style:{fontSize:10,color:r.c,fontFamily:mn,fontWeight:600}},r.v)
+                );
+              })
+            ),
+            h("div",{style:{display:"flex",flexDirection:"column",gap:4,marginBottom:10}},
+              STEPS.map(function(s,i){
+                return h("div",{key:i,style:{display:"flex",alignItems:"center",gap:8,padding:"7px 10px",background:st>i?G+"12":st===i?G+"08":CD,border:"1px solid "+(st>i?G+"40":st===i?G+"30":BD),borderRadius:8,transition:"all .5s",position:"relative",overflow:"hidden"}},
+                  st===i?h("div",{style:{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,transparent,"+G+",transparent)",animation:"shimmer 1.5s linear infinite"}}):null,
+                  h("div",{style:{width:18,height:18,borderRadius:9,background:st>i?G:st===i?G+"25":BD,display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:800,color:st>i?BG:st===i?G:DM}},st>i?"\u2713":i+1),
+                  h("div",{style:{flex:1}},
+                    h("div",{style:{fontSize:8,fontFamily:mn,color:st>=i?G:DM,fontWeight:600}},s.fn),
+                    h("div",{style:{fontSize:9,color:st===i?TX:DM}},s.d)
+                  ),
+                  st===i?h("div",{style:{width:5,height:5,borderRadius:"50%",background:G,boxShadow:"0 0 6px "+G,animation:"pulse 1.5s ease-in-out infinite"}}):null
+                );
+              })
+            ),
+            sd?h("div",{style:{background:G+"15",border:"1px solid "+G+"40",borderRadius:10,padding:12,textAlign:"center",animation:"fadeIn .5s ease"}},
+              h("div",{style:{fontSize:20,marginBottom:4}},"\u2705"),
+              h("div",{style:{fontSize:13,fontWeight:700,color:G}},"Settlement Complete"),
+              h("div",{style:{fontSize:10,color:TX,fontFamily:mn,marginTop:2}},"+$10.00 USDC credited")
+            ):null
+          ):null,
+
+          vw==="locker"?h("div",{style:{flex:1,overflowY:"auto",padding:"0 14px 14px"}},
+            h("div",{style:{fontSize:9,fontFamily:mn,color:DM,letterSpacing:1,textTransform:"uppercase",marginBottom:6}},"Data Locker"),
+            h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}},
+              CATS.map(function(c){
+                var on=pm[c.id];
+                return h("button",{key:c.id,onClick:function(){setPm(function(p){var n={};for(var k in p)n[k]=p[k];n[c.id]=!p[c.id];return n})},style:{background:on?G+"08":CD,border:"1px solid "+(on?G+"30":BD),borderRadius:10,padding:9,cursor:"pointer",textAlign:"left",transition:"all .3s"}},
+                  h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}},
+                    h("span",{style:{fontSize:18}},c.i),
+                    h("div",{style:{width:32,height:18,borderRadius:9,background:on?G:BD,position:"relative",transition:"all .3s",border:"1px solid "+(on?G+"60":BD)}},
+                      h("div",{style:{width:12,height:12,borderRadius:6,background:on?BG:DM,position:"absolute",top:2,left:on?16:2,transition:"all .3s"}})
+                    )
+                  ),
+                  h("div",{style:{fontSize:10,fontWeight:600,color:on?TX:DM,marginBottom:1}},c.l),
+                  h("div",{style:{fontSize:7,fontFamily:mn,color:on?G:DM}},"Fee: "+c.f+"%")
+                );
+              })
+            )
+          ):null,
+
+          vw==="earnings"?h("div",{style:{flex:1,overflowY:"auto",padding:"0 14px 14px"}},
+            h("div",{style:{textAlign:"center",padding:"14px 0"}},
+              h("div",{style:{fontSize:9,fontFamily:mn,color:DM,letterSpacing:1.5,textTransform:"uppercase",marginBottom:2}},"Available to Withdraw"),
+              h("div",{style:{fontSize:36,fontWeight:800,color:G,lineHeight:1,transition:"all .3s"}},"$"+ea.toFixed(2)),
+              h("div",{style:{fontSize:10,color:DM,fontFamily:mn,marginTop:3}},"USDC on Base")
+            ),
+            ws!=="idle"?h("div",{style:{background:CD,border:"1px solid "+(ws==="done"?G+"40":BD),borderRadius:12,padding:14,marginBottom:10,animation:"fadeIn .4s ease"}},
+              h("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:10}},
+                [{lb:"USDC",cl:"#2775CA",ac:ws==="converting"},{lb:"USD",cl:G,ac:ws==="depositing"||ws==="done"},{lb:"Bank",cl:G,ac:ws==="done",em:"\uD83C\uDFE6"}].map(function(s,i){
+                  return h("div",{key:i,style:{display:"flex",alignItems:"center",gap:6}},
+                    h("div",{style:{textAlign:"center",opacity:s.ac?1:.3,transition:"all .5s"}},
+                      h("div",{style:{width:32,height:32,borderRadius:16,background:s.cl+"15",border:"1px solid "+s.cl+"40",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 3px",fontSize:s.em?14:12,fontWeight:800,color:s.cl,fontFamily:mn}},s.em||"$"),
+                      h("div",{style:{fontSize:7,color:s.cl,fontFamily:mn}},s.lb)
+                    ),
+                    i<2?h("div",{style:{fontSize:12,color:DM,marginTop:-10}},"\u2192"):null
+                  );
+                })
+              ),
+              h("div",{style:{textAlign:"center"}},
+                ws==="converting"?h("div",{style:{fontSize:10,color:"#2775CA",fontFamily:mn,animation:"pulse 1s ease-in-out infinite"}},"Converting $"+wa.toFixed(2)+" USDC \u2192 USD..."):null,
+                ws==="depositing"?h("div",{style:{fontSize:10,color:G,fontFamily:mn,animation:"pulse 1s ease-in-out infinite"}},"Depositing $"+wa.toFixed(2)+" to bank..."):null,
+                ws==="done"?h("div",{style:{animation:"fadeIn .4s ease"}},
+                  h("div",{style:{fontSize:16,marginBottom:3}},"\u2705"),
+                  h("div",{style:{fontSize:12,fontWeight:700,color:G}},"Deposit Confirmed"),
+                  h("div",{style:{fontSize:9,color:TX,fontFamily:mn,marginTop:2}},"$"+wa.toFixed(2)+" USD deposited instantly")
+                ):null
+              )
+            ):null,
+            ws==="idle"&&ea>0?h("button",{onClick:function(){setWa(ea);setWs("converting");setTimeout(function(){setWs("depositing")},1800);setTimeout(function(){setWs("done");setEa(0)},3600);setTimeout(function(){setWs("idle")},6000)},style:{width:"100%",padding:11,background:G,color:BG,border:"none",borderRadius:10,fontSize:12,fontWeight:700,fontFamily:mn,cursor:"pointer",marginBottom:10,boxShadow:"0 4px 16px "+G+"40"}},"WITHDRAW $"+ea.toFixed(2)+" \u2192 BANK"):null,
+            h("div",{style:{fontSize:9,fontFamily:mn,color:DM,letterSpacing:1,textTransform:"uppercase",marginBottom:6}},"Earnings by Agent"),
+            ETX.map(function(tx,i){
+              return h("div",{key:i,style:{display:"flex",alignItems:"center",gap:10,padding:"8px 10px",background:CD,border:"1px solid "+BD,borderRadius:8,marginBottom:4}},
+                h("span",{style:{fontSize:16}},tx.i),
+                h("div",{style:{flex:1}},
+                  h("div",{style:{fontSize:11,fontWeight:600,color:TX}},tx.a),
+                  h("div",{style:{fontSize:7,color:DM,fontFamily:mn}},"Protocol 3%: $"+tx.pf.toFixed(2))
+                ),
+                h("div",{style:{fontSize:12,fontWeight:700,color:G,fontFamily:mn}},"+$"+tx.m.toFixed(2))
+              );
+            }),
+            h("div",{style:{marginTop:8,padding:"8px 10px",background:CD,border:"1px solid "+BD,borderRadius:8}},
+              h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
+                h("span",{style:{fontSize:8,color:DM,fontFamily:mn}},"Your earnings (user fees)"),
+                h("span",{style:{fontSize:8,color:G,fontFamily:mn,fontWeight:700}},"$41.10")
+              ),
+              h("div",{style:{display:"flex",justifyContent:"space-between"}},
+                h("span",{style:{fontSize:8,color:DM,fontFamily:mn}},"Protocol collected (3%)"),
+                h("span",{style:{fontSize:8,color:G,fontFamily:mn,fontWeight:700}},"$1.23")
+              )
+            )
+          ):null,
+
+          vw==="activity"?h("div",{style:{flex:1,overflowY:"auto",padding:"0 14px 14px"}},
+            dealing?h(DealFeed):null,
+            h("div",{style:{fontSize:9,fontFamily:mn,color:DM,letterSpacing:1,textTransform:"uppercase",marginBottom:8}},"Settlement History"),
+            ATX.map(function(tx,i){
+              return h("div",{key:i,style:{padding:9,background:tx.r?RD+"08":CD,border:"1px solid "+(tx.r?RD+"20":BD),borderRadius:8,marginBottom:4}},
+                h("div",{style:{display:"flex",alignItems:"center",gap:8}},
+                  h("span",{style:{fontSize:14,opacity:tx.r?.5:1}},tx.i),
+                  h("div",{style:{flex:1}},
+                    h("div",{style:{fontSize:11,fontWeight:600,color:tx.r?DM:TX}},tx.a),
+                    h("div",{style:{fontSize:8,color:DM,fontFamily:mn}},tx.t)
+                  ),
+                  h("div",{style:{textAlign:"right"}},
+                    h("div",{style:{fontSize:11,fontWeight:700,color:tx.r?RD:G,fontFamily:mn}},(tx.r?"\u2718":"+")+(" $"+tx.m.toFixed(2))),
+                    h("div",{style:{fontSize:7,color:tx.r?RD:DM,fontFamily:mn}},tx.r?"REVOKED":"USDC")
+                  )
+                ),
+                h("div",{style:{display:"flex",gap:4,marginTop:5}},
+                  tx.r?
+                    [{t:"Consent \u2713",c:G},{t:"Escrow \u2718",c:RD},{t:"Revoked",c:RD}].map(function(tg,j){return h("span",{key:j,style:{fontSize:7,fontFamily:mn,color:tg.c,background:tg.c+"12",border:"1px solid "+tg.c+"25",borderRadius:4,padding:"2px 5px"}},tg.t)}):
+                    ["Consent \u2713","Escrow \u2713","Settled \u2713"].map(function(t,j){return h("span",{key:j,style:{fontSize:7,fontFamily:mn,color:G,background:G+"12",border:"1px solid "+G+"25",borderRadius:4,padding:"2px 5px"}},t)})
+                )
+              );
+            }),
+            h("div",{style:{marginTop:8,padding:"8px 10px",background:CD,border:"1px solid "+BD,borderRadius:8,textAlign:"center"}},
+              h("div",{style:{fontSize:9,fontFamily:mn,color:DM}},"Settled: ",h("span",{style:{color:G,fontWeight:700}},"$41.10")," \u00b7 Revoked: ",h("span",{style:{color:RD,fontWeight:700}},"$15.30"))
+            )
+          ):null,
+
+          h("div",{style:{display:"flex",justifyContent:"space-around",padding:"5px 0 8px",borderTop:"1px solid "+BD,background:"#0d111780"}},
+            [{id:"home",ic:"\u25C9",lb:"Wallet"},{id:"locker",ic:"\u229E",lb:"Data"},{id:"earnings",ic:"$",lb:"Earn"},{id:"activity",ic:"\u21C4",lb:"Activity"}].map(function(n){
+              return h("button",{key:n.id,onClick:function(){if(!dm)setVw(n.id)},style:{background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:1,padding:"2px 8px"}},
+                h("span",{style:{fontSize:n.id==="earnings"?16:14,fontWeight:n.id==="earnings"?800:400,color:cv===n.id?G:DM,fontFamily:n.id==="earnings"?mn:sn}},n.ic),
+                h("span",{style:{fontSize:7,fontWeight:600,color:cv===n.id?G:DM}},n.lb)
+              );
+            })
+          ),
+          h("div",{style:{display:"flex",justifyContent:"center",paddingBottom:4}},
+            h("div",{style:{width:80,height:4,borderRadius:2,background:"#333"}})
+          )
+        )
+      ),
+
+      h("div",{style:{display:"flex",gap:6}},
+        h("button",{onClick:function(){setPa(function(p){return !p})},disabled:!active,style:{border:"none",borderRadius:8,fontFamily:mn,fontWeight:700,cursor:"pointer",padding:"9px 16px",fontSize:11,background:"#A855F7",color:"#000",opacity:active?1:.4,boxShadow:active?"0 4px 20px #A855F740":"none"}},pa?"\u25B6 Resume":"\u23F8 Pause"),
+        h("button",{onClick:run,style:{border:"none",borderRadius:8,fontFamily:mn,fontWeight:700,cursor:"pointer",padding:"9px 22px",fontSize:11,background:active?DM:G,color:BG,boxShadow:active?"none":"0 4px 20px "+G+"40"}},active?"RUNNING...":"\u25B6 RUN DEMO"),
+        h("button",{onClick:stop,disabled:!active,style:{border:"none",borderRadius:8,fontFamily:mn,fontWeight:700,cursor:"pointer",padding:"9px 16px",fontSize:11,background:"#EF4444",color:"#000",opacity:active?1:.4,boxShadow:active?"0 4px 20px #EF444440":"none"}},"\u25A0 Stop")
+      ),
+      h("button",{onClick:reset,style:{border:"none",borderRadius:8,fontFamily:mn,fontWeight:700,cursor:"pointer",padding:"7px 20px",fontSize:10,background:"#FACC15",color:"#000",boxShadow:"0 4px 20px #FACC1540"}},"\u21BB Reset All")
+    ),
+
+    h("div",{style:{width:260,display:"flex",flexDirection:"column",gap:10}},
+
+      h("div",{style:{background:G+"10",border:"1px solid "+G+"30",borderRadius:12,padding:14,textAlign:"center"}},
+        h("div",{style:{fontSize:11,fontFamily:mn,color:G,letterSpacing:1.5,textTransform:"uppercase",fontWeight:700,marginBottom:4}},"Money Flow"),
+        h("div",{style:{fontSize:9,color:DM,fontFamily:mn,lineHeight:1.5}},"Every settlement splits fees on-chain in real time")
+      ),
+
+      h("div",{style:{background:CD,border:"1px solid "+BD,borderRadius:12,padding:14,position:"relative"}},
+        h("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:6}},
+          h("div",{style:{width:28,height:28,borderRadius:14,background:G+"20",border:"1px solid "+G+"40",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}},"\uD83D\uDC64"),
+          h("div",null,
+            h("div",{style:{fontSize:10,fontWeight:700,color:TX}},"User Wallet"),
+            h("div",{style:{fontSize:7,color:DM,fontFamily:mn}},"0x7a3F...e91B")
+          )
+        ),
+        h("div",{style:{fontSize:26,fontWeight:800,color:G,fontFamily:mn,transition:"all .3s"}},"$"+ea.toFixed(2)),
+        h("div",{style:{fontSize:8,color:DM,fontFamily:mn,marginTop:2}},"USDC earned from data permissions")
+      ),
+
+      h("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:2}},
+        h("div",{style:{width:2,height:16,background:dealing?G:BD,transition:"all .3s",boxShadow:dealing?"0 0 8px "+G:"none"}}),
+        h("div",{style:{background:dealing?G+"20":"transparent",border:"1px solid "+(dealing?G+"50":BD),borderRadius:8,padding:"4px 12px",display:"flex",alignItems:"center",gap:6}},
+          h("span",{style:{fontSize:9,fontFamily:mn,color:G,fontWeight:700}},"3%"),
+          h("span",{style:{fontSize:8,color:DM,fontFamily:mn}},"protocol fee"),
+          dealing?h("div",{style:{width:4,height:4,borderRadius:"50%",background:G,boxShadow:"0 0 6px "+G,animation:"pulse .5s ease-in-out infinite"}}):null
+        ),
+        h("div",{style:{width:2,height:16,background:dealing?G:BD,transition:"all .3s",boxShadow:dealing?"0 0 8px "+G:"none"}}),
+        h("div",{style:{fontSize:14,color:dealing?G:DM,transition:"all .3s"}},"\u2193")
+      ),
+
+      h("div",{style:{background:"#0f1a12",border:"1px solid "+G+"40",borderRadius:12,padding:14,boxShadow:dealing?"0 0 20px "+G+"15":"none",transition:"all .3s"}},
+        h("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:6}},
+          h("div",{style:{width:28,height:28,borderRadius:14,background:G+"30",border:"1px solid "+G+"60",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}},"\uD83D\uDC51"),
+          h("div",null,
+            h("div",{style:{fontSize:10,fontWeight:700,color:G}},"Owner Wallet"),
+            h("div",{style:{fontSize:7,color:DM,fontFamily:mn}},"0x0c8B...223d \u00b7 Base")
+          )
+        ),
+        h("div",{style:{fontSize:28,fontWeight:800,color:G,fontFamily:mn,lineHeight:1,transition:"all .3s",textShadow:dealing?"0 0 12px "+G+"60":"none"}},"$"+pr.toFixed(2)),
+        h("div",{style:{fontSize:8,color:DM,fontFamily:mn,marginTop:4}},"3% of every settlement \u2192 your wallet"),
+        dealing?h("div",{style:{marginTop:8,padding:"5px 8px",background:G+"10",borderRadius:6,display:"flex",alignItems:"center",gap:6}},
+          h("div",{style:{width:4,height:4,borderRadius:"50%",background:G,boxShadow:"0 0 6px "+G,animation:"pulse .3s ease-in-out infinite"}}),
+          h("span",{style:{fontSize:8,fontFamily:mn,color:G}},"Receiving funds...")
+        ):null
+      ),
+
+      h("div",{style:{background:CD,border:"1px solid "+BD,borderRadius:12,padding:12}},
+        h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:6}},
+          h("span",{style:{fontSize:8,color:DM,fontFamily:mn}},"Settlements"),
+          h("span",{style:{fontSize:8,color:TX,fontFamily:mn,fontWeight:700}},sc)
+        ),
+        h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:6}},
+          h("span",{style:{fontSize:8,color:DM,fontFamily:mn}},"User earned"),
+          h("span",{style:{fontSize:8,color:G,fontFamily:mn,fontWeight:700}},"$"+ea.toFixed(2))
+        ),
+        h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:6}},
+          h("span",{style:{fontSize:8,color:DM,fontFamily:mn}},"Owner collected (3%)"),
+          h("span",{style:{fontSize:8,color:G,fontFamily:mn,fontWeight:700}},"$"+pr.toFixed(2))
+        ),
+        h("div",{style:{display:"flex",justifyContent:"space-between"}},
+          h("span",{style:{fontSize:8,color:DM,fontFamily:mn}},"Verify: 3% of user"),
+          h("span",{style:{fontSize:8,color:DM,fontFamily:mn,fontWeight:700}},"$"+(ea*0.03).toFixed(2))
+        )
+      ),
+
+      h("div",{style:{background:G+"08",border:"1px solid "+G+"20",borderRadius:10,padding:10}},
+        h("div",{style:{fontSize:8,fontFamily:mn,color:G,marginBottom:4,fontWeight:700}},"EVERY SETTLEMENT"),
+        h("div",{style:{fontSize:8,color:DM,fontFamily:mn,lineHeight:1.7}},
+          "Agent pays \u2192 Smart Contract",h("br"),
+          "\u2192 User gets their fee",h("br"),
+          "\u2192 ",h("span",{style:{color:G,fontWeight:700}},"3% \u2192 Owner Wallet"),h("br"),
+          "\u2192 Agent gets remainder",h("br"),
+          "All on-chain \u00b7 Immutable \u00b7 Base L2"
+        )
+      ),
+
+      h("div",{style:{display:"flex",gap:6}},
+        [{l:"COSS",s:"Open Source"},{l:"3%",s:"Hardcoded"},{l:"Base",s:"ID: 8453"}].map(function(x,i){
+          return h("div",{key:i,style:{flex:1,textAlign:"center",background:CD,border:"1px solid "+BD,borderRadius:8,padding:"5px 2px"}},
+            h("div",{style:{fontSize:11,fontWeight:800,color:G,fontFamily:mn}},x.l),
+            h("div",{style:{fontSize:6,color:"#fff",fontFamily:mn,textTransform:"uppercase"}},x.s)
+          );
+        })
+      ),
+      h("div",{style:{fontSize:7,color:DM+"80",fontFamily:mn,textAlign:"center"}},"prmission.com")
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+</script>
+</body>
+</html>
