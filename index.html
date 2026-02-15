@@ -79,6 +79,26 @@
       font-size: clamp(16px, 1.7vw, 24px);
     }
 
+    .hero-actions {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .cta {
+      display: inline-block;
+      border: 1px solid #1ad09a;
+      background: var(--green);
+      color: #02120d;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
     .live {
       margin-top: 14px;
       border: 1px solid #1ad09a;
@@ -243,6 +263,9 @@
       <p class="eyebrow">AI Agent Commerce</p>
       <h1>OpenAI gave agents a brain.<br>Google and Apple gave them reach.<br><span class="accent">Prmission gives us a wallet.</span></h1>
       <p class="sub">The economic layer for AI agent commerce: permission, escrow, and settlement.</p>
+      <div class="hero-actions">
+        <a class="cta" href="#waitlist">Join Waitlist</a>
+      </div>
       <div class="live">Live on Base Mainnet • 3% protocol fee (300 bps) hardcoded on-chain • 0x0c8B16a57524f4009581B748356E01e1a969223d</div>
       <div class="stats">
         <div class="stat"><b>3%</b><span>Protocol Fee</span></div>
@@ -300,16 +323,19 @@
     </section>
 
     <section class="section" id="waitlist">
-      <h2 class="title">Contact + Waitlist (Launching Soon)</h2>
-      <p class="body">Marcos Benaim built Prmission from zero to live Base mainnet deployment with working consent, escrow, and settlement mechanics.</p>
+      <h2 class="title">Waitlist</h2>
+      <p class="body">Marcos Benaim built Prmission from zero to a live Base mainnet protocol with working consent, escrow, and settlement. Now focused on scaling integrations and building the core team with YC support.</p>
       <div class="waitlist">
         <h3>Join the Waitlist</h3>
         <details class="dropdown">
           <summary>Click to join waitlist</summary>
-          <form class="form" action="mailto:marcos@prmission.com" method="post" enctype="text/plain" onsubmit="event.preventDefault(); this.querySelector('button[type=submit]').textContent='Confirmed'; this.reset();">
+          <form class="form" id="waitlist-form" action="https://formsubmit.co/ajax/marcos@prmission.com" method="post">
+            <input type="hidden" name="_subject" value="Prmission Waitlist Signup">
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_template" value="table">
             <input type="text" name="name" placeholder="Full name" required>
             <input type="email" name="email" placeholder="Email" required>
-            <button type="submit">Join Waitlist</button>
+            <button type="submit" id="waitlist-button">Join Waitlist</button>
           </form>
         </details>
       </div>
@@ -324,5 +350,45 @@
       </span>
     </footer>
   </main>
+  <script>
+    // Lightweight analytics without external dashboard setup.
+    fetch("https://api.countapi.xyz/hit/prmission.com/pageviews");
+
+    const waitlistForm = document.getElementById("waitlist-form");
+    const waitlistButton = document.getElementById("waitlist-button");
+
+    waitlistForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const previous = waitlistButton.textContent;
+      waitlistButton.textContent = "Submitting...";
+      waitlistButton.disabled = true;
+
+      try {
+        const payload = new FormData(waitlistForm);
+        const response = await fetch(waitlistForm.action, {
+          method: "POST",
+          body: payload,
+          headers: { "Accept": "application/json" }
+        });
+
+        if (!response.ok) throw new Error("submit_failed");
+
+        waitlistButton.textContent = "Confirmed";
+        waitlistForm.reset();
+        fetch("https://api.countapi.xyz/hit/prmission.com/waitlist_signups");
+
+        setTimeout(() => {
+          waitlistButton.textContent = "Join Waitlist";
+          waitlistButton.disabled = false;
+        }, 1800);
+      } catch (error) {
+        waitlistButton.textContent = "Try Again";
+        setTimeout(() => {
+          waitlistButton.textContent = previous;
+          waitlistButton.disabled = false;
+        }, 1800);
+      }
+    });
+  </script>
 </body>
 </html>
