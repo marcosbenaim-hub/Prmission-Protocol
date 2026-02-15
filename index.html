@@ -306,10 +306,10 @@
         <h3>Join the Waitlist</h3>
         <details class="dropdown">
           <summary>Click to join waitlist</summary>
-          <form class="form" action="mailto:marcos@prmission.com" method="post" enctype="text/plain">
+          <form class="form" action="mailto:marcos@prmission.com" method="post" enctype="text/plain" onsubmit="event.preventDefault(); this.querySelector('button[type=submit]').textContent='Confirmed'; this.reset();">
             <input type="text" name="name" placeholder="Full name" required>
             <input type="email" name="email" placeholder="Email" required>
-            <button type="submit" onclick="this.textContent='Confirmed'; this.disabled=true;">Join Waitlist</button>
+            <button type="submit">Join Waitlist</button>
           </form>
         </details>
       </div>
