@@ -44,22 +44,13 @@
       height: 70px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
     }
 
     .brand {
       color: var(--green);
       font: 800 clamp(24px, 2.6vw, 34px) ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       letter-spacing: .6px;
-    }
-
-    .pill {
-      border: 1px solid #1ad09a;
-      color: var(--green);
-      border-radius: 10px;
-      padding: 7px 12px;
-      font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      letter-spacing: 1px;
     }
 
     .hero { padding: 56px 0 24px; }
@@ -244,7 +235,6 @@
   <header class="top">
     <div class="wrap nav">
       <div class="brand">Prmission</div>
-      <div class="pill">YC S26</div>
     </div>
   </header>
 
@@ -319,7 +309,7 @@
           <form class="form" action="mailto:marcos@prmission.com" method="post" enctype="text/plain">
             <input type="text" name="name" placeholder="Full name" required>
             <input type="email" name="email" placeholder="Email" required>
-            <button type="submit">Join Waitlist</button>
+            <button type="submit" onclick="this.textContent='Confirmed'; this.disabled=true;">Join Waitlist</button>
           </form>
         </details>
       </div>
