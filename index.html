@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prmission | The Economic Layer for AI Agent Commerce</title>
+  <meta name="description" content="Prmission is a consent-gated escrow and settlement protocol for AI agent commerce. Live on Base mainnet with a fixed 3% protocol fee.">
+  <style>
+    :root {
+      --bg: #060b14;
+      --panel: #0d1628;
+      --line: #203556;
+      --text: #e8edf8;
+      --muted: #9ca8bf;
+      --green: #00e5a0;
+      --max: 1100px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 500px at 88% 2%, rgba(0,229,160,.12), transparent 60%),
+        radial-gradient(850px 360px at 8% 92%, rgba(0,140,255,.08), transparent 64%),
+        var(--bg);
+      line-height: 1.45;
+    }
+
+    .wrap { width: min(var(--max), 92vw); margin: 0 auto; }
+
+    .top {
+      border-bottom: 1px solid #11243d;
+      background: rgba(6,11,20,.85);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .nav {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      color: var(--green);
+      font: 800 clamp(24px, 2.6vw, 34px) ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      letter-spacing: .6px;
+    }
+
+    .pill {
+      border: 1px solid #1ad09a;
+      color: var(--green);
+      border-radius: 10px;
+      padding: 7px 12px;
+      font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      letter-spacing: 1px;
+    }
+
+    .hero { padding: 56px 0 24px; }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      line-height: 1.05;
+      letter-spacing: -.8px;
+      font-size: clamp(34px, 6.2vw, 68px);
+    }
+
+    .accent { color: var(--green); }
+
+    .sub {
+      margin: 0;
+      color: #d0d9eb;
+      max-width: 900px;
+      font-size: clamp(16px, 1.7vw, 24px);
+    }
+
+    .live {
+      margin-top: 14px;
+      border: 1px solid #1ad09a;
+      border-radius: 999px;
+      padding: 9px 12px;
+      color: var(--green);
+      font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: linear-gradient(90deg, rgba(0,229,160,.11), rgba(0,229,160,.03));
+      overflow-wrap: anywhere;
+    }
+
+    .stats, .cards { display: grid; gap: 10px; }
+    .stats { margin-top: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .cards { margin-top: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .stat, .card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(16,26,44,.95), rgba(11,18,32,.95));
+      padding: 12px;
+    }
+
+    .stat b {
+      display: block;
+      color: var(--green);
+      font: 800 clamp(18px, 2.1vw, 26px) ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      margin-bottom: 2px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 11px;
+    }
+
+    .section { padding: 10px 0; }
+
+    .title {
+      margin: 0 0 5px;
+      font-size: clamp(22px, 2.6vw, 34px);
+      line-height: 1.1;
+      letter-spacing: -.3px;
+    }
+
+    .body {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 960px;
+    }
+
+    .card h3 { margin: 0 0 5px; font-size: 16px; }
+    .card p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .flow {
+      margin-top: 9px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--panel);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 8px 11px;
+      border-bottom: 1px solid #1b2f4b;
+      font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .row:last-child { border-bottom: none; }
+    .row strong { color: var(--green); }
+
+    .waitlist {
+      margin-top: 10px;
+      border: 1px solid #1ad09a;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(15,24,41,.95), rgba(11,18,33,.95));
+      padding: 12px;
+    }
+
+    .waitlist h3 { margin: 0 0 5px; font-size: 17px; }
+
+    .dropdown {
+      margin-top: 8px;
+    }
+
+    .dropdown summary {
+      list-style: none;
+      cursor: pointer;
+      color: var(--green);
+      font-size: 12px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      width: fit-content;
+    }
+
+    .dropdown summary::-webkit-details-marker { display: none; }
+
+    .dropdown[open] summary {
+      margin-bottom: 8px;
+    }
+
+    .form {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .form input {
+      border: 1px solid #294267;
+      border-radius: 10px;
+      background: #0b1424;
+      color: var(--text);
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+
+    .form button {
+      border: 1px solid #1ad09a;
+      background: var(--green);
+      color: #02120d;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .footer {
+      margin-top: 14px;
+      padding: 10px 0 14px;
+      border-top: 1px solid #13253f;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: #7f90ad;
+      font-size: 12px;
+    }
+
+    .link { color: var(--green); text-decoration: underline; text-underline-offset: 3px; }
+
+    @media (max-width: 900px) {
+      .stats, .cards, .form { grid-template-columns: 1fr; }
+      .hero { padding-top: 42px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap nav">
+      <div class="brand">Prmission</div>
+      <div class="pill">YC S26</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <p class="eyebrow">AI Agent Commerce</p>
+      <h1>OpenAI gave agents a brain.<br>Google and Apple gave them reach.<br><span class="accent">Prmission gives us a wallet.</span></h1>
+      <p class="sub">The economic layer for AI agent commerce: permission, escrow, and settlement.</p>
+      <div class="live">Live on Base Mainnet • 3% protocol fee (300 bps) hardcoded on-chain • 0x0c8B16a57524f4009581B748356E01e1a969223d</div>
+      <div class="stats">
+        <div class="stat"><b>3%</b><span>Protocol Fee</span></div>
+        <div class="stat"><b>24h</b><span>Dispute Window</span></div>
+        <div class="stat"><b>51</b><span>Tests Passing</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="title">What Prmission Does</h2>
+      <p class="body">Prmission is a consent-gated escrow and settlement protocol for AI agent commerce. It gives agents a standard flow to request permission, lock funds, and settle outcomes on-chain.</p>
+      <div class="cards">
+        <article class="card">
+          <h3>Neutral Infrastructure</h3>
+          <p>Prmission integrates with model and interface layers without replacing them.</p>
+        </article>
+        <article class="card">
+          <h3>Immutable Monetization</h3>
+          <p>3% protocol fee (300 bps) is hardcoded on-chain and captured on settlement.</p>
+        </article>
+        <article class="card">
+          <h3>Compounding Volume</h3>
+          <p>As settlement-required agent actions scale, protocol fee capture scales with them.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="title">Proof</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>Live Deployment</h3>
+          <p>Verified contract on Base mainnet. Settlement token is USDC on Base.</p>
+        </article>
+        <article class="card">
+          <h3>Traction</h3>
+          <p>First live end-to-end transfer recorded on February 6, 2026.</p>
+        </article>
+        <article class="card">
+          <h3>Robustness</h3>
+          <p>51 tests passing across core flows, edge cases, and V2 improvements.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="title">How It Works</h2>
+      <div class="flow">
+        <div class="row"><span>1. grantPermission()</span><strong>User defines scope and fee</strong></div>
+        <div class="row"><span>2. depositEscrow()</span><strong>Agent locks USDC</strong></div>
+        <div class="row"><span>3. reportOutcome()</span><strong>Outcome is reported</strong></div>
+        <div class="row"><span>4. disputeSettlement()</span><strong>24-hour dispute window</strong></div>
+        <div class="row"><span>5. settle()</span><strong>Funds auto-distribute</strong></div>
+      </div>
+    </section>
+
+    <section class="section" id="waitlist">
+      <h2 class="title">Contact + Waitlist (Launching Soon)</h2>
+      <p class="body">Marcos Benaim built Prmission from zero to live Base mainnet deployment with working consent, escrow, and settlement mechanics.</p>
+      <div class="waitlist">
+        <h3>Join the Waitlist</h3>
+        <details class="dropdown">
+          <summary>Click to join waitlist</summary>
+          <form class="form" action="mailto:marcos@prmission.com" method="post" enctype="text/plain">
+            <input type="text" name="name" placeholder="Full name" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <button type="submit">Join Waitlist</button>
+          </form>
+        </details>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Prmission Protocol</span>
+      <span>
+        <a class="link" href="https://basescan.org/address/0x0c8B16a57524f4009581B748356E01e1a969223d#code" target="_blank" rel="noreferrer">BaseScan</a>
+        •
+        <a class="link" href="https://github.com/marcosbenaim-hub/Prmission-Protocol" target="_blank" rel="noreferrer">GitHub</a>
+      </span>
+    </footer>
+  </main>
+</body>
+</html>
