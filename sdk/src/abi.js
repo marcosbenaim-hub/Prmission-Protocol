@@ -1,0 +1,43 @@
+const PRMISSION_V2_ABI = [
+  { name: "grantPermission", type: "function", stateMutability: "nonpayable", inputs: [{ name: "agent", type: "address" }, { name: "dataType", type: "string" }, { name: "compensationBps", type: "uint256" }, { name: "duration", type: "uint256" }, { name: "upfrontFee", type: "uint256" }], outputs: [{ name: "permissionId", type: "uint256" }] },
+  { name: "revokePermission", type: "function", stateMutability: "nonpayable", inputs: [{ name: "permissionId", type: "uint256" }], outputs: [] },
+  { name: "depositEscrow", type: "function", stateMutability: "nonpayable", inputs: [{ name: "permissionId", type: "uint256" }, { name: "amount", type: "uint256" }], outputs: [{ name: "escrowId", type: "uint256" }] },
+  { name: "reportOutcome", type: "function", stateMutability: "nonpayable", inputs: [{ name: "escrowId", type: "uint256" }, { name: "outcomeValue", type: "uint256" }], outputs: [] },
+  { name: "refundEscrow", type: "function", stateMutability: "nonpayable", inputs: [{ name: "escrowId", type: "uint256" }], outputs: [] },
+  { name: "settle", type: "function", stateMutability: "nonpayable", inputs: [{ name: "escrowId", type: "uint256" }], outputs: [] },
+  { name: "disputeSettlement", type: "function", stateMutability: "nonpayable", inputs: [{ name: "escrowId", type: "uint256" }, { name: "reason", type: "string" }], outputs: [] },
+  { name: "resolveDispute", type: "function", stateMutability: "nonpayable", inputs: [{ name: "escrowId", type: "uint256" }, { name: "userShare", type: "uint256" }, { name: "agentShare", type: "uint256" }], outputs: [] },
+  { name: "setTreasury", type: "function", stateMutability: "nonpayable", inputs: [{ name: "treasury", type: "address" }], outputs: [] },
+  { name: "setIdentityRegistry", type: "function", stateMutability: "nonpayable", inputs: [{ name: "registry", type: "address" }], outputs: [] },
+  { name: "setReputationRegistry", type: "function", stateMutability: "nonpayable", inputs: [{ name: "registry", type: "address" }], outputs: [] },
+  { name: "setIdentityEnforcement", type: "function", stateMutability: "nonpayable", inputs: [{ name: "enabled", type: "bool" }], outputs: [] },
+  { name: "setReputationEnforcement", type: "function", stateMutability: "nonpayable", inputs: [{ name: "enabled", type: "bool" }], outputs: [] },
+  { name: "setTrustedReviewers", type: "function", stateMutability: "nonpayable", inputs: [{ name: "reviewers", type: "address[]" }], outputs: [] },
+  { name: "pause", type: "function", stateMutability: "nonpayable", inputs: [], outputs: [] },
+  { name: "unpause", type: "function", stateMutability: "nonpayable", inputs: [], outputs: [] },
+  { name: "rescueTokens", type: "function", stateMutability: "nonpayable", inputs: [{ name: "token", type: "address" }, { name: "to", type: "address" }, { name: "amount", type: "uint256" }], outputs: [] },
+  { name: "getPermission", type: "function", stateMutability: "view", inputs: [{ name: "permissionId", type: "uint256" }], outputs: [{ name: "", type: "tuple", components: [{ name: "user", type: "address" }, { name: "agent", type: "address" }, { name: "dataType", type: "string" }, { name: "compensationBps", type: "uint256" }, { name: "expiresAt", type: "uint256" }, { name: "upfrontFee", type: "uint256" }, { name: "active", type: "bool" }, { name: "revokedAt", type: "uint256" }] }] },
+  { name: "getEscrow", type: "function", stateMutability: "view", inputs: [{ name: "escrowId", type: "uint256" }], outputs: [{ name: "", type: "tuple", components: [{ name: "permissionId", type: "uint256" }, { name: "agent", type: "address" }, { name: "amount", type: "uint256" }, { name: "outcomeValue", type: "uint256" }, { name: "outcomeReported", type: "bool" }, { name: "outcomeReportedAt", type: "uint256" }, { name: "settled", type: "bool" }, { name: "disputed", type: "bool" }, { name: "disputeReason", type: "string" }] }] },
+  { name: "getUserPermissions", type: "function", stateMutability: "view", inputs: [{ name: "user", type: "address" }, { name: "offset", type: "uint256" }, { name: "limit", type: "uint256" }], outputs: [{ name: "", type: "uint256[]" }] },
+  { name: "getPermissionEscrows", type: "function", stateMutability: "view", inputs: [{ name: "permissionId", type: "uint256" }], outputs: [{ name: "", type: "uint256[]" }] },
+  { name: "owner", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "address" }] },
+  { name: "treasury", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "address" }] },
+  { name: "paused", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "bool" }] },
+  { name: "PROTOCOL_FEE_BPS", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
+  { name: "DISPUTE_WINDOW", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
+  { name: "PermissionGranted", type: "event", inputs: [{ name: "permissionId", type: "uint256", indexed: true }, { name: "user", type: "address", indexed: true }, { name: "agent", type: "address", indexed: true }, { name: "dataType", type: "string", indexed: false }, { name: "compensationBps", type: "uint256", indexed: false }] },
+  { name: "PermissionRevoked", type: "event", inputs: [{ name: "permissionId", type: "uint256", indexed: true }, { name: "user", type: "address", indexed: true }] },
+  { name: "EscrowDeposited", type: "event", inputs: [{ name: "escrowId", type: "uint256", indexed: true }, { name: "permissionId", type: "uint256", indexed: true }, { name: "agent", type: "address", indexed: true }, { name: "amount", type: "uint256", indexed: false }] },
+  { name: "OutcomeReported", type: "event", inputs: [{ name: "escrowId", type: "uint256", indexed: true }, { name: "outcomeValue", type: "uint256", indexed: false }] },
+  { name: "Settled", type: "event", inputs: [{ name: "escrowId", type: "uint256", indexed: true }, { name: "userPayout", type: "uint256", indexed: false }, { name: "protocolFee", type: "uint256", indexed: false }, { name: "agentPayout", type: "uint256", indexed: false }] },
+  { name: "Disputed", type: "event", inputs: [{ name: "escrowId", type: "uint256", indexed: true }, { name: "disputedBy", type: "address", indexed: true }, { name: "reason", type: "string", indexed: false }] },
+  { name: "DisputeResolved", type: "event", inputs: [{ name: "escrowId", type: "uint256", indexed: true }, { name: "userShare", type: "uint256", indexed: false }, { name: "agentShare", type: "uint256", indexed: false }] },
+  { name: "EscrowRefunded", type: "event", inputs: [{ name: "escrowId", type: "uint256", indexed: true }, { name: "amount", type: "uint256", indexed: false }] }
+];
+const ERC20_ABI = [
+  { name: "approve", type: "function", stateMutability: "nonpayable", inputs: [{ name: "spender", type: "address" }, { name: "amount", type: "uint256" }], outputs: [{ name: "", type: "bool" }] },
+  { name: "allowance", type: "function", stateMutability: "view", inputs: [{ name: "owner", type: "address" }, { name: "spender", type: "address" }], outputs: [{ name: "", type: "uint256" }] },
+  { name: "balanceOf", type: "function", stateMutability: "view", inputs: [{ name: "account", type: "address" }], outputs: [{ name: "", type: "uint256" }] },
+  { name: "decimals", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint8" }] }
+];
+module.exports = { PRMISSION_V2_ABI, ERC20_ABI };

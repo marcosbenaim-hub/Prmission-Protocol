@@ -1,0 +1,13 @@
+{
+  "name": "@prmission/sdk",
+  "version": "1.0.0",
+  "description": "The settlement layer for AI agents. Consent-gated data exchange with atomic escrow settlement on Base.",
+  "main": "src/index.js",
+  "files": ["src/", "README.md", "LICENSE"],
+  "keywords": ["prmission", "ai-agents", "data-consent", "escrow", "settlement", "base", "blockchain", "erc-8004", "web3", "usdc"],
+  "author": "Marcos Benaim",
+  "license": "BSL-1.1",
+  "repository": { "type": "git", "url": "https://github.com/marcosbenaim-hub/Prmission-Protocol.git" },
+  "dependencies": { "ethers": "^6.0.0" },
+  "engines": { "node": ">=18.0.0" }
+}
