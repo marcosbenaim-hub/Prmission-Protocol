@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Prmission | The Economic Layer for AI Agent Commerce</title>
-  <meta name="description" content="Prmission is a consent-gated escrow and settlement protocol for AI agent commerce. Live on Base mainnet with a fixed 3% protocol fee.">
+  <meta name="description" content="Prmission is a consent-gated escrow and settlement protocol for AI agent commerce on-chain. Ethereum ERC-8004 identity verification, escrow, and settlement on Base (Ethereum L2).">
   <style>
     :root {
       --bg: #060b14;
@@ -71,6 +71,7 @@
     }
 
     .accent { color: var(--green); }
+    .eth { color: var(--green); font-weight: 700; }
 
     .sub {
       margin: 0;
@@ -174,61 +175,86 @@
     .row:last-child { border-bottom: none; }
     .row strong { color: var(--green); }
 
-    .waitlist {
+    .video-section {
       margin-top: 10px;
-      border: 1px solid #1ad09a;
+      border: 1px solid var(--line);
       border-radius: 12px;
-      background: linear-gradient(180deg, rgba(15,24,41,.95), rgba(11,18,33,.95));
+      overflow: hidden;
+      background: var(--panel);
       padding: 12px;
     }
 
-    .waitlist h3 { margin: 0 0 5px; font-size: 17px; }
-
-    .dropdown {
+    .video-section video {
+      width: 100%;
+      border-radius: 8px;
       margin-top: 8px;
     }
 
-    .dropdown summary {
-      list-style: none;
-      cursor: pointer;
-      color: var(--green);
-      font-size: 12px;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      width: fit-content;
+    .waitlist-section {
+      max-width: 600px;
+      margin: 30px auto 0;
+      text-align: center;
     }
 
-    .dropdown summary::-webkit-details-marker { display: none; }
-
-    .dropdown[open] summary {
-      margin-bottom: 8px;
+    .waitlist-section h3 {
+      margin: 0 0 5px;
+      font-size: clamp(22px, 2.6vw, 34px);
+      letter-spacing: -.3px;
     }
 
-    .form {
-      display: grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap: 8px;
-      margin-top: 8px;
+    .waitlist-section p {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0 0 16px;
     }
 
-    .form input {
-      border: 1px solid #294267;
+    .wl-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .wl-form input {
+      border: 1px solid var(--line);
       border-radius: 10px;
-      background: #0b1424;
+      background: var(--panel);
       color: var(--text);
-      padding: 8px 10px;
-      font-size: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .3s;
     }
 
-    .form button {
+    .wl-form input:focus {
+      border-color: var(--green);
+    }
+
+    .wl-form button {
       border: 1px solid #1ad09a;
       background: var(--green);
       color: #02120d;
       font-weight: 700;
       border-radius: 10px;
-      padding: 8px 12px;
+      padding: 12px;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 15px;
+      font-family: inherit;
+      transition: background .3s;
+    }
+
+    .wl-form button:hover {
+      background: #00f5b0;
+    }
+
+    .slogan {
+      margin-top: 30px;
+      padding: 20px 0;
+      text-align: center;
+      font-size: clamp(18px, 2.4vw, 28px);
+      font-weight: 800;
+      color: var(--green);
+      letter-spacing: -.3px;
     }
 
     .footer {
@@ -246,7 +272,7 @@
     .link { color: var(--green); text-decoration: underline; text-underline-offset: 3px; }
 
     @media (max-width: 900px) {
-      .stats, .cards, .form { grid-template-columns: 1fr; }
+      .stats, .cards { grid-template-columns: 1fr; }
       .hero { padding-top: 42px; }
     }
   </style>
@@ -262,33 +288,33 @@
     <section class="hero">
       <p class="eyebrow">AI Agent Commerce</p>
       <h1>OpenAI gave agents a brain.<br>Google and Apple gave them reach.<br><span class="accent">Prmission gives us a wallet.</span></h1>
-      <p class="sub">The economic layer for AI agent commerce: permission, escrow, and settlement.</p>
+      <p class="sub">The on-chain economic layer for AI agent commerce: permission, escrow, and settlement.</p>
       <div class="hero-actions">
         <a class="cta" href="#waitlist">Join Waitlist</a>
       </div>
-      <div class="live">Live on Base Mainnet • 3% protocol fee (300 bps) hardcoded on-chain • 0x0c8B16a57524f4009581B748356E01e1a969223d</div>
+      <div class="live">Live on Base (<span class="eth">Ethereum</span> L2) • 3% protocol fee hardcoded on-chain • 0x0c8B16a57524f4009581B748356E01e1a969223d</div>
       <div class="stats">
-        <div class="stat"><b>3%</b><span>Protocol Fee</span></div>
-        <div class="stat"><b>24h</b><span>Dispute Window</span></div>
+        <div class="stat"><b>3%</b><span>Protocol Fee On-Chain</span></div>
+        <div class="stat"><b>24h</b><span>On-Chain Dispute Window</span></div>
         <div class="stat"><b>51</b><span>Tests Passing</span></div>
       </div>
     </section>
 
     <section class="section">
       <h2 class="title">What Prmission Does</h2>
-      <p class="body">Prmission is a consent-gated escrow and settlement protocol for AI agent commerce. It gives agents a standard flow to request permission, lock funds, and settle outcomes on-chain.</p>
+      <p class="body">Prmission is a consent-gated escrow and settlement protocol for AI agent commerce. It gives agents a standard on-chain flow to request permission, lock funds, and settle outcomes — all verified on <span class="eth">Ethereum</span>.</p>
       <div class="cards">
         <article class="card">
           <h3>Neutral Infrastructure</h3>
-          <p>Prmission integrates with model and interface layers without replacing them.</p>
+          <p>Prmission integrates with model and interface layers without replacing them. We settle on-chain beneath them.</p>
         </article>
         <article class="card">
           <h3>Immutable Monetization</h3>
-          <p>3% protocol fee (300 bps) is hardcoded on-chain and captured on settlement.</p>
+          <p>3% protocol fee is hardcoded on-chain in the Prmission smart contract on <span class="eth">Ethereum</span>. Not even we can change it.</p>
         </article>
         <article class="card">
           <h3>Compounding Volume</h3>
-          <p>As settlement-required agent actions scale, protocol fee capture scales with them.</p>
+          <p>As settlement-required agent actions scale, on-chain protocol fee capture scales with them.</p>
         </article>
       </div>
     </section>
@@ -297,48 +323,67 @@
       <h2 class="title">Proof</h2>
       <div class="cards">
         <article class="card">
-          <h3>Live Deployment</h3>
-          <p>Verified contract on Base mainnet. Settlement token is USDC on Base.</p>
+          <h3>Live On-Chain Deployment</h3>
+          <p>Verified contract on Base (<span class="eth">Ethereum</span> L2). Settlement token is USDC on Base.</p>
         </article>
         <article class="card">
           <h3>Traction</h3>
-          <p>First live end-to-end transfer recorded on February 6, 2026.</p>
+          <p>First live end-to-end on-chain transfer recorded on February 6, 2026.</p>
         </article>
         <article class="card">
           <h3>Robustness</h3>
-          <p>51 tests passing across core flows, edge cases, and V2 improvements.</p>
+          <p>51 tests passing across core on-chain flows, edge cases, and V2 improvements.</p>
         </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="title">Prmission Crypto Wallet</h2>
+      <p class="body">Your data. Your wallet. You get paid. AI agents pay you in USDC — convert to USD and withdraw to your bank.</p>
+      <div class="video-section">
+        <video controls autoplay muted loop playsinline>
+          <source src="demo.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
       </div>
     </section>
 
     <section class="section">
       <h2 class="title">How It Works</h2>
       <div class="flow">
-        <div class="row"><span>1. grantPermission()</span><strong>User defines scope and fee</strong></div>
-        <div class="row"><span>2. depositEscrow()</span><strong>Agent locks USDC</strong></div>
-        <div class="row"><span>3. reportOutcome()</span><strong>Outcome is reported</strong></div>
-        <div class="row"><span>4. disputeSettlement()</span><strong>24-hour dispute window</strong></div>
-        <div class="row"><span>5. settle()</span><strong>Funds auto-distribute</strong></div>
+        <div class="row"><span>1. grantPermission()</span><strong>User defines scope and fee — <span class="eth">Ethereum</span> ERC-8004 verified</strong></div>
+        <div class="row"><span>2. depositEscrow()</span><strong>Agent locks USDC on-chain</strong></div>
+        <div class="row"><span>3. reportOutcome()</span><strong>Outcome reported on-chain</strong></div>
+        <div class="row"><span>4. disputeSettlement()</span><strong>24-hour on-chain dispute window</strong></div>
+        <div class="row"><span>5. settle()</span><strong>Funds auto-distribute on-chain</strong></div>
       </div>
     </section>
 
+    <section class="section">
+      <p class="body">Marcos Benaim built Prmission from zero to a live on-chain protocol on Base (<span class="eth">Ethereum</span> L2) with working consent, escrow, and settlement. Now focused on scaling integrations and building the core team.</p>
+    </section>
+
     <section class="section" id="waitlist">
-      <p class="body">Marcos Benaim built Prmission from zero to a live Base mainnet protocol with working consent, escrow, and settlement. Now focused on scaling integrations and building the core team.</p>
-      <div class="waitlist">
+      <div class="waitlist-section">
         <h3>Join the Waitlist</h3>
-        <details class="dropdown">
-          <summary>Click to join waitlist</summary>
-          <form class="form" id="waitlist-form" action="https://formsubmit.co/ajax/marcos@prmission.com" method="post">
+        <p>Be the first to know when Prmission opens to users and agents.</p>
+        <div id="wl-form-container">
+          <form class="wl-form" id="waitlist-form" action="https://formsubmit.co/ajax/marcos@prmission.com" method="post">
             <input type="hidden" name="_subject" value="Prmission Waitlist Signup">
             <input type="hidden" name="_captcha" value="false">
             <input type="hidden" name="_template" value="table">
-            <input type="text" name="name" placeholder="Full name" required>
-            <input type="email" name="email" placeholder="Email" required>
+            <input type="text" name="name" placeholder="Your name" required>
+            <input type="email" name="email" placeholder="Your email" required>
             <button type="submit" id="waitlist-button">Join Waitlist</button>
           </form>
-        </details>
+        </div>
+        <div id="wl-confirmed" style="display:none;color:var(--green);font-size:1.1rem;font-weight:700;padding:20px 0">✓ You're on the list. We'll be in touch.</div>
       </div>
     </section>
+
+    <div class="slogan">Prmission: Where Autonomous AI agents pay humans on-chain.</div>
+
+    <p class="body" style="text-align:center;margin:0 auto 20px;max-width:600px">AI agents need your data. Prmission makes them pay you for it — automatically, every time, on-chain.</p>
 
     <footer class="footer">
       <span>Prmission Protocol</span>
@@ -350,7 +395,6 @@
     </footer>
   </main>
   <script>
-    // Lightweight analytics without external dashboard setup.
     fetch("https://api.countapi.xyz/hit/prmission.com/pageviews");
 
     const waitlistForm = document.getElementById("waitlist-form");
@@ -372,14 +416,10 @@
 
         if (!response.ok) throw new Error("submit_failed");
 
-        waitlistButton.textContent = "Confirmed";
+        document.getElementById("wl-form-container").style.display = "none";
+        document.getElementById("wl-confirmed").style.display = "block";
         waitlistForm.reset();
         fetch("https://api.countapi.xyz/hit/prmission.com/waitlist_signups");
-
-        setTimeout(() => {
-          waitlistButton.textContent = "Join Waitlist";
-          waitlistButton.disabled = false;
-        }, 1800);
       } catch (error) {
         waitlistButton.textContent = "Try Again";
         setTimeout(() => {
