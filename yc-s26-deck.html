@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prmission YC S26 Deck</title>
+  <style>
+    :root {
+      --bg: #060b14;
+      --panel: #0b1220;
+      --panel-2: #0e1626;
+      --line: #1a2940;
+      --text: #e9edf7;
+      --muted: #9ba7be;
+      --green: #00e5a0;
+      --green-dim: rgba(0, 229, 160, 0.14);
+      --cyan: #22b8ff;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+      background:
+        radial-gradient(1200px 500px at 85% 25%, rgba(0,229,160,0.10), transparent 60%),
+        radial-gradient(900px 380px at 10% 70%, rgba(34,184,255,0.08), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .shell {
+      height: 100%;
+      display: grid;
+      grid-template-rows: 76px 1fr;
+    }
+
+    .topbar {
+      border-bottom: 1px solid #132238;
+      backdrop-filter: blur(8px);
+      background: rgba(5, 10, 18, 0.84);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 26px;
+      gap: 16px;
+    }
+
+    .brand {
+      font-size: 42px;
+      color: var(--green);
+      letter-spacing: 1px;
+      font-weight: 700;
+      margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      background: rgba(14, 22, 38, 0.7);
+      border: 1px solid #1a2940;
+      padding: 4px;
+      border-radius: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      appearance: none;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #99a4bc;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      color: #021111;
+      background: var(--green);
+      border-color: #7ff3cf;
+      box-shadow: 0 0 0 2px rgba(0, 229, 160, 0.16);
+    }
+
+    .badge {
+      justify-self: end;
+      border: 1px solid #18c28e;
+      color: var(--green);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 24px;
+      letter-spacing: 1px;
+    }
+
+    .deck {
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 48px 70px 56px;
+      overflow: auto;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .eyebrow {
+      margin: 0 0 20px;
+      color: var(--green);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      font-size: 18px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .title {
+      margin: 0 0 20px;
+      font-size: clamp(46px, 5.2vw, 84px);
+      line-height: 1.02;
+      letter-spacing: -1px;
+    }
+
+    .title strong { color: var(--green); }
+
+    .lead {
+      margin: 0;
+      max-width: 1100px;
+      font-size: clamp(26px, 2vw, 36px);
+      color: #cbd5e8;
+      line-height: 1.3;
+    }
+
+    .stack {
+      margin-top: 30px;
+      display: grid;
+      gap: 14px;
+      max-width: 1200px;
+    }
+
+    .line {
+      color: #a8b4ca;
+      font-size: clamp(22px, 1.55vw, 29px);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .line strong { color: var(--green); font-weight: 700; }
+
+    .chips {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      max-width: 1080px;
+    }
+
+    .chip {
+      border: 1px solid #1c2c45;
+      background: linear-gradient(180deg, rgba(17,25,41,0.95), rgba(11,18,32,0.95));
+      border-radius: 14px;
+      padding: 22px;
+    }
+
+    .chip h3 {
+      margin: 0 0 8px;
+      font-size: 36px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--green);
+    }
+
+    .chip p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .bar {
+      margin-top: 18px;
+      border: 1px solid #18c28e;
+      border-radius: 999px;
+      padding: 12px 16px;
+      color: var(--green);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 20px;
+      max-width: 1400px;
+      background: linear-gradient(90deg, rgba(0, 229, 160, 0.10), rgba(0, 229, 160, 0.02));
+    }
+
+    .cards {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      border: 1px solid #233651;
+      border-radius: 14px;
+      padding: 22px;
+      background: linear-gradient(180deg, rgba(16,22,38,0.95), rgba(10,16,29,0.95));
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      line-height: 1.1;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.36;
+      color: var(--muted);
+    }
+
+    .panel {
+      margin-top: 24px;
+      border: 1px solid #18c28e;
+      border-radius: 14px;
+      padding: 20px 24px;
+      background: linear-gradient(90deg, rgba(0,229,160,0.08), rgba(34,184,255,0.06));
+      color: #dcf9f0;
+      font-size: 24px;
+      line-height: 1.38;
+    }
+
+    .steps {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .step {
+      border: 1px solid #24415d;
+      border-radius: 12px;
+      background: #0d1524;
+      padding: 15px;
+      min-height: 132px;
+    }
+
+    .step .n {
+      display: inline-flex;
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      align-items: center;
+      justify-content: center;
+      background: var(--green);
+      color: #061012;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .step code {
+      display: block;
+      color: var(--green);
+      background: rgba(0, 229, 160, 0.08);
+      border: 1px solid rgba(0, 229, 160, 0.3);
+      padding: 8px 10px;
+      border-radius: 9px;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .step p {
+      margin: 0;
+      font-size: 18px;
+      color: #93a4be;
+    }
+
+    .table {
+      margin-top: 20px;
+      border: 1px solid #26405e;
+      border-radius: 12px;
+      overflow: hidden;
+      max-width: 1050px;
+      background: #0d1523;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid #1c314a;
+      font-size: 24px;
+      color: #a8b4ca;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .row:last-child { border-bottom: none; }
+    .row strong { color: var(--green); }
+
+    .timeline {
+      margin-top: 28px;
+      border-top: 3px solid #19d49a;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      padding-top: 18px;
+    }
+
+    .phase h4 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--green);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .phase b {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 42px;
+    }
+
+    .phase p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 24px;
+      line-height: 1.35;
+    }
+
+    .final {
+      margin-top: 18px;
+      max-width: 1300px;
+      font-size: clamp(34px, 2.25vw, 44px);
+      color: #d9e4f7;
+      line-height: 1.2;
+    }
+
+    .accent {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    @media (max-width: 1260px) {
+      .slide { padding: 34px 26px 38px; }
+      .cards { grid-template-columns: 1fr; }
+      .chips { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .timeline { grid-template-columns: 1fr; }
+      .title { font-size: 52px; }
+      .line, .card p, .panel, .row, .phase p, .final { font-size: 20px; }
+      .card h3 { font-size: 29px; }
+      .brand { font-size: 30px; }
+      .badge { font-size: 18px; }
+    }
+
+    @media (max-width: 900px) {
+      body { overflow: auto; }
+      .shell { height: auto; min-height: 100%; grid-template-rows: auto 1fr; }
+      .deck { min-height: 100vh; }
+      .slide { position: static; display: none; height: auto; min-height: calc(100vh - 90px); }
+      .slide.active { display: block; }
+      .topbar { grid-template-columns: 1fr; gap: 8px; padding: 12px; }
+      .tabs { justify-content: flex-start; overflow: auto; }
+      .badge { justify-self: start; }
+      .chips { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <h1 class="brand">Prmission</h1>
+      <nav class="tabs" id="tabs"></nav>
+      <div class="badge">YC S26</div>
+    </header>
+
+    <main class="deck">
+      <section class="slide active" data-id="intro">
+        <p class="eyebrow">Y Combinator Spring 2026</p>
+        <h2 class="title">OpenAI gave agents a brain.<br>Google and Apple gave them reach.<br><strong>Prmission gives us a wallet.</strong></h2>
+        <p class="lead">The transaction layer for AI agent commerce.</p>
+        <div class="stack">
+          <p class="line">Consent-gated escrow and settlement protocol. Live on Base mainnet.</p>
+          <p class="line"><strong>3% protocol fee hardcoded on-chain.</strong></p>
+        </div>
+        <div class="bar">Live on Base Mainnet • 0x0c8B16a57524f4009581B748356E01e1a969223d</div>
+        <div class="chips">
+          <article class="chip"><h3>COSS</h3><p>Open Source SDK</p></article>
+          <article class="chip"><h3>3%</h3><p>PROTOCOL FEE</p></article>
+          <article class="chip"><h3>LIVE</h3><p>Base Mainnet</p></article>
+        </div>
+      </section>
+
+      <section class="slide" data-id="problem">
+        <p class="eyebrow">The Problem</p>
+        <h2 class="title">AI agents can act, but they still can’t natively settle permissioned data transactions.</h2>
+        <div class="stack">
+          <p class="line">There is no default protocol that combines permission, escrow, dispute handling, and payout in one deterministic flow.</p>
+          <p class="line">Without a neutral settlement layer, agent commerce fragments into ad hoc, platform-specific rails.</p>
+        </div>
+        <div class="cards">
+          <article class="card">
+            <h3>Agents Need Permissioned Data</h3>
+            <p>Bookings, purchases, and recommendations require user context. There is no native economic rail for this exchange.</p>
+          </article>
+          <article class="card">
+            <h3>No Default Settlement Standard</h3>
+            <p>Every ecosystem is improvising payment logic. Permission, escrow, and payout are still disconnected.</p>
+          </article>
+          <article class="card">
+            <h3>Timing Window Is Now</h3>
+            <p>Agent capability is accelerating fast. Core transaction infrastructure is lagging behind.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="slide" data-id="solution">
+        <p class="eyebrow">The Solution</p>
+        <h2 class="title">Prmission is the transaction layer below the agent stack.</h2>
+        <div class="stack">
+          <p class="line">Prmission does not compete with ChatGPT, Apple, or Google agent platforms.</p>
+          <p class="line">They provide intelligence and distribution; Prmission provides the transaction layer: permission, escrow, and settlement.</p>
+          <p class="line">As agent ecosystems scale to millions of interactions, Prmission captures the settlement layer those interactions require.</p>
+          <p class="line">We don’t need to own the interface or model. We monetize the settlement event beneath them.</p>
+        </div>
+        <div class="panel">
+          <strong>Why Prmission wins:</strong><br>
+          1) Immutable monetization: 3% fee is protocol-enforced on every settlement.<br>
+          2) Neutral position: we integrate under agent platforms instead of competing with them.<br>
+          3) Fast compounding: as agent transactions scale, settlement events scale.
+        </div>
+      </section>
+
+      <section class="slide" data-id="protocol">
+        <p class="eyebrow">Protocol Mechanics</p>
+        <h2 class="title">Five steps. Verifiable on-chain.</h2>
+        <div class="steps">
+          <article class="step"><span class="n">1</span><code>grantPermission()</code><p>User defines scope, purpose, fee, duration.</p></article>
+          <article class="step"><span class="n">2</span><code>depositEscrow()</code><p>Agent locks USDC before access.</p></article>
+          <article class="step"><span class="n">3</span><code>reportOutcome()</code><p>Outcome reported after task completion.</p></article>
+          <article class="step"><span class="n">4</span><code>disputeSettlement()</code><p>24-hour dispute window.</p></article>
+          <article class="step"><span class="n">5</span><code>settle()</code><p>Contract auto-distributes settlement.</p></article>
+        </div>
+        <div class="table">
+          <div class="row"><span>Example: $500 outcome value (user fee 2%)</span><strong></strong></div>
+          <div class="row"><span>User receives (2% x $500)</span><strong>$10.00</strong></div>
+          <div class="row"><span>Protocol receives (3% x $500)</span><strong>$15.00</strong></div>
+          <div class="row"><span>Agent receives remainder</span><strong>$475.00</strong></div>
+        </div>
+      </section>
+
+      <section class="slide" data-id="traction">
+        <p class="eyebrow">Traction</p>
+        <h2 class="title">Live. Tested. Shipping.</h2>
+        <div class="stack">
+          <p class="line">Live on Base Mainnet with verified contract deployment.</p>
+          <p class="line">First live end-to-end transfer recorded: February 6, 2026.</p>
+          <p class="line">51 tests passing across core flows and V2 improvements.</p>
+          <p class="line">V2 fixes critical payout/dispute vulnerabilities and adds production-grade controls.</p>
+        </div>
+        <div class="chips">
+          <article class="chip"><h3>LIVE</h3><p>Base Mainnet</p></article>
+          <article class="chip"><h3>51</h3><p>Tests Passing</p></article>
+          <article class="chip"><h3>300</h3><p>bps</p></article>
+        </div>
+      </section>
+
+      <section class="slide" data-id="market">
+        <p class="eyebrow">Market</p>
+        <h2 class="title">Every agent action needing user data becomes a settlement event.</h2>
+        <div class="stack">
+          <p class="line">Bookings, purchases, recommendations, and data-backed execution increasingly require permissioned access.</p>
+          <p class="line">These are transaction opportunities, not just product interactions.</p>
+          <p class="line">As agent-initiated transactions scale, Prmission captures settlement volume by default.</p>
+        </div>
+        <div class="table">
+          <div class="row"><span>Protocol Fee</span><strong>3% on each settlement. Hardcoded on-chain.</strong></div>
+          <div class="row"><span>Revenue Model</span><strong>Scales with settlement-required agent actions.</strong></div>
+          <div class="row"><span>Wedge</span><strong>High-intent actions where payment already exists.</strong></div>
+        </div>
+      </section>
+
+      <section class="slide" data-id="business">
+        <p class="eyebrow">Business Model</p>
+        <h2 class="title">3% of every settlement. Hardcoded. Non-negotiable.</h2>
+        <div class="stack">
+          <p class="line">If an agent settles through Prmission, fee capture is automatic at the protocol layer.</p>
+          <p class="line">Revenue is protocol-native, not sales-team dependent.</p>
+          <p class="line">We don’t need speculative capital to start. We need the right team and focused capital to scale settlement volume.</p>
+          <p class="line">We’re already live; funding accelerates integrations and transaction velocity.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-id="landscape">
+        <p class="eyebrow">Landscape & Differentiation</p>
+        <h2 class="title">Others touch data or privacy. We own settlement.</h2>
+        <div class="stack">
+          <p class="line">Most adjacent players optimize ads, datasets, or privacy.</p>
+          <p class="line">Prmission focuses on permissioned agent transactions with escrow and settlement.</p>
+          <p class="line">Prmission is the neutral settlement layer for AI agent commerce.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-id="tech">
+        <p class="eyebrow">Technical Architecture</p>
+        <h2 class="title">Three layers. One economic primitive.</h2>
+        <div class="table">
+          <div class="row"><span>User Interface</span><strong>Consent UX, fee visibility, controls.</strong></div>
+          <div class="row"><span>Prmission SDK</span><strong>Policy and integration surface.</strong></div>
+          <div class="row"><span>Blockchain</span><strong>Consent records, escrow, disputes, settlement.</strong></div>
+        </div>
+        <div class="panel">
+          <strong>Design decisions:</strong><br>
+          Immutable 3% fee • Escrow before access • 24h dispute window • User-defined access fee • ERC-8004-compatible trust gating
+        </div>
+      </section>
+
+      <section class="slide" data-id="roadmap">
+        <p class="eyebrow">Roadmap</p>
+        <h2 class="title">Validate → Integrate → Scale</h2>
+        <div class="timeline">
+          <article class="phase">
+            <h4>Phase 1</h4>
+            <b>Validate</b>
+            <p>Run settlements, prove completion and dispute reliability.</p>
+          </article>
+          <article class="phase">
+            <h4>Phase 2</h4>
+            <b>Integrate</b>
+            <p>Embed with agent builders across OpenAI, Google, and Apple ecosystems.</p>
+          </article>
+          <article class="phase">
+            <h4>Phase 3</h4>
+            <b>Scale</b>
+            <p>Grow settlement volume as agent autonomy increases.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="slide" data-id="founder">
+        <p class="eyebrow">Founder</p>
+        <h2 class="title">Solo founder. Built fast. Shipping faster.</h2>
+        <div class="panel" style="font-size: 28px; line-height: 1.35; max-width: 1380px;">
+          <strong>Marcos Benaim — Founder</strong><br>
+          Built Prmission live in 5 days with no prior coding experience, using Claude.<br>
+          Built an AI agent and completed a successful live transaction with real USDC.<br>
+          Shipped from zero to a live Base mainnet protocol with working consent, escrow, and settlement mechanics.
+        </div>
+      </section>
+
+      <section class="slide" data-id="ask">
+        <p class="eyebrow">The Ask</p>
+        <h2 class="title">Build the economic engine for the AI agent era.</h2>
+        <div class="stack">
+          <p class="line"><strong>YC S26</strong></p>
+          <p class="line">We’re past concept: Prmission is already running on Base with protocol-native monetization.</p>
+          <p class="line">Now we scale integrations, settlement throughput, and team quality.</p>
+          <p class="line">Looking to YC to help us recruit a world-class technical co-founder and a savant senior engineer.</p>
+          <p class="line">This is the moment to own the economic rails behind agent commerce.</p>
+        </div>
+        <p class="final">Prmission is live on Base with protocol-native monetization. We don’t need to win the model layer or interface layer. We win the settlement event beneath every permissioned agent transaction. <span class="accent">The AI agent economy needs rails. We’re building them first.</span></p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const slideOrder = [
+      ["intro", "Intro"],
+      ["problem", "Problem"],
+      ["solution", "Solution"],
+      ["protocol", "Protocol"],
+      ["traction", "Traction"],
+      ["market", "Market"],
+      ["business", "Business"],
+      ["landscape", "Landscape"],
+      ["tech", "Tech"],
+      ["roadmap", "Roadmap"],
+      ["founder", "Founder"],
+      ["ask", "Ask"]
+    ];
+
+    const tabs = document.getElementById("tabs");
+    const slides = Array.from(document.querySelectorAll(".slide"));
+
+    function activate(id) {
+      slides.forEach((s) => s.classList.toggle("active", s.dataset.id === id));
+      document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.id === id));
+      history.replaceState(null, "", "#" + id);
+    }
+
+    slideOrder.forEach(([id, label]) => {
+      const b = document.createElement("button");
+      b.className = "tab" + (id === "intro" ? " active" : "");
+      b.dataset.id = id;
+      b.textContent = label;
+      b.addEventListener("click", () => activate(id));
+      tabs.appendChild(b);
+    });
+
+    const ids = slideOrder.map((x) => x[0]);
+    function step(dir) {
+      const current = document.querySelector(".slide.active");
+      const idx = Math.max(0, ids.indexOf(current?.dataset.id || "intro"));
+      const next = Math.min(ids.length - 1, Math.max(0, idx + dir));
+      activate(ids[next]);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === "PageDown") step(1);
+      if (e.key === "ArrowLeft" || e.key === "PageUp") step(-1);
+    });
+
+    const hash = location.hash.replace("#", "");
+    if (ids.includes(hash)) activate(hash);
+  </script>
+</body>
+</html>
