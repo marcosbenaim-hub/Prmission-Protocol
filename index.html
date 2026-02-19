@@ -275,6 +275,32 @@
       .stats, .cards { grid-template-columns: 1fr; }
       .hero { padding-top: 42px; }
     }
+
+    @media (max-width: 480px) {
+      h1 { font-size: clamp(22px, 7vw, 34px); letter-spacing: -.5px; }
+      .sub { font-size: 14px; }
+      .eyebrow { font-size: 10px; letter-spacing: 2px; }
+      .brand { font-size: 20px; }
+      .nav { height: 56px; }
+      .hero { padding: 32px 0 16px; }
+      .live { font-size: 10px; padding: 7px 10px; }
+      .stat b { font-size: 18px; }
+      .stat span { font-size: 10px; }
+      .stat { padding: 10px; }
+      .title { font-size: 20px; }
+      .body { font-size: 13px; }
+      .card h3 { font-size: 14px; }
+      .card p { font-size: 12px; }
+      .card { padding: 10px; }
+      .row { font-size: 10px; padding: 6px 8px; }
+      .slogan { font-size: 16px; }
+      .waitlist-section h3 { font-size: 18px; }
+      .waitlist-section p { font-size: 12px; }
+      .wl-form input { font-size: 13px; padding: 10px; }
+      .wl-form button { font-size: 13px; padding: 10px; }
+      .video-section { padding: 8px; }
+      .wrap { width: 94vw; }
+    }
   </style>
 </head>
 <body>
@@ -357,10 +383,6 @@
         <div class="row"><span>4. disputeSettlement()</span><strong>24-hour on-chain dispute window</strong></div>
         <div class="row"><span>5. settle()</span><strong>Funds auto-distribute on-chain</strong></div>
       </div>
-    </section>
-
-    <section class="section">
-      <p class="body">Marcos Benaim built Prmission from zero to a live on-chain protocol on Base (<span class="eth">Ethereum</span> L2) with working consent, escrow, and settlement. Now focused on scaling integrations and building the core team.</p>
     </section>
 
     <section class="section" id="waitlist">
