@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prmission dApp — Live on Base</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+<style>
+:root{--bg:#0a0e17;--card:#111827;--cardH:#162031;--inp:#0d1321;--brd:#1e2a3a;--foc:#10b981;--g:#10b981;--gd:rgba(16,185,129,.15);--gg:rgba(16,185,129,.3);--t:#f1f5f9;--td:#94a3b8;--tm:#64748b;--r:#ef4444;--rd:rgba(239,68,68,.15);--y:#f59e0b;--b:#3b82f6;--bd:rgba(59,130,246,.15)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--t);font-family:'JetBrains Mono',monospace;min-height:100vh;line-height:1.5}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(30,42,58,.2) 1px,transparent 1px),linear-gradient(90deg,rgba(30,42,58,.2) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+body::after{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,var(--gg),transparent 70%);opacity:.12;pointer-events:none}
+.hdr{position:sticky;top:0;z-index:100;background:rgba(10,14,23,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);padding:0 20px}
+.hdr-in{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;height:60px}
+.logo{font-size:20px;font-weight:800;color:var(--g);letter-spacing:-.03em;display:flex;align-items:center;gap:8px}
+.badge{padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--g);background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2)}
+.btn{padding:8px 16px;border-radius:7px;border:none;font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--g);color:#fff}.btn-p:hover{background:#059669}.btn-p:disabled{background:#1e293b;color:var(--tm);cursor:not-allowed}
+.btn-d{background:var(--r);color:#fff;padding:5px 12px;font-size:11px}.btn-d:hover{background:#dc2626}
+.btn-g{background:transparent;color:var(--t);border:1px solid var(--brd);padding:5px 12px;font-size:11px}.btn-g:hover{background:var(--cardH)}
+.btn-lg{padding:12px 24px;font-size:15px}
+.main{max-width:1100px;margin:0 auto;padding:20px 20px 60px;position:relative;z-index:1}
+.card{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:20px;margin-bottom:8px}
+.tabs{display:flex;gap:2px;background:var(--inp);border-radius:8px;padding:3px;margin-bottom:20px}
+.tab{flex:1;padding:8px 12px;border-radius:6px;border:none;background:transparent;color:var(--tm);font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .15s}
+.tab.on{background:var(--card);color:var(--g)}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:10px;font-weight:600;color:var(--td);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.fi{width:100%;padding:9px 12px;border-radius:7px;border:1px solid var(--brd);background:var(--inp);color:var(--t);font-size:13px;font-family:'JetBrains Mono',monospace;outline:none;transition:border .15s}
+.fi:focus{border-color:var(--foc)}.fi::placeholder{color:var(--tm)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.iw{position:relative}.is{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--tm)}
+.conn{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;text-align:center;animation:fu .6s ease}
+.conn-i{width:72px;height:72px;border-radius:18px;background:var(--gd);border:2px solid rgba(16,185,129,.25);display:flex;align-items:center;justify-content:center;margin-bottom:28px;font-size:32px}
+.conn-t{font-size:clamp(26px,5vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:14px;background:linear-gradient(135deg,var(--t),var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.conn-s{font-size:15px;color:var(--td);max-width:480px;line-height:1.6;margin-bottom:36px}
+.conn-stats{margin-top:28px;display:flex;gap:28px;flex-wrap:wrap;justify-content:center}
+.cs-v{font-size:20px;font-weight:800;color:var(--g)}
+.cs-l{font-size:10px;color:var(--tm);margin-top:2px;text-transform:uppercase;letter-spacing:.08em}
+.conn-c{margin-top:40px;padding:10px 16px;border-radius:7px;background:var(--card);border:1px solid var(--brd);font-size:10px;color:var(--tm)}
+.notifs{position:fixed;top:14px;right:14px;z-index:1000;display:flex;flex-direction:column;gap:6px}
+.notif{padding:8px 14px;border-radius:7px;font-size:11px;font-weight:600;max-width:380px;animation:si .3s ease}
+.n-ok{background:var(--gd);border:1px solid rgba(16,185,129,.25);color:var(--g)}
+.n-err{background:var(--rd);border:1px solid rgba(239,68,68,.25);color:var(--r)}
+.n-info{background:var(--bd);border:1px solid rgba(59,130,246,.25);color:var(--b)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--g);box-shadow:0 0 6px var(--g);display:inline-block}
+.tag{display:inline-flex;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;text-transform:uppercase}
+.tag-g{color:var(--g);background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2)}
+.tag-r{color:var(--r);background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2)}
+.tag-y{color:var(--y);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2)}
+.tag-b{color:var(--b);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2)}
+.mf{background:var(--inp);border:1px solid var(--brd);border-radius:8px;padding:14px;margin-top:12px}
+.mf-t{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.mf-r{display:flex;justify-content:space-between;align-items:center}
+.mf-i{text-align:center;flex:1}
+.mf-v{font-size:16px;font-weight:700}
+.mf-l{font-size:9px;color:var(--td);margin-top:2px}
+.mf-a{color:var(--tm);font-size:16px}
+.proof-tx{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--inp);border:1px solid var(--brd);border-radius:8px;margin-bottom:6px;font-size:11px;flex-wrap:wrap;gap:6px}
+.proof-tx a{color:var(--g);text-decoration:none;font-weight:600}
+.proof-tx a:hover{text-decoration:underline}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--td);font-size:13px;gap:8px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--g);border-radius:50%;animation:sp .6s linear infinite}
+.link{color:var(--g);text-decoration:none;font-weight:600}.link:hover{text-decoration:underline}
+.hidden{display:none!important}
+footer{border-top:1px solid var(--brd);padding:14px 20px;text-align:center;font-size:10px;color:var(--tm);position:relative;z-index:1}
+footer a{color:var(--g);text-decoration:none}
+@keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes si{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media(max-width:600px){.fr{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}.conn-t{font-size:24px}.tabs{flex-wrap:wrap}.tab{font-size:10px;padding:6px 8px}}
+</style>
+</head>
+<body>
+<div class="notifs" id="notifs"></div>
+<header class="hdr"><div class="hdr-in">
+  <div class="logo">Prmission <span class="badge">Base L2</span> <span class="badge" style="color:var(--b);background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.2)">dApp</span></div>
+  <div id="wallet-area"><button class="btn btn-p" id="connect-btn" onclick="connectWallet()">Connect Wallet</button></div>
+</div></header>
+
+<div class="main">
+<!-- CONNECT SCREEN -->
+<div id="screen-connect" class="conn">
+  <div class="conn-i">&#x1F510;</div>
+  <h1 class="conn-t">Your Data. Your Wallet.<br>You Get Paid.</h1>
+  <p class="conn-s">AI agents pay you in USDC for consented access to your data. Every settlement happens on-chain through the Prmission smart contract on Base.</p>
+  <button class="btn btn-p btn-lg" onclick="connectWallet()">&#x2192; Connect Wallet</button>
+  <div class="conn-stats">
+    <div><div class="cs-v">3%</div><div class="cs-l">Protocol Fee</div></div>
+    <div><div class="cs-v">Base L2</div><div class="cs-l">Network</div></div>
+    <div><div class="cs-v">USDC</div><div class="cs-l">Settlement</div></div>
+    <div><div class="cs-v" id="s-perms">-</div><div class="cs-l">Permissions</div></div>
+    <div><div class="cs-v" id="s-escrows">-</div><div class="cs-l">Escrows</div></div>
+  </div>
+  <div class="conn-c">Contract: <span style="color:var(--g)">0x0c8B16a57524f4009581B748356E01e1a969223d</span> &middot; Verified on BaseScan</div>
+</div>
+
+<!-- CONNECTED APP -->
+<div id="screen-app" class="hidden">
+  <div class="tabs">
+    <button class="tab on" onclick="switchTab('dashboard',this)">&#x25C6; Dashboard</button>
+    <button class="tab" onclick="switchTab('grant',this)">+ Grant</button>
+    <button class="tab" onclick="switchTab('permissions',this)">&#x25C8; Permissions</button>
+    <button class="tab" onclick="switchTab('proof',this)">&#x2713; Proof</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard">
+    <div class="card" style="background:linear-gradient(135deg,var(--card),#0f2922);border-color:rgba(16,185,129,.15)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px">
+        <div>
+          <div style="font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Connected Wallet</div>
+          <div style="font-size:14px;font-weight:700;color:var(--g)" id="d-wallet">-</div>
+          <div style="font-size:11px;color:var(--td);margin-top:4px">Base Mainnet (Chain ID 8453)</div>
+        </div>
+        <div class="grid3" style="min-width:280px">
+          <div class="card" style="padding:10px;text-align:center;margin:0"><div style="font-size:20px;font-weight:800;color:var(--g)" id="d-my">-</div><div style="font-size:9px;color:var(--td);text-transform:uppercase;margin-top:2px">My Permissions</div></div>
+          <div class="card" style="padding:10px;text-align:center;margin:0"><div style="font-size:20px;font-weight:800;color:var(--b)" id="d-tp">-</div><div style="font-size:9px;color:var(--td);text-transform:uppercase;margin-top:2px">Protocol Total</div></div>
+          <div class="card" style="padding:10px;text-align:center;margin:0"><div style="font-size:20px;font-weight:800;color:var(--y)" id="d-te">-</div><div style="font-size:9px;color:var(--td);text-transform:uppercase;margin-top:2px">Total Escrows</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Protocol Info</div>
+      <div class="grid3">
+        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Contract</div><a href="https://basescan.org/address/0x0c8B16a57524f4009581B748356E01e1a969223d#code" target="_blank" class="link" style="font-size:12px">0x0c8B...223d &#x2197;</a></div>
+        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Network</div><div style="font-size:12px;font-weight:600;margin-top:2px">Base (Ethereum L2)</div></div>
+        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Payment</div><div style="font-size:12px;font-weight:600;margin-top:2px">USDC</div></div>
+        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Fee</div><div style="font-size:12px;font-weight:600;margin-top:2px;color:var(--g)">3% (hardcoded)</div></div>
+        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Dispute</div><div style="font-size:12px;font-weight:600;margin-top:2px">24 hours</div></div>
+        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Max Comp</div><div style="font-size:12px;font-weight:600;margin-top:2px">50%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRANT -->
+  <div id="tab-grant" class="hidden">
+    <div class="card" style="border-color:rgba(16,185,129,.2)">
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px">Grant New Permission</div>
+      <p style="font-size:11px;color:var(--td);margin-bottom:16px">Calls <span style="color:var(--g)">grantPermission()</span> on PrmissionV2. You sign a real transaction on Base.</p>
+      <div class="fg"><label class="fl">Agent / Merchant Address</label><input class="fi" id="g-agent" placeholder="0x... (empty = open access)"><div style="font-size:9px;color:var(--tm);margin-top:3px">Empty = any agent can use this permission</div></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Data Category</label><input class="fi" id="g-cat" placeholder="e.g. Travel, Health" value="Travel"></div>
+        <div class="fg"><label class="fl">Compensation</label><div class="iw"><input class="fi" id="g-comp" type="number" min="0" max="50" value="10" oninput="updatePreview()"><span class="is">% (max 50)</span></div></div>
+      </div>
+      <div class="fg"><label class="fl">Purpose</label><input class="fi" id="g-purp" placeholder="e.g. Flight booking optimization" value="AI agent data access"></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Upfront Fee (USDC)</label><div class="iw"><input class="fi" id="g-up" type="number" min="0" value="0"><span class="is">USDC</span></div></div>
+        <div class="fg"><label class="fl">Duration</label><div class="iw"><input class="fi" id="g-dur" type="number" min="1" value="30"><span class="is">days</span></div></div>
+      </div>
+      <div class="mf"><div class="mf-t">Settlement Preview (per $100 USDC escrow)</div><div class="mf-r">
+        <div class="mf-i"><div class="mf-v" style="color:var(--g)" id="pv-u">$10.00</div><div class="mf-l">You</div></div>
+        <div class="mf-a">&#x2192;</div>
+        <div class="mf-i"><div class="mf-v" style="color:var(--y)" id="pv-p">$3.00</div><div class="mf-l">Protocol (3%)</div></div>
+        <div class="mf-a">&#x2192;</div>
+        <div class="mf-i"><div class="mf-v" style="color:var(--b)" id="pv-a">$87.00</div><div class="mf-l">Agent</div></div>
+      </div></div>
+      <div style="margin-top:16px"><button class="btn btn-p" onclick="doGrant()" id="grant-btn">Sign &amp; Grant Permission</button></div>
+    </div>
+  </div>
+
+  <!-- PERMISSIONS -->
+  <div id="tab-permissions" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div><div style="font-size:16px;font-weight:800">My Permissions</div><div style="font-size:11px;color:var(--td)" id="p-sub">Loading...</div></div>
+      <button class="btn btn-p" style="padding:6px 14px;font-size:12px" onclick="switchTab('grant',document.querySelectorAll('.tab')[1])">+ Grant New</button>
+    </div>
+    <div id="p-list"><div class="loading"><span class="spin"></span> Reading from Base...</div></div>
+  </div>
+
+  <!-- PROOF -->
+  <div id="tab-proof" class="hidden">
+    <div class="card" style="border-color:rgba(16,185,129,.2)">
+      <div style="font-size:16px;font-weight:800;margin-bottom:4px">&#x2713; Live Transaction Proof</div>
+      <div style="font-size:12px;color:var(--td);margin-bottom:16px">Three real transactions on Base Mainnet &mdash; Feb 17, 2026. Verifiable on BaseScan.</div>
+      <div class="proof-tx"><div><span class="tag tag-g">1. Grant Permission</span></div><div style="font-size:10px;color:var(--tm)">Block 42291734</div><a href="https://basescan.org/tx/0xabaf9adb1646ce900eca37790bdb872019fa90cb7eda752f5422848ebd531242" target="_blank">0xabaf...1242 &#x2197;</a></div>
+      <div class="proof-tx"><div><span class="tag tag-b">2. Deposit 1 USDC Escrow</span></div><div style="font-size:10px;color:var(--tm)">Block 42291738</div><a href="https://basescan.org/tx/0xc2c4f2429ed074e36ff699a1ed406ab9e9d1845118e11286e9e73b09d174c59b" target="_blank">0xc2c4...c59b &#x2197;</a></div>
+      <div class="proof-tx"><div><span class="tag tag-y">3. Report Outcome</span></div><div style="font-size:10px;color:var(--tm)">Block 42291741</div><a href="https://basescan.org/tx/0x3f5b2540d259cabb3521a75806ae67fc40b92be7a6e8ccd858eba8d3769e9db3" target="_blank">0x3f5b...9db3 &#x2197;</a></div>
+      <div class="mf"><div class="mf-t">Settlement Math &mdash; 1 USDC Escrow at 10% Compensation</div><div class="mf-r">
+        <div class="mf-i"><div class="mf-v" style="color:var(--g)">$0.10</div><div class="mf-l">User (10%)</div></div><div class="mf-a">&#x2192;</div>
+        <div class="mf-i"><div class="mf-v" style="color:var(--y)">$0.03</div><div class="mf-l">Protocol (3%)</div></div><div class="mf-a">&#x2192;</div>
+        <div class="mf-i"><div class="mf-v" style="color:var(--b)">$0.87</div><div class="mf-l">Agent (87%)</div></div>
+      </div></div>
+      <div style="margin-top:14px;font-size:11px;color:var(--td)"><strong style="color:var(--t)">What this proves:</strong> A Python SDK agent paid a user for consent-gated location data access. Full flow executed live on Base mainnet with real USDC.</div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <a href="https://basescan.org/address/0x0c8B16a57524f4009581B748356E01e1a969223d#code" target="_blank" class="btn btn-g">BaseScan &#x2197;</a>
+        <a href="https://github.com/marcosbenaim-hub/Prmission-Protocol" target="_blank" class="btn btn-g">GitHub &#x2197;</a>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<footer><span style="color:var(--g);font-weight:700">Prmission Protocol</span> &middot; Live on Base &middot; <a href="https://basescan.org/address/0x0c8B16a57524f4009581B748356E01e1a969223d#code" target="_blank">BaseScan</a> &middot; <a href="https://github.com/marcosbenaim-hub/Prmission-Protocol" target="_blank">GitHub</a> &middot; <a href="https://prmission.com" target="_blank">prmission.com</a></footer>
+
+<script>
+const CONTRACT="0x0c8B16a57524f4009581B748356E01e1a969223d";
+const BASE_HEX="0x2105",BASE_RPC="https://mainnet.base.org",BSCAN="https://basescan.org";
+
+const ABI=[
+  "function nextPermissionId() view returns (uint256)",
+  "function nextEscrowId() view returns (uint256)",
+  "function PROTOCOL_FEE_BPS() view returns (uint256)",
+  "function MAX_COMPENSATION_BPS() view returns (uint256)",
+  "function totalProtocolFees() view returns (uint256)",
+  "function totalSettledVolume() view returns (uint256)",
+  "function permissions(uint256) view returns (address user, address merchant, string dataCategory, string purpose, uint256 compensationBps, uint256 upfrontFee, uint256 validUntil, uint8 status, uint256 createdAt, uint256 revokedAt)",
+  "function escrows(uint256) view returns (uint256 permissionId, address agent, uint256 agentId, uint256 amount, uint256 outcomeValue, string outcomeType, string outcomeDescription, uint256 reportedAt, uint8 status, uint256 createdAt)",
+  "function getUserPermissions(address user, uint256 offset, uint256 limit) view returns (uint256[])",
+  "function getUserPermissionCount(address user) view returns (uint256)",
+  "function getPermissionEscrows(uint256 permissionId) view returns (uint256[])",
+  "function previewSettlement(uint256 escrowId) view returns (uint256 userShare, uint256 protocolFee, uint256 agentRefund, uint256 disputeWindowEnd)",
+  "function grantPermission(address merchant, string calldata dataCategory, string calldata purpose, uint256 compensationBps, uint256 upfrontFee, uint256 validityPeriod) returns (uint256)",
+  "function revokePermission(uint256 permissionId)",
+  "function settle(uint256 escrowId)",
+  "function disputeSettlement(uint256 escrowId, string calldata reason)",
+  "function refundEscrow(uint256 escrowId)"
+];
+
+let provider,signer,contract,wallet;
+const rp=new ethers.JsonRpcProvider(BASE_RPC);
+const rc=new ethers.Contract(CONTRACT,ABI,rp);
+
+function notify(m,t="ok"){const e=document.createElement("div");e.className=`notif n-${t}`;e.innerHTML=(t==="err"?"&#x2715; ":t==="info"?"&#x2139; ":"&#x2713; ")+m;document.getElementById("notifs").appendChild(e);setTimeout(()=>e.remove(),5000)}
+function short(a){return a?a.slice(0,6)+"..."+a.slice(-4):"-"}
+
+// Load protocol stats on page load
+(async()=>{try{const[np,ne]=await Promise.all([rc.nextPermissionId(),rc.nextEscrowId()]);document.getElementById("s-perms").textContent=Number(np)-1;document.getElementById("s-escrows").textContent=Number(ne)-1}catch(e){console.error(e)}})();
+
+async function connectWallet(){
+  const b=document.getElementById("connect-btn");b.disabled=true;b.textContent="Connecting...";
+  try{
+    if(!window.ethereum){notify("No wallet found. Install Coinbase Wallet or MetaMask.","err");b.disabled=false;b.textContent="Connect Wallet";return}
+    const accs=await window.ethereum.request({method:"eth_requestAccounts"});wallet=accs[0];
+    const cid=await window.ethereum.request({method:"eth_chainId"});
+    if(cid!==BASE_HEX){try{await window.ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:BASE_HEX}]})}catch(sw){if(sw.code===4902){await window.ethereum.request({method:"wallet_addEthereumChain",params:[{chainId:BASE_HEX,chainName:"Base",nativeCurrency:{name:"ETH",symbol:"ETH",decimals:18},rpcUrls:[BASE_RPC],blockExplorerUrls:[BSCAN]}]})}else{notify("Switch to Base network","err");b.disabled=false;b.textContent="Connect Wallet";return}}}
+    provider=new ethers.BrowserProvider(window.ethereum);signer=await provider.getSigner();contract=new ethers.Contract(CONTRACT,ABI,signer);
+    document.getElementById("wallet-area").innerHTML=`<div style="display:flex;align-items:center;gap:10px"><div style="padding:5px 12px;border-radius:7px;background:var(--gd);border:1px solid rgba(16,185,129,.2);font-size:11px;color:var(--g);font-weight:600;display:flex;align-items:center;gap:6px"><span class="dot"></span> ${short(wallet)}</div><button class="btn btn-g" onclick="disco()">Disconnect</button></div>`;
+    document.getElementById("screen-connect").classList.add("hidden");document.getElementById("screen-app").classList.remove("hidden");
+    notify("Connected to Base");loadDash();loadPerms();
+    window.ethereum.on("accountsChanged",()=>location.reload());window.ethereum.on("chainChanged",()=>location.reload());
+  }catch(e){console.error(e);notify("Failed: "+(e.message||e),"err");b.disabled=false;b.textContent="Connect Wallet"}
+}
+
+function disco(){wallet=null;provider=null;signer=null;contract=null;document.getElementById("screen-app").classList.add("hidden");document.getElementById("screen-connect").classList.remove("hidden");document.getElementById("wallet-area").innerHTML='<button class="btn btn-p" id="connect-btn" onclick="connectWallet()">Connect Wallet</button>';notify("Disconnected")}
+
+async function loadDash(){
+  if(!wallet)return;document.getElementById("d-wallet").textContent=short(wallet);
+  try{const[np,ne,mc]=await Promise.all([rc.nextPermissionId(),rc.nextEscrowId(),rc.getUserPermissionCount(wallet)]);document.getElementById("d-my").textContent=Number(mc);document.getElementById("d-tp").textContent=Number(np)-1;document.getElementById("d-te").textContent=Number(ne)-1}catch(e){console.error(e)}
+}
+
+const PS=["INACTIVE","ACTIVE","REVOKED","EXPIRED"],PC=["tag-y","tag-g","tag-r","tag-y"];
+
+async function loadPerms(){
+  if(!wallet)return;const el=document.getElementById("p-list");
+  try{
+    const cnt=Number(await rc.getUserPermissionCount(wallet));
+    document.getElementById("p-sub").textContent=`${cnt} permission${cnt!==1?"s":""}`;
+    if(cnt===0){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--tm)"><div style="font-size:40px;margin-bottom:12px;opacity:.5">&#x1F512;</div><div style="font-size:13px;margin-bottom:6px">No permissions yet</div><div style="font-size:11px">Grant your first permission to start earning.</div><button class="btn btn-p" style="margin-top:14px" onclick="switchTab(\'grant\',document.querySelectorAll(\'.tab\')[1])">+ Grant Permission</button></div>';return}
+    const ids=await rc.getUserPermissions(wallet,0,cnt);let h="";
+    for(const id of ids){
+      const p=await rc.permissions(id);const st=Number(p.status);const cp=Number(p.compensationBps)/100;
+      const merch=p.merchant==="0x0000000000000000000000000000000000000000"?"Open (any agent)":short(p.merchant);
+      const exp=new Date(Number(p.validUntil)*1000).toLocaleDateString();const cre=new Date(Number(p.createdAt)*1000).toLocaleDateString();
+      let ec=0;try{ec=(await rc.getPermissionEscrows(id)).length}catch(e){}
+      h+=`<div class="card" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px"><div style="flex:1;min-width:200px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:15px;font-weight:700">Permission #${Number(id)}</span><span class="tag ${PC[st]||"tag-y"}">${PS[st]||"?"}</span></div><div style="font-size:12px;color:var(--td);margin-bottom:4px">${p.purpose}</div><div style="display:flex;gap:14px;font-size:11px;color:var(--tm);flex-wrap:wrap"><span>&#x1F4CA; ${p.dataCategory}</span><span>&#x1F4B0; ${cp}%</span><span>&#x1F4E6; ${ec} escrow${ec!==1?"s":""}</span><span>&#x1F464; ${merch}</span></div><div style="font-size:10px;color:var(--tm);margin-top:4px">Created ${cre} &middot; Expires ${exp}</div></div><div style="text-align:right">${st===1?`<button class="btn btn-d" onclick="doRevoke(${Number(id)})">Revoke</button>`:""}</div></div></div>`;
+    }
+    el.innerHTML=h;
+  }catch(e){console.error(e);el.innerHTML=`<div style="text-align:center;padding:20px;color:var(--r);font-size:12px">Error: ${e.message}</div>`}
+}
+
+async function doGrant(){
+  if(!contract){notify("Connect wallet first","err");return}
+  const b=document.getElementById("grant-btn");b.disabled=true;b.textContent="Signing...";
+  try{
+    const agent=document.getElementById("g-agent").value.trim()||"0x0000000000000000000000000000000000000000";
+    const cat=document.getElementById("g-cat").value.trim();const purp=document.getElementById("g-purp").value.trim();
+    if(!cat||!purp){notify("Category and purpose required","err");b.disabled=false;b.textContent="Sign & Grant Permission";return}
+    const bps=Math.min(parseInt(document.getElementById("g-comp").value)||0,50)*100;
+    const up=ethers.parseUnits((parseFloat(document.getElementById("g-up").value)||0).toString(),6);
+    const dur=(parseInt(document.getElementById("g-dur").value)||30)*86400;
+    notify("Sending grantPermission() to Base...","info");
+    const tx=await contract.grantPermission(agent,cat,purp,bps,up,dur);
+    notify("Tx sent! Confirming...","info");b.textContent="Confirming...";
+    const r=await tx.wait();
+    notify(`Permission granted! <a href="${BSCAN}/tx/${r.hash}" target="_blank" style="color:var(--g)">${short(r.hash)} &#x2197;</a>`);
+    b.disabled=false;b.textContent="Sign & Grant Permission";loadDash();loadPerms();
+  }catch(e){console.error(e);notify((e.reason||e.message||"Failed").slice(0,120),"err");b.disabled=false;b.textContent="Sign & Grant Permission"}
+}
+
+async function doRevoke(id){
+  if(!contract){notify("Connect wallet","err");return}
+  if(!confirm(`Revoke permission #${id}? Active escrows get 60s grace.`))return;
+  try{notify(`Revoking #${id}...`,"info");const tx=await contract.revokePermission(id);await tx.wait();notify(`#${id} revoked!`);loadPerms();loadDash()}catch(e){notify((e.reason||e.message||"Failed").slice(0,120),"err")}
+}
+
+function updatePreview(){const c=Math.min(parseFloat(document.getElementById("g-comp").value)||0,50);const u=(100*c/100).toFixed(2);const p=(3).toFixed(2);const a=(100-parseFloat(u)-parseFloat(p)).toFixed(2);document.getElementById("pv-u").textContent="$"+u;document.getElementById("pv-p").textContent="$"+p;document.getElementById("pv-a").textContent="$"+a}
+
+function switchTab(n,btn){document.querySelectorAll('[id^="tab-"]').forEach(e=>e.classList.add("hidden"));document.getElementById("tab-"+n).classList.remove("hidden");document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));if(btn)btn.classList.add("on")}
+</script>
+</body>
+</html>
