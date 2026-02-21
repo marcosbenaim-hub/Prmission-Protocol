@@ -232,30 +232,48 @@ function short(a){return a?a.slice(0,6)+"..."+a.slice(-4):"-"}
 // Load protocol stats on page load
 (async()=>{try{const[np,ne]=await Promise.all([rc.nextPermissionId(),rc.nextEscrowId()]);document.getElementById("s-perms").textContent=Number(np)-1;document.getElementById("s-escrows").textContent=Number(ne)-1}catch(e){console.error(e)}})();
 
+async function getProvider(){
+  // Immediately available
+  if(window.ethereum)return window.ethereum;
+  if(window.coinbaseWalletExtension)return window.coinbaseWalletExtension;
+  // Wait for injection (Coinbase Wallet mobile can be slow)
+  return new Promise((resolve)=>{
+    let tries=0;
+    const check=setInterval(()=>{
+      tries++;
+      if(window.ethereum){clearInterval(check);resolve(window.ethereum)}
+      else if(window.coinbaseWalletExtension){clearInterval(check);resolve(window.coinbaseWalletExtension)}
+      else if(tries>20){clearInterval(check);resolve(null)}
+    },200);
+  });
+}
+
 async function connectWallet(){
-  const b=document.getElementById("connect-btn");b.disabled=true;b.textContent="Connecting...";
+  const b=document.getElementById("connect-btn");b.disabled=true;b.textContent="Looking for wallet...";
   try{
-    // Detect wallet provider - support MetaMask, Coinbase Wallet, and others
-    let eth=window.ethereum;
-    if(!eth&&window.coinbaseWalletExtension)eth=window.coinbaseWalletExtension;
-    if(!eth&&window.web3&&window.web3.currentProvider)eth=window.web3.currentProvider;
+    let eth=await getProvider();
     
-    // If multiple providers (e.g. both MetaMask and Coinbase), try to find the right one
+    // Handle multiple providers
     if(eth&&eth.providers&&eth.providers.length){
       eth=eth.providers.find(p=>p.isCoinbaseWallet)||eth.providers.find(p=>p.isMetaMask)||eth.providers[0];
     }
     
     if(!eth){
-      // Mobile: show helpful message with links
       const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       if(isMobile){
-        notify("Open this page in your Coinbase Wallet or MetaMask app's browser","err");
+        // Deep link to open in Coinbase Wallet
+        const dappUrl=encodeURIComponent(window.location.href);
+        const cbLink=`https://go.cb-w.com/dapp?cb_url=${dappUrl}`;
+        notify("Opening Coinbase Wallet...","info");
+        window.location.href=cbLink;
+        return;
       }else{
         notify("No wallet found. Install Coinbase Wallet or MetaMask.","err");
       }
       b.disabled=false;b.textContent="💳 Connect Your Wallet to Start";return;
     }
     
+    b.textContent="Connecting...";
     const accs=await eth.request({method:"eth_requestAccounts"});wallet=accs[0];
     const cid=await eth.request({method:"eth_chainId"});
     if(cid!==BASE_HEX){try{await eth.request({method:"wallet_switchEthereumChain",params:[{chainId:BASE_HEX}]})}catch(sw){if(sw.code===4902||sw.code===4001){await eth.request({method:"wallet_addEthereumChain",params:[{chainId:BASE_HEX,chainName:"Base",nativeCurrency:{name:"ETH",symbol:"ETH",decimals:18},rpcUrls:[BASE_RPC],blockExplorerUrls:[BSCAN]}]})}else{notify("Switch to Base network","err");b.disabled=false;b.textContent="💳 Connect Your Wallet to Start";return}}}
