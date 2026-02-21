@@ -257,19 +257,25 @@ const PS=["INACTIVE","ACTIVE","REVOKED","EXPIRED"],PC=["tag-y","tag-g","tag-r","
 async function loadPerms(){
   if(!wallet)return;const el=document.getElementById("p-list");
   try{
-    const cnt=Number(await rc.getUserPermissionCount(wallet));
+    // Use contract with signer if available, fallback to read-only
+    const c=contract||rc;
+    const cnt=Number(await c.getUserPermissionCount(wallet));
     document.getElementById("p-sub").textContent=`${cnt} permission${cnt!==1?"s":""}`;
     if(cnt===0){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--tm)"><div style="font-size:40px;margin-bottom:12px;opacity:.5">&#x1F512;</div><div style="font-size:13px;margin-bottom:6px">No permissions yet</div><div style="font-size:11px">Grant your first permission to start earning.</div><button class="btn btn-p" style="margin-top:14px" onclick="switchTab(\'grant\',document.querySelectorAll(\'.tab\')[1])">+ Grant Permission</button></div>';return}
-    const ids=await rc.getUserPermissions(wallet,0,cnt);let h="";
+    const ids=await c.getUserPermissions(wallet,0,cnt);let h="";
     for(const id of ids){
-      const p=await rc.permissions(id);const st=Number(p.status);const cp=Number(p.compensationBps)/100;
-      const merch=p.merchant==="0x0000000000000000000000000000000000000000"?"Open (any agent)":short(p.merchant);
-      const exp=new Date(Number(p.validUntil)*1000).toLocaleDateString();const cre=new Date(Number(p.createdAt)*1000).toLocaleDateString();
-      let ec=0;try{ec=(await rc.getPermissionEscrows(id)).length}catch(e){}
-      h+=`<div class="card" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px"><div style="flex:1;min-width:200px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:15px;font-weight:700">Permission #${Number(id)}</span><span class="tag ${PC[st]||"tag-y"}">${PS[st]||"?"}</span></div><div style="font-size:12px;color:var(--td);margin-bottom:4px">${p.purpose}</div><div style="display:flex;gap:14px;font-size:11px;color:var(--tm);flex-wrap:wrap"><span>&#x1F4CA; ${p.dataCategory}</span><span>&#x1F4B0; ${cp}%</span><span>&#x1F4E6; ${ec} escrow${ec!==1?"s":""}</span><span>&#x1F464; ${merch}</span></div><div style="font-size:10px;color:var(--tm);margin-top:4px">Created ${cre} &middot; Expires ${exp}</div></div><div style="text-align:right">${st===1?`<button class="btn btn-d" onclick="doRevoke(${Number(id)})">Revoke</button>`:""}</div></div></div>`;
+      try{
+        const p=await c.permissions(id);const st=Number(p[7]);const cp=Number(p[4])/100;
+        const merchantAddr=p[1];
+        const merch=merchantAddr==="0x0000000000000000000000000000000000000000"?"Open (any agent)":short(merchantAddr);
+        const exp=new Date(Number(p[6])*1000).toLocaleDateString();const cre=new Date(Number(p[8])*1000).toLocaleDateString();
+        const category=p[2];const purpose=p[3];
+        let ec=0;try{ec=(await c.getPermissionEscrows(id)).length}catch(e){}
+        h+=`<div class="card" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px"><div style="flex:1;min-width:200px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:15px;font-weight:700">Permission #${Number(id)}</span><span class="tag ${PC[st]||"tag-y"}">${PS[st]||"?"}</span></div><div style="font-size:12px;color:var(--td);margin-bottom:4px">${purpose}</div><div style="display:flex;gap:14px;font-size:11px;color:var(--tm);flex-wrap:wrap"><span>&#x1F4CA; ${category}</span><span>&#x1F4B0; ${cp}%</span><span>&#x1F4E6; ${ec} escrow${ec!==1?"s":""}</span><span>&#x1F464; ${merch}</span></div><div style="font-size:10px;color:var(--tm);margin-top:4px">Created ${cre} &middot; Expires ${exp}</div></div><div style="text-align:right">${st===1?`<button class="btn btn-d" onclick="doRevoke(${Number(id)})">Revoke</button>`:""}</div></div></div>`;
+      }catch(pe){console.error("Permission",Number(id),"error:",pe);h+=`<div class="card" style="margin-bottom:8px"><div style="font-size:13px">Permission #${Number(id)} <span style="color:var(--r);font-size:11px">(failed to load details)</span></div></div>`}
     }
     el.innerHTML=h;
-  }catch(e){console.error(e);el.innerHTML=`<div style="text-align:center;padding:20px;color:var(--r);font-size:12px">Error: ${e.message}</div>`}
+  }catch(e){console.error(e);el.innerHTML=`<div style="text-align:center;padding:20px;color:var(--r);font-size:12px">Error: ${e.message}<br><button class="btn btn-p" style="margin-top:10px" onclick="loadPerms()">Retry</button></div>`}
 }
 
 async function doGrant(){
