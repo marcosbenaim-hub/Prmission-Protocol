@@ -235,16 +235,36 @@ function short(a){return a?a.slice(0,6)+"..."+a.slice(-4):"-"}
 async function connectWallet(){
   const b=document.getElementById("connect-btn");b.disabled=true;b.textContent="Connecting...";
   try{
-    if(!window.ethereum){notify("No wallet found. Install Coinbase Wallet or MetaMask.","err");b.disabled=false;b.textContent="Connect Wallet";return}
-    const accs=await window.ethereum.request({method:"eth_requestAccounts"});wallet=accs[0];
-    const cid=await window.ethereum.request({method:"eth_chainId"});
-    if(cid!==BASE_HEX){try{await window.ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:BASE_HEX}]})}catch(sw){if(sw.code===4902){await window.ethereum.request({method:"wallet_addEthereumChain",params:[{chainId:BASE_HEX,chainName:"Base",nativeCurrency:{name:"ETH",symbol:"ETH",decimals:18},rpcUrls:[BASE_RPC],blockExplorerUrls:[BSCAN]}]})}else{notify("Switch to Base network","err");b.disabled=false;b.textContent="Connect Wallet";return}}}
-    provider=new ethers.BrowserProvider(window.ethereum);signer=await provider.getSigner();contract=new ethers.Contract(CONTRACT,ABI,signer);
+    // Detect wallet provider - support MetaMask, Coinbase Wallet, and others
+    let eth=window.ethereum;
+    if(!eth&&window.coinbaseWalletExtension)eth=window.coinbaseWalletExtension;
+    if(!eth&&window.web3&&window.web3.currentProvider)eth=window.web3.currentProvider;
+    
+    // If multiple providers (e.g. both MetaMask and Coinbase), try to find the right one
+    if(eth&&eth.providers&&eth.providers.length){
+      eth=eth.providers.find(p=>p.isCoinbaseWallet)||eth.providers.find(p=>p.isMetaMask)||eth.providers[0];
+    }
+    
+    if(!eth){
+      // Mobile: show helpful message with links
+      const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if(isMobile){
+        notify("Open this page in your Coinbase Wallet or MetaMask app's browser","err");
+      }else{
+        notify("No wallet found. Install Coinbase Wallet or MetaMask.","err");
+      }
+      b.disabled=false;b.textContent="💳 Connect Your Wallet to Start";return;
+    }
+    
+    const accs=await eth.request({method:"eth_requestAccounts"});wallet=accs[0];
+    const cid=await eth.request({method:"eth_chainId"});
+    if(cid!==BASE_HEX){try{await eth.request({method:"wallet_switchEthereumChain",params:[{chainId:BASE_HEX}]})}catch(sw){if(sw.code===4902||sw.code===4001){await eth.request({method:"wallet_addEthereumChain",params:[{chainId:BASE_HEX,chainName:"Base",nativeCurrency:{name:"ETH",symbol:"ETH",decimals:18},rpcUrls:[BASE_RPC],blockExplorerUrls:[BSCAN]}]})}else{notify("Switch to Base network","err");b.disabled=false;b.textContent="💳 Connect Your Wallet to Start";return}}}
+    provider=new ethers.BrowserProvider(eth);signer=await provider.getSigner();contract=new ethers.Contract(CONTRACT,ABI,signer);
     document.getElementById("wallet-area").innerHTML=`<div style="display:flex;align-items:center;gap:10px"><div style="padding:5px 12px;border-radius:7px;background:var(--gd);border:1px solid rgba(16,185,129,.2);font-size:11px;color:var(--g);font-weight:600;display:flex;align-items:center;gap:6px"><span class="dot"></span> ${short(wallet)}</div><button class="btn btn-g" onclick="disco()">Disconnect</button></div>`;
     document.getElementById("screen-connect").classList.add("hidden");document.getElementById("screen-app").classList.remove("hidden");
     notify("Wallet connected! You're on Base.");loadDash();loadPerms();
-    window.ethereum.on("accountsChanged",()=>location.reload());window.ethereum.on("chainChanged",()=>location.reload());
-  }catch(e){console.error(e);notify("Failed: "+(e.message||e),"err");b.disabled=false;b.textContent="Connect Wallet"}
+    eth.on("accountsChanged",()=>location.reload());eth.on("chainChanged",()=>location.reload());
+  }catch(e){console.error(e);notify("Failed: "+(e.message||e),"err");b.disabled=false;b.textContent="💳 Connect Your Wallet to Start"}
 }
 
 function disco(){wallet=null;provider=null;signer=null;contract=null;document.getElementById("screen-app").classList.add("hidden");document.getElementById("screen-connect").classList.remove("hidden");document.getElementById("wallet-area").innerHTML='<button class="btn btn-p" id="connect-btn" onclick="connectWallet()">Connect Wallet</button>';notify("Disconnected")}
