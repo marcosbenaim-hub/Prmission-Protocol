@@ -78,33 +78,34 @@ footer a{color:var(--g);text-decoration:none}
 <div class="notifs" id="notifs"></div>
 <header class="hdr"><div class="hdr-in">
   <div class="logo">Prmission <span class="badge">Base L2</span> <span class="badge" style="color:var(--b);background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.2)">dApp</span></div>
-  <div id="wallet-area"><button class="btn btn-p" id="connect-btn" onclick="connectWallet()">Connect Wallet</button></div>
+  <div id="wallet-area"><button class="btn btn-p" id="connect-btn" onclick="connectWallet()" style="padding:10px 22px;font-size:14px;border-radius:10px">&#x1F4B3; Connect Wallet</button></div>
 </div></header>
 
 <div class="main">
 <!-- CONNECT SCREEN -->
 <div id="screen-connect" class="conn">
-  <div class="conn-i">&#x1F510;</div>
-  <h1 class="conn-t">Your Data. Your Wallet.<br>You Get Paid.</h1>
-  <p class="conn-s">AI agents pay you in USDC for consented access to your data. Every settlement happens on-chain through the Prmission smart contract on Base.</p>
-  <button class="btn btn-p btn-lg" onclick="connectWallet()">&#x2192; Connect Wallet</button>
+  <div class="conn-i">&#x1F4B0;</div>
+  <h1 class="conn-t">AI Agents Want Your Data.<br>Make Them Pay You.</h1>
+  <p class="conn-s">Companies use AI agents to learn about you. With Prmission, you choose what to share, set your price, and get paid in real dollars (USDC) every single time. It's automatic.</p>
+  <button class="btn btn-p btn-lg" style="padding:16px 36px;font-size:17px;border-radius:12px" onclick="connectWallet()">&#x1F4B3; Connect Your Wallet to Start</button>
+  <div style="font-size:11px;color:var(--tm);margin-top:10px">Works with Coinbase Wallet &amp; MetaMask</div>
   <div class="conn-stats">
-    <div><div class="cs-v">3%</div><div class="cs-l">Protocol Fee</div></div>
-    <div><div class="cs-v">Base L2</div><div class="cs-l">Network</div></div>
-    <div><div class="cs-v">USDC</div><div class="cs-l">Settlement</div></div>
-    <div><div class="cs-v" id="s-perms">-</div><div class="cs-l">Permissions</div></div>
-    <div><div class="cs-v" id="s-escrows">-</div><div class="cs-l">Escrows</div></div>
+    <div><div class="cs-v">3%</div><div class="cs-l">Our Fee</div></div>
+    <div><div class="cs-v">Instant</div><div class="cs-l">Payments</div></div>
+    <div><div class="cs-v">USDC</div><div class="cs-l">Real Dollars</div></div>
+    <div><div class="cs-v" id="s-perms">-</div><div class="cs-l">Users Active</div></div>
+    <div><div class="cs-v" id="s-escrows">-</div><div class="cs-l">Payments Made</div></div>
   </div>
-  <div class="conn-c">Contract: <span style="color:var(--g)">0x0c8B16a57524f4009581B748356E01e1a969223d</span> &middot; Verified on BaseScan</div>
+  <div class="conn-c">Secured by blockchain: <span style="color:var(--g)">0x0c8B16a57524f4009581B748356E01e1a969223d</span> &middot; Publicly verified</div>
 </div>
 
 <!-- CONNECTED APP -->
 <div id="screen-app" class="hidden">
   <div class="tabs">
-    <button class="tab on" onclick="switchTab('dashboard',this)">&#x25C6; Dashboard</button>
-    <button class="tab" onclick="switchTab('grant',this)">+ Grant</button>
-    <button class="tab" onclick="switchTab('permissions',this)">&#x25C8; Permissions</button>
-    <button class="tab" onclick="switchTab('proof',this)">&#x2713; Proof</button>
+    <button class="tab on" onclick="switchTab('dashboard',this)">&#x1F3E0; Home</button>
+    <button class="tab" onclick="switchTab('grant',this)">&#x2795; Share Data</button>
+    <button class="tab" onclick="switchTab('permissions',this)">&#x1F4CB; My Shares</button>
+    <button class="tab" onclick="switchTab('proof',this)">&#x2705; Real Proof</button>
   </div>
 
   <!-- DASHBOARD -->
@@ -112,26 +113,26 @@ footer a{color:var(--g);text-decoration:none}
     <div class="card" style="background:linear-gradient(135deg,var(--card),#0f2922);border-color:rgba(16,185,129,.15)">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px">
         <div>
-          <div style="font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Connected Wallet</div>
+          <div style="font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Your Wallet</div>
           <div style="font-size:14px;font-weight:700;color:var(--g)" id="d-wallet">-</div>
-          <div style="font-size:11px;color:var(--td);margin-top:4px">Base Mainnet (Chain ID 8453)</div>
+          <div style="font-size:11px;color:var(--td);margin-top:4px">Connected to Base (Coinbase's network)</div>
         </div>
         <div class="grid3" style="min-width:280px">
-          <div class="card" style="padding:10px;text-align:center;margin:0"><div style="font-size:20px;font-weight:800;color:var(--g)" id="d-my">-</div><div style="font-size:9px;color:var(--td);text-transform:uppercase;margin-top:2px">My Permissions</div></div>
-          <div class="card" style="padding:10px;text-align:center;margin:0"><div style="font-size:20px;font-weight:800;color:var(--b)" id="d-tp">-</div><div style="font-size:9px;color:var(--td);text-transform:uppercase;margin-top:2px">Protocol Total</div></div>
-          <div class="card" style="padding:10px;text-align:center;margin:0"><div style="font-size:20px;font-weight:800;color:var(--y)" id="d-te">-</div><div style="font-size:9px;color:var(--td);text-transform:uppercase;margin-top:2px">Total Escrows</div></div>
+          <div class="card" style="padding:10px;text-align:center;margin:0"><div style="font-size:20px;font-weight:800;color:var(--g)" id="d-my">-</div><div style="font-size:9px;color:var(--td);text-transform:uppercase;margin-top:2px">My Data Shares</div></div>
+          <div class="card" style="padding:10px;text-align:center;margin:0"><div style="font-size:20px;font-weight:800;color:var(--b)" id="d-tp">-</div><div style="font-size:9px;color:var(--td);text-transform:uppercase;margin-top:2px">Total Users</div></div>
+          <div class="card" style="padding:10px;text-align:center;margin:0"><div style="font-size:20px;font-weight:800;color:var(--y)" id="d-te">-</div><div style="font-size:9px;color:var(--td);text-transform:uppercase;margin-top:2px">Payments Made</div></div>
         </div>
       </div>
     </div>
     <div class="card">
-      <div style="font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Protocol Info</div>
+      <div style="font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">How It Works</div>
       <div class="grid3">
-        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Contract</div><a href="https://basescan.org/address/0x0c8B16a57524f4009581B748356E01e1a969223d#code" target="_blank" class="link" style="font-size:12px">0x0c8B...223d &#x2197;</a></div>
-        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Network</div><div style="font-size:12px;font-weight:600;margin-top:2px">Base (Ethereum L2)</div></div>
-        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Payment</div><div style="font-size:12px;font-weight:600;margin-top:2px">USDC</div></div>
-        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Fee</div><div style="font-size:12px;font-weight:600;margin-top:2px;color:var(--g)">3% (hardcoded)</div></div>
-        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Dispute</div><div style="font-size:12px;font-weight:600;margin-top:2px">24 hours</div></div>
-        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Max Comp</div><div style="font-size:12px;font-weight:600;margin-top:2px">50%</div></div>
+        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Verified On</div><a href="https://basescan.org/address/0x0c8B16a57524f4009581B748356E01e1a969223d#code" target="_blank" class="link" style="font-size:12px">BaseScan &#x2197;</a></div>
+        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Network</div><div style="font-size:12px;font-weight:600;margin-top:2px">Base (by Coinbase)</div></div>
+        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">You Get Paid In</div><div style="font-size:12px;font-weight:600;margin-top:2px">USDC (= US Dollars)</div></div>
+        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Our Cut</div><div style="font-size:12px;font-weight:600;margin-top:2px;color:var(--g)">Only 3%</div></div>
+        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Dispute Time</div><div style="font-size:12px;font-weight:600;margin-top:2px">24 hours to object</div></div>
+        <div><div style="font-size:9px;color:var(--tm);text-transform:uppercase">Your Max Cut</div><div style="font-size:12px;font-weight:600;margin-top:2px">Up to 50%</div></div>
       </div>
     </div>
   </div>
@@ -139,34 +140,35 @@ footer a{color:var(--g);text-decoration:none}
   <!-- GRANT -->
   <div id="tab-grant" class="hidden">
     <div class="card" style="border-color:rgba(16,185,129,.2)">
-      <div style="font-size:15px;font-weight:700;margin-bottom:4px">Grant New Permission</div>
-      <p style="font-size:11px;color:var(--td);margin-bottom:16px">Calls <span style="color:var(--g)">grantPermission()</span> on PrmissionV2. You sign a real transaction on Base.</p>
-      <div class="fg"><label class="fl">Agent / Merchant Address</label><input class="fi" id="g-agent" placeholder="0x... (empty = open access)"><div style="font-size:9px;color:var(--tm);margin-top:3px">Empty = any agent can use this permission</div></div>
+      <div style="font-size:18px;font-weight:700;margin-bottom:4px">&#x1F4B0; Share Your Data &amp; Get Paid</div>
+      <p style="font-size:12px;color:var(--td);margin-bottom:16px">Choose what data you want to share with AI agents. Set your price. Get paid automatically every time they use it.</p>
+      <div class="fg"><label class="fl">Who Can Access? (optional)</label><input class="fi" id="g-agent" placeholder="Leave empty = anyone can pay for your data"><div style="font-size:9px;color:var(--tm);margin-top:3px">Leave blank to let any AI agent pay you. Or paste a specific agent's address.</div></div>
       <div class="fr">
-        <div class="fg"><label class="fl">Data Category</label><input class="fi" id="g-cat" placeholder="e.g. Travel, Health" value="Travel"></div>
-        <div class="fg"><label class="fl">Compensation</label><div class="iw"><input class="fi" id="g-comp" type="number" min="0" max="50" value="10" oninput="updatePreview()"><span class="is">% (max 50)</span></div></div>
+        <div class="fg"><label class="fl">What Data Are You Sharing?</label><input class="fi" id="g-cat" placeholder="e.g. Travel, Health, Location" value="Travel"></div>
+        <div class="fg"><label class="fl">Your Cut (% of payment)</label><div class="iw"><input class="fi" id="g-comp" type="number" min="0" max="50" value="10" oninput="updatePreview()"><span class="is">% (max 50)</span></div></div>
       </div>
-      <div class="fg"><label class="fl">Purpose</label><input class="fi" id="g-purp" placeholder="e.g. Flight booking optimization" value="AI agent data access"></div>
+      <div class="fg"><label class="fl">What Will They Use It For?</label><input class="fi" id="g-purp" placeholder="e.g. Better travel recommendations" value="AI agent data access"></div>
       <div class="fr">
-        <div class="fg"><label class="fl">Upfront Fee (USDC)</label><div class="iw"><input class="fi" id="g-up" type="number" min="0" value="0"><span class="is">USDC</span></div></div>
-        <div class="fg"><label class="fl">Duration</label><div class="iw"><input class="fi" id="g-dur" type="number" min="1" value="30"><span class="is">days</span></div></div>
+        <div class="fg"><label class="fl">Upfront Fee (optional bonus)</label><div class="iw"><input class="fi" id="g-up" type="number" min="0" value="0"><span class="is">USDC</span></div></div>
+        <div class="fg"><label class="fl">How Long?</label><div class="iw"><input class="fi" id="g-dur" type="number" min="1" value="30"><span class="is">days</span></div></div>
       </div>
-      <div class="mf"><div class="mf-t">Settlement Preview (per $100 USDC escrow)</div><div class="mf-r">
-        <div class="mf-i"><div class="mf-v" style="color:var(--g)" id="pv-u">$10.00</div><div class="mf-l">You</div></div>
+      <div class="mf"><div class="mf-t">&#x1F4CA; Here's How The Money Splits (per $100 payment)</div><div class="mf-r">
+        <div class="mf-i"><div class="mf-v" style="color:var(--g)" id="pv-u">$10.00</div><div class="mf-l">&#x1F4B0; You</div></div>
         <div class="mf-a">&#x2192;</div>
-        <div class="mf-i"><div class="mf-v" style="color:var(--y)" id="pv-p">$3.00</div><div class="mf-l">Protocol (3%)</div></div>
+        <div class="mf-i"><div class="mf-v" style="color:var(--y)" id="pv-p">$3.00</div><div class="mf-l">&#x1F3E2; Prmission (3%)</div></div>
         <div class="mf-a">&#x2192;</div>
-        <div class="mf-i"><div class="mf-v" style="color:var(--b)" id="pv-a">$87.00</div><div class="mf-l">Agent</div></div>
+        <div class="mf-i"><div class="mf-v" style="color:var(--b)" id="pv-a">$87.00</div><div class="mf-l">&#x1F916; AI Agent</div></div>
       </div></div>
-      <div style="margin-top:16px"><button class="btn btn-p" onclick="doGrant()" id="grant-btn">Sign &amp; Grant Permission</button></div>
+      <div style="margin-top:16px"><button class="btn btn-p" onclick="doGrant()" id="grant-btn" style="padding:14px 28px;font-size:15px;border-radius:10px">&#x2705; Start Sharing &amp; Earning</button></div>
+      <div style="font-size:10px;color:var(--tm);margin-top:8px">Your wallet will ask you to confirm. Gas fee is a fraction of a cent on Base.</div>
     </div>
   </div>
 
   <!-- PERMISSIONS -->
   <div id="tab-permissions" class="hidden">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-      <div><div style="font-size:16px;font-weight:800">My Permissions</div><div style="font-size:11px;color:var(--td)" id="p-sub">Loading...</div></div>
-      <button class="btn btn-p" style="padding:6px 14px;font-size:12px" onclick="switchTab('grant',document.querySelectorAll('.tab')[1])">+ Grant New</button>
+      <div><div style="font-size:16px;font-weight:800">&#x1F4CB; My Data Shares</div><div style="font-size:11px;color:var(--td)" id="p-sub">Loading...</div></div>
+      <button class="btn btn-p" style="padding:8px 18px;font-size:13px;border-radius:10px" onclick="switchTab('grant',document.querySelectorAll('.tab')[1])">+ Share More Data</button>
     </div>
     <div id="p-list"><div class="loading"><span class="spin"></span> Reading from Base...</div></div>
   </div>
@@ -174,17 +176,17 @@ footer a{color:var(--g);text-decoration:none}
   <!-- PROOF -->
   <div id="tab-proof" class="hidden">
     <div class="card" style="border-color:rgba(16,185,129,.2)">
-      <div style="font-size:16px;font-weight:800;margin-bottom:4px">&#x2713; Live Transaction Proof</div>
-      <div style="font-size:12px;color:var(--td);margin-bottom:16px">Three real transactions on Base Mainnet &mdash; Feb 17, 2026. Verifiable on BaseScan.</div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:4px">&#x2705; This Is Real — Here's Proof</div>
+      <div style="font-size:12px;color:var(--td);margin-bottom:16px">On February 17, 2026, an AI agent paid a real user for their data through Prmission. Three transactions, all publicly verifiable.</div>
       <div class="proof-tx"><div><span class="tag tag-g">1. Grant Permission</span></div><div style="font-size:10px;color:var(--tm)">Block 42291734</div><a href="https://basescan.org/tx/0xabaf9adb1646ce900eca37790bdb872019fa90cb7eda752f5422848ebd531242" target="_blank">0xabaf...1242 &#x2197;</a></div>
       <div class="proof-tx"><div><span class="tag tag-b">2. Deposit 1 USDC Escrow</span></div><div style="font-size:10px;color:var(--tm)">Block 42291738</div><a href="https://basescan.org/tx/0xc2c4f2429ed074e36ff699a1ed406ab9e9d1845118e11286e9e73b09d174c59b" target="_blank">0xc2c4...c59b &#x2197;</a></div>
       <div class="proof-tx"><div><span class="tag tag-y">3. Report Outcome</span></div><div style="font-size:10px;color:var(--tm)">Block 42291741</div><a href="https://basescan.org/tx/0x3f5b2540d259cabb3521a75806ae67fc40b92be7a6e8ccd858eba8d3769e9db3" target="_blank">0x3f5b...9db3 &#x2197;</a></div>
-      <div class="mf"><div class="mf-t">Settlement Math &mdash; 1 USDC Escrow at 10% Compensation</div><div class="mf-r">
-        <div class="mf-i"><div class="mf-v" style="color:var(--g)">$0.10</div><div class="mf-l">User (10%)</div></div><div class="mf-a">&#x2192;</div>
-        <div class="mf-i"><div class="mf-v" style="color:var(--y)">$0.03</div><div class="mf-l">Protocol (3%)</div></div><div class="mf-a">&#x2192;</div>
-        <div class="mf-i"><div class="mf-v" style="color:var(--b)">$0.87</div><div class="mf-l">Agent (87%)</div></div>
+      <div class="mf"><div class="mf-t">&#x1F4CA; How The $1.00 Payment Was Split</div><div class="mf-r">
+        <div class="mf-i"><div class="mf-v" style="color:var(--g)">$0.10</div><div class="mf-l">&#x1F4B0; User Got Paid</div></div><div class="mf-a">&#x2192;</div>
+        <div class="mf-i"><div class="mf-v" style="color:var(--y)">$0.03</div><div class="mf-l">&#x1F3E2; Prmission Fee</div></div><div class="mf-a">&#x2192;</div>
+        <div class="mf-i"><div class="mf-v" style="color:var(--b)">$0.87</div><div class="mf-l">&#x1F916; Agent Kept</div></div>
       </div></div>
-      <div style="margin-top:14px;font-size:11px;color:var(--td)"><strong style="color:var(--t)">What this proves:</strong> A Python SDK agent paid a user for consent-gated location data access. Full flow executed live on Base mainnet with real USDC.</div>
+      <div style="margin-top:14px;font-size:11px;color:var(--td)"><strong style="color:var(--t)">What happened:</strong> An AI agent wanted a user's location data to give them better restaurant recommendations. The user said yes and set their price at 10%. The agent paid $1.00, the user got $0.10 automatically, and Prmission took a $0.03 fee. All done in seconds, all publicly verified.</div>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
         <a href="https://basescan.org/address/0x0c8B16a57524f4009581B748356E01e1a969223d#code" target="_blank" class="btn btn-g">BaseScan &#x2197;</a>
         <a href="https://github.com/marcosbenaim-hub/Prmission-Protocol" target="_blank" class="btn btn-g">GitHub &#x2197;</a>
@@ -240,7 +242,7 @@ async function connectWallet(){
     provider=new ethers.BrowserProvider(window.ethereum);signer=await provider.getSigner();contract=new ethers.Contract(CONTRACT,ABI,signer);
     document.getElementById("wallet-area").innerHTML=`<div style="display:flex;align-items:center;gap:10px"><div style="padding:5px 12px;border-radius:7px;background:var(--gd);border:1px solid rgba(16,185,129,.2);font-size:11px;color:var(--g);font-weight:600;display:flex;align-items:center;gap:6px"><span class="dot"></span> ${short(wallet)}</div><button class="btn btn-g" onclick="disco()">Disconnect</button></div>`;
     document.getElementById("screen-connect").classList.add("hidden");document.getElementById("screen-app").classList.remove("hidden");
-    notify("Connected to Base");loadDash();loadPerms();
+    notify("Wallet connected! You're on Base.");loadDash();loadPerms();
     window.ethereum.on("accountsChanged",()=>location.reload());window.ethereum.on("chainChanged",()=>location.reload());
   }catch(e){console.error(e);notify("Failed: "+(e.message||e),"err");b.disabled=false;b.textContent="Connect Wallet"}
 }
@@ -261,7 +263,7 @@ async function loadPerms(){
     const c=contract||rc;
     const cnt=Number(await c.getUserPermissionCount(wallet));
     document.getElementById("p-sub").textContent=`${cnt} permission${cnt!==1?"s":""}`;
-    if(cnt===0){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--tm)"><div style="font-size:40px;margin-bottom:12px;opacity:.5">&#x1F512;</div><div style="font-size:13px;margin-bottom:6px">No permissions yet</div><div style="font-size:11px">Grant your first permission to start earning.</div><button class="btn btn-p" style="margin-top:14px" onclick="switchTab(\'grant\',document.querySelectorAll(\'.tab\')[1])">+ Grant Permission</button></div>';return}
+    if(cnt===0){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--tm)"><div style="font-size:40px;margin-bottom:12px;opacity:.5">&#x1F4B0;</div><div style="font-size:13px;margin-bottom:6px">You haven\'t shared any data yet</div><div style="font-size:11px">Share your first data category and start earning from AI agents.</div><button class="btn btn-p" style="margin-top:14px;padding:10px 22px;font-size:13px;border-radius:10px" onclick="switchTab(\'grant\',document.querySelectorAll(\'.tab\')[1])">+ Start Earning</button></div>';return}
     const ids=await c.getUserPermissions(wallet,0,cnt);let h="";
     for(const id of ids){
       try{
@@ -271,7 +273,7 @@ async function loadPerms(){
         const exp=new Date(Number(p[6])*1000).toLocaleDateString();const cre=new Date(Number(p[8])*1000).toLocaleDateString();
         const category=p[2];const purpose=p[3];
         let ec=0;try{ec=(await c.getPermissionEscrows(id)).length}catch(e){}
-        h+=`<div class="card" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px"><div style="flex:1;min-width:200px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:15px;font-weight:700">Permission #${Number(id)}</span><span class="tag ${PC[st]||"tag-y"}">${PS[st]||"?"}</span></div><div style="font-size:12px;color:var(--td);margin-bottom:4px">${purpose}</div><div style="display:flex;gap:14px;font-size:11px;color:var(--tm);flex-wrap:wrap"><span>&#x1F4CA; ${category}</span><span>&#x1F4B0; ${cp}%</span><span>&#x1F4E6; ${ec} escrow${ec!==1?"s":""}</span><span>&#x1F464; ${merch}</span></div><div style="font-size:10px;color:var(--tm);margin-top:4px">Created ${cre} &middot; Expires ${exp}</div></div><div style="text-align:right">${st===1?`<button class="btn btn-d" onclick="doRevoke(${Number(id)})">Revoke</button>`:""}</div></div></div>`;
+        h+=`<div class="card" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px"><div style="flex:1;min-width:200px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:15px;font-weight:700">Share #${Number(id)}</span><span class="tag ${PC[st]||"tag-y"}">${PS[st]||"?"}</span></div><div style="font-size:12px;color:var(--td);margin-bottom:4px">${purpose}</div><div style="display:flex;gap:14px;font-size:11px;color:var(--tm);flex-wrap:wrap"><span>&#x1F4CA; ${category}</span><span>&#x1F4B0; ${cp}% your cut</span><span>&#x1F4E6; ${ec} payment${ec!==1?"s":""}</span><span>&#x1F464; ${merch}</span></div><div style="font-size:10px;color:var(--tm);margin-top:4px">Started ${cre} &middot; Ends ${exp}</div></div><div style="text-align:right">${st===1?`<button class="btn btn-d" style="padding:8px 16px;font-size:12px;border-radius:8px" onclick="doRevoke(${Number(id)})">Stop Sharing</button>`:""}</div></div></div>`;
       }catch(pe){console.error("Permission",Number(id),"error:",pe);h+=`<div class="card" style="margin-bottom:8px"><div style="font-size:13px">Permission #${Number(id)} <span style="color:var(--r);font-size:11px">(failed to load details)</span></div></div>`}
     }
     el.innerHTML=h;
@@ -288,19 +290,19 @@ async function doGrant(){
     const bps=Math.min(parseInt(document.getElementById("g-comp").value)||0,50)*100;
     const up=ethers.parseUnits((parseFloat(document.getElementById("g-up").value)||0).toString(),6);
     const dur=(parseInt(document.getElementById("g-dur").value)||30)*86400;
-    notify("Sending grantPermission() to Base...","info");
+    notify("Sending to blockchain...","info");
     const tx=await contract.grantPermission(agent,cat,purp,bps,up,dur);
-    notify("Tx sent! Confirming...","info");b.textContent="Confirming...";
+    notify("Almost done, confirming...","info");b.textContent="Confirming...";
     const r=await tx.wait();
-    notify(`Permission granted! <a href="${BSCAN}/tx/${r.hash}" target="_blank" style="color:var(--g)">${short(r.hash)} &#x2197;</a>`);
-    b.disabled=false;b.textContent="Sign & Grant Permission";loadDash();loadPerms();
-  }catch(e){console.error(e);notify((e.reason||e.message||"Failed").slice(0,120),"err");b.disabled=false;b.textContent="Sign & Grant Permission"}
+    notify(`You're now earning! <a href="${BSCAN}/tx/${r.hash}" target="_blank" style="color:var(--g)">View proof &#x2197;</a>`);
+    b.disabled=false;b.textContent="✅ Start Sharing & Earning";loadDash();loadPerms();
+  }catch(e){console.error(e);notify((e.reason||e.message||"Failed").slice(0,120),"err");b.disabled=false;b.textContent="✅ Start Sharing & Earning"}
 }
 
 async function doRevoke(id){
   if(!contract){notify("Connect wallet","err");return}
-  if(!confirm(`Revoke permission #${id}? Active escrows get 60s grace.`))return;
-  try{notify(`Revoking #${id}...`,"info");const tx=await contract.revokePermission(id);await tx.wait();notify(`#${id} revoked!`);loadPerms();loadDash()}catch(e){notify((e.reason||e.message||"Failed").slice(0,120),"err")}
+  if(!confirm(`Stop sharing data for #${id}? Active payments get 60 seconds to finish.`))return;
+  try{notify(`Stopping share #${id}...`,"info");const tx=await contract.revokePermission(id);await tx.wait();notify(`Share #${id} stopped!`);loadPerms();loadDash()}catch(e){notify((e.reason||e.message||"Failed").slice(0,120),"err")}
 }
 
 function updatePreview(){const c=Math.min(parseFloat(document.getElementById("g-comp").value)||0,50);const u=(100*c/100).toFixed(2);const p=(3).toFixed(2);const a=(100-parseFloat(u)-parseFloat(p)).toFixed(2);document.getElementById("pv-u").textContent="$"+u;document.getElementById("pv-p").textContent="$"+p;document.getElementById("pv-a").textContent="$"+a}
