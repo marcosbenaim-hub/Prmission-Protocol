@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Prmission | The Economic Layer for AI Agent Commerce</title>
-  <meta name="description" content="Prmission is a consent-gated escrow and settlement protocol for AI agent commerce on-chain. Ethereum ERC-8004 identity verification, escrow, and settlement on Base (Ethereum L2).">
+  <meta name="description" content="Prmission is a consent-gated escrow and settlement protocol for AI agent commerce. Live on Base mainnet with a fixed 3% protocol fee.">
   <style>
     :root {
       --bg: #060b14;
@@ -71,7 +71,6 @@
     }
 
     .accent { color: var(--green); }
-    .eth { color: var(--green); font-weight: 700; }
 
     .sub {
       margin: 0;
@@ -175,86 +174,61 @@
     .row:last-child { border-bottom: none; }
     .row strong { color: var(--green); }
 
-    .video-section {
+    .waitlist {
       margin-top: 10px;
-      border: 1px solid var(--line);
+      border: 1px solid #1ad09a;
       border-radius: 12px;
-      overflow: hidden;
-      background: var(--panel);
+      background: linear-gradient(180deg, rgba(15,24,41,.95), rgba(11,18,33,.95));
       padding: 12px;
     }
 
-    .video-section video {
-      width: 100%;
-      border-radius: 8px;
+    .waitlist h3 { margin: 0 0 5px; font-size: 17px; }
+
+    .dropdown {
       margin-top: 8px;
     }
 
-    .waitlist-section {
-      max-width: 600px;
-      margin: 30px auto 0;
-      text-align: center;
+    .dropdown summary {
+      list-style: none;
+      cursor: pointer;
+      color: var(--green);
+      font-size: 12px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      width: fit-content;
     }
 
-    .waitlist-section h3 {
-      margin: 0 0 5px;
-      font-size: clamp(22px, 2.6vw, 34px);
-      letter-spacing: -.3px;
+    .dropdown summary::-webkit-details-marker { display: none; }
+
+    .dropdown[open] summary {
+      margin-bottom: 8px;
     }
 
-    .waitlist-section p {
-      color: var(--muted);
-      font-size: 14px;
-      margin: 0 0 16px;
+    .form {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 8px;
+      margin-top: 8px;
     }
 
-    .wl-form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .wl-form input {
-      border: 1px solid var(--line);
+    .form input {
+      border: 1px solid #294267;
       border-radius: 10px;
-      background: var(--panel);
+      background: #0b1424;
       color: var(--text);
-      padding: 12px 14px;
-      font-size: 14px;
-      font-family: inherit;
-      outline: none;
-      transition: border-color .3s;
+      padding: 8px 10px;
+      font-size: 12px;
     }
 
-    .wl-form input:focus {
-      border-color: var(--green);
-    }
-
-    .wl-form button {
+    .form button {
       border: 1px solid #1ad09a;
       background: var(--green);
       color: #02120d;
       font-weight: 700;
       border-radius: 10px;
-      padding: 12px;
+      padding: 8px 12px;
       cursor: pointer;
-      font-size: 15px;
-      font-family: inherit;
-      transition: background .3s;
-    }
-
-    .wl-form button:hover {
-      background: #00f5b0;
-    }
-
-    .slogan {
-      margin-top: 30px;
-      padding: 20px 0;
-      text-align: center;
-      font-size: clamp(18px, 2.4vw, 28px);
-      font-weight: 800;
-      color: var(--green);
-      letter-spacing: -.3px;
+      font-size: 12px;
     }
 
     .footer {
@@ -272,34 +246,8 @@
     .link { color: var(--green); text-decoration: underline; text-underline-offset: 3px; }
 
     @media (max-width: 900px) {
-      .stats, .cards { grid-template-columns: 1fr; }
+      .stats, .cards, .form { grid-template-columns: 1fr; }
       .hero { padding-top: 42px; }
-    }
-
-    @media (max-width: 480px) {
-      h1 { font-size: clamp(22px, 7vw, 34px); letter-spacing: -.5px; }
-      .sub { font-size: 14px; }
-      .eyebrow { font-size: 10px; letter-spacing: 2px; }
-      .brand { font-size: 20px; }
-      .nav { height: 56px; }
-      .hero { padding: 32px 0 16px; }
-      .live { font-size: 10px; padding: 7px 10px; }
-      .stat b { font-size: 18px; }
-      .stat span { font-size: 10px; }
-      .stat { padding: 10px; }
-      .title { font-size: 20px; }
-      .body { font-size: 13px; }
-      .card h3 { font-size: 14px; }
-      .card p { font-size: 12px; }
-      .card { padding: 10px; }
-      .row { font-size: 10px; padding: 6px 8px; }
-      .slogan { font-size: 16px; }
-      .waitlist-section h3 { font-size: 18px; }
-      .waitlist-section p { font-size: 12px; }
-      .wl-form input { font-size: 13px; padding: 10px; }
-      .wl-form button { font-size: 13px; padding: 10px; }
-      .video-section { padding: 8px; }
-      .wrap { width: 94vw; }
     }
   </style>
 </head>
@@ -314,118 +262,84 @@
     <section class="hero">
       <p class="eyebrow">AI Agent Commerce</p>
       <h1>OpenAI gave agents a brain.<br>Google and Apple gave them reach.<br><span class="accent">Prmission gives us a wallet.</span></h1>
-      <p class="sub">The on-chain economic layer for AI agent commerce: permission, escrow, and settlement.</p>
+      <p class="sub">The economic layer for AI agent commerce: permission, escrow, and settlement.</p>
       <div class="hero-actions">
+        <button class="cta" id="connect-wallet">Launch App</button>
         <a class="cta" href="#waitlist">Join Waitlist</a>
-        <a class="cta" href="app.html" style="background:transparent;color:var(--green);border:1px solid var(--green)">Launch App</a>
       </div>
-      <div class="live">Live on Base (<span class="eth">Ethereum</span> L2) • 3% protocol fee hardcoded on-chain • 0x0c8B16a57524f4009581B748356E01e1a969223d</div>
+      <div class="live">Live on Base Mainnet • 3% protocol fee (300 bps) hardcoded on-chain • 0x0c8B16a57524f4009581B748356E01e1a969223d</div>
+      <div class="stats">
+        <div class="stat"><b>3%</b><span>Protocol Fee</span></div>
+        <div class="stat"><b>24h</b><span>Dispute Window</span></div>
+        <div class="stat"><b>51</b><span>Tests Passing</span></div>
+      </div>
     </section>
 
     <section class="section">
       <h2 class="title">What Prmission Does</h2>
-      <p class="body">Prmission is a consent-gated escrow and settlement protocol for AI agent commerce. It gives agents a standard on-chain flow to request permission, lock funds, and settle outcomes — deployed on Base (<span class="eth">Ethereum</span> L2) with optional ERC-8004 identity verification.</p>
+      <p class="body">Prmission is a consent-gated escrow and settlement protocol for AI agent commerce. It gives agents a standard flow to request permission, lock funds, and settle outcomes on-chain.</p>
       <div class="cards">
         <article class="card">
           <h3>Neutral Infrastructure</h3>
-          <p>Prmission integrates with model and interface layers without replacing them. We settle on-chain beneath them.</p>
+          <p>Prmission integrates with model and interface layers without replacing them.</p>
         </article>
         <article class="card">
           <h3>Immutable Monetization</h3>
-          <p>3% protocol fee is hardcoded on-chain in the Prmission smart contract on Base (<span class="eth">Ethereum</span> L2). Not even we can change it.</p>
+          <p>3% protocol fee (300 bps) is hardcoded on-chain and captured on settlement.</p>
         </article>
         <article class="card">
           <h3>Compounding Volume</h3>
-          <p>As settlement-required agent actions scale, on-chain protocol fee capture scales with them.</p>
+          <p>As settlement-required agent actions scale, protocol fee capture scales with them.</p>
         </article>
       </div>
     </section>
 
     <section class="section">
-      <h2 class="title">How You Make <span style="color:var(--green);font-size:1.3em">$</span></h2>
-      <p class="body">AI agents need your data. When they access it, you get paid in USDC — automatically, on-chain, every time.</p>
-      <div class="cards" style="grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 10px;">
+      <h2 class="title">Proof</h2>
+      <div class="cards">
         <article class="card">
-          <h3>Set Your Price</h3>
-          <p>You decide what your data is worth, up to 50% of the escrow value. AI agents pay the fee you set before they can access anything.</p>
+          <h3>Live Deployment</h3>
+          <p>Verified contract on Base mainnet. Settlement token is USDC on Base.</p>
         </article>
         <article class="card">
-          <h3>Get Paid Automatically</h3>
-          <p>Every time an AI agent accesses your data, USDC hits your wallet automatically. No invoices. No chasing payments.</p>
+          <h3>Traction</h3>
+          <p>First live end-to-end transfer recorded on February 6, 2026.</p>
         </article>
         <article class="card">
-          <h3>Cash Out Anytime</h3>
-          <p>Earnings settle in USDC to your connected wallet. Withdraw or convert through any major exchange like Coinbase.</p>
+          <h3>Robustness</h3>
+          <p>51 tests passing across core flows, edge cases, and V2 improvements.</p>
         </article>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2 class="title">Connect Your Wallet</h2>
-      <p class="body">Connect your Coinbase Wallet to receive USDC payments from AI agents automatically on Base. Convert to USD and withdraw to your bank directly through Coinbase. Also compatible with MetaMask and other Base-compatible wallets.</p>
-      <div class="video-section">
-        <video controls autoplay muted loop playsinline>
-          <source src="demo.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
       </div>
     </section>
 
     <section class="section">
       <h2 class="title">How It Works</h2>
       <div class="flow">
-        <div class="row"><span>1. grantPermission()</span><strong>User defines scope and fee — supports optional ERC-8004 identity verification</strong></div>
-        <div class="row"><span>2. depositEscrow()</span><strong>Agent locks USDC on-chain</strong></div>
-        <div class="row"><span>3. reportOutcome()</span><strong>Outcome reported on-chain</strong></div>
-        <div class="row"><span>4. disputeSettlement()</span><strong>24-hour on-chain dispute window</strong></div>
-        <div class="row"><span>5. settle()</span><strong>Funds auto-distribute on-chain</strong></div>
-      </div>
-      <p class="body" style="margin-top:12px">Built with ReentrancyGuard, emergency pause capability, 60-second revocation grace period, and flexible dispute resolution — including custom splits and full refunds.</p>
-    </section>
-
-    <section class="section" id="get-started">
-      <h2>Get Started in 30 Seconds</h2>
-      <div class="grid">
-        <article>
-          <h3>1. Download the App</h3>
-          <p>Get the free Base app (by Coinbase) from the App Store or Google Play. Create an account — takes 30 seconds.</p>
-        </article>
-        <article>
-          <h3>2. Open Prmission</h3>
-          <p>Tap the search icon in the Base app and type prmission.com. Tap Connect Your Wallet.</p>
-        </article>
-        <article>
-          <h3>3. Start Earning</h3>
-          <p>Choose what data to share, set your price, and get paid in USDC every time an AI agent uses it.</p>
-        </article>
-      </div>
-      <div style="text-align:center;margin-top:2rem">
-        <a class="cta" href="app.html">Launch App Now</a>
+        <div class="row"><span>1. grantPermission()</span><strong>User defines scope and fee</strong></div>
+        <div class="row"><span>2. depositEscrow()</span><strong>Agent locks USDC</strong></div>
+        <div class="row"><span>3. reportOutcome()</span><strong>Outcome is reported</strong></div>
+        <div class="row"><span>4. disputeSettlement()</span><strong>24-hour dispute window</strong></div>
+        <div class="row"><span>5. settle()</span><strong>Funds auto-distribute</strong></div>
       </div>
     </section>
-
 
     <section class="section" id="waitlist">
-      <div class="waitlist-section">
+      <p class="body">Marcos Benaim built Prmission from zero to a live Base mainnet protocol with working consent, escrow, and settlement. Now focused on scaling integrations and building the core team.</p>
+      <div class="waitlist">
         <h3>Join the Waitlist</h3>
-        <p>Be the first to know when Prmission opens to users and agents.</p>
-        <div id="wl-form-container">
-          <form class="wl-form" id="waitlist-form" action="https://formsubmit.co/ajax/marcosbenaim@gmail.com" method="post">
+        <details class="dropdown">
+          <summary>Click to join waitlist</summary>
+          <form class="form" id="waitlist-form" action="https://formsubmit.co/ajax/marcos@prmission.com" method="post">
             <input type="hidden" name="_subject" value="Prmission Waitlist Signup">
             <input type="hidden" name="_captcha" value="false">
             <input type="hidden" name="_template" value="table">
-            <input type="text" name="name" placeholder="Your name" required>
-            <input type="email" name="email" placeholder="Your email" required>
+            <input type="text" name="name" placeholder="Full name" required>
+            <input type="email" name="email" placeholder="Email" required>
             <button type="submit" id="waitlist-button">Join Waitlist</button>
           </form>
-        </div>
-        <div id="wl-confirmed" style="display:none;color:var(--green);font-size:1.1rem;font-weight:700;padding:20px 0">✓ You're on the list. We'll be in touch.</div>
+        </details>
       </div>
     </section>
-
-    <div class="slogan">Prmission: Where AI agents pay humans on-chain.</div>
-
-    <p class="body" style="text-align:center;margin:0 auto 20px;max-width:600px">AI agents need your data. Prmission makes them pay you for it — automatically, every time, on-chain.</p>
 
     <footer class="footer">
       <span>Prmission Protocol</span>
@@ -437,6 +351,16 @@
     </footer>
   </main>
   <script>
+    const connectBtn = document.getElementById("connect-wallet");
+
+    if (connectBtn) {
+      connectBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        window.location.href = "app.html?connect=1";
+      });
+    }
+
+    // Lightweight analytics without external dashboard setup.
     fetch("https://api.countapi.xyz/hit/prmission.com/pageviews");
 
     const waitlistForm = document.getElementById("waitlist-form");
@@ -458,10 +382,14 @@
 
         if (!response.ok) throw new Error("submit_failed");
 
-        document.getElementById("wl-form-container").style.display = "none";
-        document.getElementById("wl-confirmed").style.display = "block";
+        waitlistButton.textContent = "Confirmed";
         waitlistForm.reset();
         fetch("https://api.countapi.xyz/hit/prmission.com/waitlist_signups");
+
+        setTimeout(() => {
+          waitlistButton.textContent = "Join Waitlist";
+          waitlistButton.disabled = false;
+        }, 1800);
       } catch (error) {
         waitlistButton.textContent = "Try Again";
         setTimeout(() => {
