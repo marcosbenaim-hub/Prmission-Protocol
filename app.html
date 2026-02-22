@@ -129,6 +129,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .conn-btn.outline:hover{border-color:var(--gb);color:var(--green)}
 .conn-note{font-family:var(--mono);font-size:8px;color:var(--text3);text-align:center;line-height:1.6}
 .swipe-tip{margin-top:8px;font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.06em}
+.conn-btn.hidden{display:none}
 
 /* RIGHT PANEL */
 .right-panel{flex:1;display:flex;flex-direction:column;gap:10px}
@@ -316,6 +317,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
           <svg width="18" height="18" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius:4px"><rect width="1024" height="1024" rx="180" fill="#0052FF"/><path d="M512 128C300.8 128 128 300.8 128 512C128 723.2 300.8 896 512 896C723.2 896 896 723.2 896 512C896 300.8 723.2 128 512 128ZM512 684.8C406.4 684.8 320 598.4 320 492.8C320 387.2 406.4 300.8 512 300.8C617.6 300.8 704 387.2 704 492.8C704 598.4 617.6 684.8 512 684.8Z" fill="white"/><rect x="428" y="448" width="168" height="89.6" rx="22" fill="white"/></svg>
           Connect Coinbase Wallet
         </button>
+          <button class="conn-btn hidden" id="openInCoinbaseBtn" onclick="openInCoinbaseWallet()">Open in Coinbase Wallet</button>
           <button class="conn-btn outline" style="margin-top:4px" onclick="openWalletModal()">&#128091; Other Wallet</button>
           <div class="conn-note">Prmission Protocol &#183; Base Mainnet<br>0x0c8B16a...969223d &#183; Verified</div>
           <div class="swipe-tip">Swipe left/right to navigate tabs after connecting</div>
@@ -500,12 +502,37 @@ const AGENTS=[
 function openWalletModal(){document.getElementById('walletModal').classList.add('open')}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 
+function getInjectedProvider(preferCoinbase){
+  const root=window.ethereum||window.coinbaseWalletExtension||window.coinbaseWallet?.ethereum||null;
+  if(!root)return null;
+  if(Array.isArray(root.providers)&&root.providers.length){
+    if(preferCoinbase){
+      return root.providers.find(p=>p&&p.isCoinbaseWallet)||root.providers[0];
+    }
+    return root.providers[0];
+  }
+  return root;
+}
+
+async function waitForInjectedProvider(preferCoinbase,timeoutMs){
+  const started=Date.now();
+  while(Date.now()-started<timeoutMs){
+    const p=getInjectedProvider(preferCoinbase);
+    if(p)return p;
+    await new Promise(r=>setTimeout(r,220));
+  }
+  return null;
+}
+
 async function connectWallet(type){
   closeModal('walletModal');
-  if(!window.ethereum){showToast('No wallet detected. Install Coinbase Wallet or use a Web3 browser.','err');return}
+  showToast('Detecting wallet provider...','ok');
   try{
-    let raw=window.ethereum;
-    if(type==='coinbase'&&window.ethereum.providers)raw=window.ethereum.providers.find(p=>p.isCoinbaseWallet)||window.ethereum;
+    const raw=await waitForInjectedProvider(type==='coinbase',7000);
+    if(!raw){
+      showToast('No wallet detected. Tap "Open in Coinbase Wallet".','err');
+      return;
+    }
     prov=new ethers.BrowserProvider(raw);
     await prov.send('eth_requestAccounts',[]);
     const net=await prov.getNetwork();
@@ -523,7 +550,13 @@ async function connectWallet(type){
     await onConnected();
     raw.on('accountsChanged',a=>{if(!a||!a.length)disconnect();else{addr=a[0];onConnected()}});
     raw.on('chainChanged',()=>location.reload());
-  }catch(err){if(err.code!==4001)showToast('Connection failed: '+(err.message||'').slice(0,60),'err')}
+  }catch(err){
+    if(err&&err.code===4001){
+      showToast('Connection rejected in wallet.','err');
+      return;
+    }
+    showToast('Connection failed: '+(err&&err.message?err.message:'unknown').slice(0,80),'err');
+  }
 }
 
 async function onConnected(){
@@ -725,6 +758,22 @@ function showToast(msg,type){
 }
 function sh(a){return a?a.slice(0,6)+'...'+a.slice(-4):'--'}
 
+function openInCoinbaseWallet(){
+  const cleanUrl=window.location.origin+window.location.pathname+'?connect=1';
+  const deepLink='https://go.cb-w.com/dapp?cb_url='+encodeURIComponent(cleanUrl);
+  window.location.href=deepLink;
+}
+
+function updateCoinbaseDeepLinkVisibility(){
+  const btn=document.getElementById('openInCoinbaseBtn');
+  if(!btn)return;
+  if(window.ethereum){
+    btn.classList.add('hidden');
+  }else{
+    btn.classList.remove('hidden');
+  }
+}
+
 function enableSwipeNavigation(){
   const screens=['wallet','data','earn','activity'];
   const phoneScreen=document.querySelector('.phone-screen');
@@ -757,6 +806,7 @@ function enableSwipeNavigation(){
 (async()=>{
   buildDataLocker();
   enableSwipeNavigation();
+  updateCoinbaseDeepLinkVisibility();
   const params=new URLSearchParams(window.location.search);
   if(params.get('connect')==='1')openWalletModal();
   if(!window.ethereum)return;
