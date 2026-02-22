@@ -369,7 +369,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
           <div class="uw-ava">&#128100;</div>
           <div>
             <div class="uw-name">User Wallet</div>
-            <div class="uw-addr" id="rpAddr">0x7a3F...e91B</div>
+            <div class="uw-addr" id="rpAddr">Not connected</div>
           </div>
         </div>
         <div class="uw-amount" id="rpUserAmt">$0.00</div>
@@ -601,6 +601,7 @@ async function onConnected(){
 function disconnect(){
   prov=sign=ct=uc=null;addr=null;
   document.getElementById('connectOverlay').classList.remove('hidden');
+  document.getElementById('rpAddr').textContent='Not connected';
   totalEarned=0;ownerEarned=0;settlementCount=0;agentEarnings={};
   ['phoneAmount','rpUserAmt','rpOwnerAmt','earnAmount'].forEach(id=>document.getElementById(id).textContent='$0.00');
   document.getElementById('settleList').innerHTML='';
@@ -929,6 +930,8 @@ function enableSwipeNavigation(){
 }
 
 (async()=>{
+  // Start from a true disconnected state so no placeholder/demo values appear.
+  disconnect();
   buildDataLocker();
   renderRecentTransactions();
   enableSwipeNavigation();
