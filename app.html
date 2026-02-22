@@ -793,8 +793,11 @@ function showToast(msg,type){
 function sh(a){return a?a.slice(0,6)+'...'+a.slice(-4):'--'}
 
 function normalizeTxItem(item){
-  const hash=item.hash||item.transactionHash||'';
-  const ts=Number(item.timeStamp||item.timestamp||Math.floor(Date.now()/1000));
+  const hash=item.hash||item.transactionHash||item.tx_hash||'';
+  const rawTs=item.timeStamp||item.timestamp||item.block_timestamp||Math.floor(Date.now()/1000);
+  const ts=typeof rawTs==='string'&&rawTs.includes('T')
+    ? Math.floor(new Date(rawTs).getTime()/1000)
+    : Number(rawTs);
   const from=(item.from||'').toLowerCase();
   const to=(item.to||'').toLowerCase();
   let kind='TX';
@@ -831,13 +834,27 @@ function renderRecentTransactions(){
 async function loadRecentTransactions(){
   if(!addr){renderRecentTransactions();return;}
   try{
-    const url='https://api.basescan.org/api?module=account&action=txlist&address='+addr+'&page=1&offset=5&sort=desc';
-    const res=await fetch(url,{headers:{'Accept':'application/json'}});
-    if(!res.ok)throw new Error('tx_api_failed');
-    const data=await res.json();
-    const rows=Array.isArray(data.result)?data.result:[];
+    const requests=[
+      fetch('https://api.basescan.org/api?module=account&action=txlist&address='+addr+'&page=1&offset=10&sort=desc',{headers:{'Accept':'application/json'}}),
+      fetch('https://api.basescan.org/api?module=account&action=tokentx&address='+addr+'&page=1&offset=10&sort=desc',{headers:{'Accept':'application/json'}}),
+      fetch('https://base.blockscout.com/api/v2/addresses/'+addr+'/transactions?items_count=10',{headers:{'Accept':'application/json'}})
+    ];
+    const [txRes,tokenRes,blockRes]=await Promise.allSettled(requests);
+    const rows=[];
+    if(txRes.status==='fulfilled'&&txRes.value.ok){
+      const data=await txRes.value.json();
+      if(Array.isArray(data.result))rows.push(...data.result);
+    }
+    if(tokenRes.status==='fulfilled'&&tokenRes.value.ok){
+      const data=await tokenRes.value.json();
+      if(Array.isArray(data.result))rows.push(...data.result);
+    }
+    if(blockRes.status==='fulfilled'&&blockRes.value.ok){
+      const data=await blockRes.value.json();
+      if(Array.isArray(data.items))rows.push(...data.items);
+    }
     txFeed=[];
-    rows.slice(0,5).forEach(r=>upsertTx(normalizeTxItem(r)));
+    rows.forEach(r=>upsertTx(normalizeTxItem(r)));
     if(!rows.length)renderRecentTransactions();
   }catch(e){
     renderRecentTransactions();
