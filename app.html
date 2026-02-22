@@ -185,10 +185,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .wopt-ico{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
 .wopt-ico.mm{background:rgba(247,147,26,.1)}
 .wopt-ico.cb{background:rgba(0,82,255,.1)}
+.wopt-ico.wc{background:rgba(0,229,160,.12)}
 .wopt-ico.gen{background:var(--card3)}
 .wopt-txt h4{font-size:13px;font-weight:600;color:var(--text)}
 .wopt-txt p{font-size:11px;color:var(--text3);margin-top:2px}
 .modal-note{font-family:var(--mono);font-size:9px;color:var(--text3);text-align:center;margin-top:12px;line-height:1.7}
+.qr-wrap{margin-top:10px;padding:10px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);text-align:center}
+.qr-wrap img{width:180px;height:180px;border-radius:6px;border:1px solid var(--border)}
+.qr-wrap p{margin-top:8px;font-size:10px;color:var(--text2);line-height:1.5}
 .tx-body{text-align:center;padding:16px 0 10px}
 .tx-spin{width:44px;height:44px;margin:0 auto 14px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -441,6 +445,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <div class="wopt-ico gen">&#128091;</div>
         <div class="wopt-txt"><h4>Browser Wallet</h4><p>Any Web3 provider</p></div>
       </div>
+      <div class="wopt" onclick="showCoinbaseQR()">
+        <div class="wopt-ico wc">&#128241;</div>
+        <div class="wopt-txt"><h4>Open on Phone (QR)</h4><p>Scan with Coinbase Wallet app</p></div>
+      </div>
+    </div>
+    <div class="qr-wrap hidden" id="coinbaseQrWrap">
+      <img id="coinbaseQrImg" alt="Coinbase Wallet deep link QR">
+      <p>Scan this QR in Coinbase Wallet app to open and connect directly.</p>
     </div>
     <div class="modal-note">Prmission Protocol &#183; Base Mainnet &#183; Chain ID: 8453<br>0x0c8B16a57524f4009581B748356E01e1a969223d</div>
   </div>
@@ -759,9 +771,22 @@ function showToast(msg,type){
 function sh(a){return a?a.slice(0,6)+'...'+a.slice(-4):'--'}
 
 function openInCoinbaseWallet(){
-  const cleanUrl=window.location.origin+window.location.pathname+'?connect=1';
-  const deepLink='https://go.cb-w.com/dapp?cb_url='+encodeURIComponent(cleanUrl);
+  const deepLink=getCoinbaseDeepLink();
   window.location.href=deepLink;
+}
+
+function getCoinbaseDeepLink(){
+  const cleanUrl=window.location.origin+window.location.pathname+'?connect=1';
+  return 'https://go.cb-w.com/dapp?cb_url='+encodeURIComponent(cleanUrl);
+}
+
+function showCoinbaseQR(){
+  const wrap=document.getElementById('coinbaseQrWrap');
+  const img=document.getElementById('coinbaseQrImg');
+  if(!wrap||!img)return;
+  const deepLink=getCoinbaseDeepLink();
+  img.src='https://api.qrserver.com/v1/create-qr-code/?size=220x220&data='+encodeURIComponent(deepLink);
+  wrap.classList.remove('hidden');
 }
 
 function updateCoinbaseDeepLinkVisibility(){
