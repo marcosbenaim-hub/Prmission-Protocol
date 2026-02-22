@@ -316,13 +316,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <div class="connect-overlay" id="connectOverlay">
           <div style="font-size:32px">&#128272;</div>
           <h3>Connect Your Wallet</h3>
-          <p>Connect to Base Mainnet to start earning USDC from AI agents accessing your data.</p>
+          <p>Connect any Web3 wallet on Base Mainnet to start earning USDC from AI agents accessing your data.</p>
           <button class="conn-btn" onclick="handlePrimaryConnect()">
           <svg width="18" height="18" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius:4px"><rect width="1024" height="1024" rx="180" fill="#0052FF"/><path d="M512 128C300.8 128 128 300.8 128 512C128 723.2 300.8 896 512 896C723.2 896 896 723.2 896 512C896 300.8 723.2 128 512 128ZM512 684.8C406.4 684.8 320 598.4 320 492.8C320 387.2 406.4 300.8 512 300.8C617.6 300.8 704 387.2 704 492.8C704 598.4 617.6 684.8 512 684.8Z" fill="white"/><rect x="428" y="448" width="168" height="89.6" rx="22" fill="white"/></svg>
-          Connect Coinbase Wallet
+          Connect Wallet
         </button>
           <button class="conn-btn hidden" id="openInCoinbaseBtn" onclick="openInCoinbaseWallet()">Open in Coinbase Wallet</button>
-          <button class="conn-btn outline" style="margin-top:4px" onclick="openWalletModal()">&#128091; Other Wallet</button>
+          <button class="conn-btn outline" style="margin-top:4px" onclick="openWalletModal()">Choose Wallet</button>
           <div class="conn-note">Prmission Protocol &#183; Base Mainnet<br>0x0c8B16a...969223d &#183; Verified</div>
           <div class="swipe-tip">Swipe left/right to navigate tabs after connecting</div>
         </div>
@@ -431,6 +431,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <button class="modal-x" onclick="closeModal('walletModal')">&#215;</button>
     </div>
     <div class="wopts">
+      <div class="wopt" onclick="connectWallet('injected')">
+        <div class="wopt-ico gen">&#128091;</div>
+        <div class="wopt-txt"><h4>Browser Wallet</h4><p>MetaMask, Rabby, Coinbase Extension, Brave Wallet, and more</p></div>
+      </div>
       <div class="wopt" onclick="connectWallet('coinbase')">
         <div class="wopt-ico cb" style="background:#fff;border-radius:10px;padding:2px">
           <svg width="34" height="34" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -439,11 +443,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
             <rect x="428" y="448" width="168" height="89.6" rx="22" fill="white"/>
           </svg>
         </div>
-        <div class="wopt-txt"><h4>Coinbase Wallet</h4><p>Recommended for Base &mdash; most popular</p></div>
-      </div>
-      <div class="wopt" onclick="connectWallet('injected')">
-        <div class="wopt-ico gen">&#128091;</div>
-        <div class="wopt-txt"><h4>Browser Wallet</h4><p>Any Web3 provider</p></div>
+        <div class="wopt-txt"><h4>Coinbase Wallet</h4><p>Direct Coinbase Wallet connection</p></div>
       </div>
       <div class="wopt" onclick="showCoinbaseQR()">
         <div class="wopt-ico wc">&#128241;</div>
@@ -776,12 +776,12 @@ function openInCoinbaseWallet(){
 }
 
 async function handlePrimaryConnect(){
-  const provider=getInjectedProvider(true);
+  const provider=getInjectedProvider(false);
   if(provider){
-    await connectWallet('coinbase');
+    await connectWallet('injected');
     return;
   }
-  openInCoinbaseWallet();
+  openWalletModal();
 }
 
 function getCoinbaseDeepLink(){
