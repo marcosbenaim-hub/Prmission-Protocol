@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Prmission | The Economic Layer for AI Agent Commerce</title>
-  <meta name="description" content="Prmission is a consent-gated escrow and settlement protocol for AI agent commerce. Live on Base mainnet with a fixed 3% protocol fee.">
+  <meta name="description" content="Prmission is a consent-gated escrow and settlement protocol for AI agent commerce on Ethereum (Base L2). Live with a fixed 3% protocol fee on-chain.">
   <style>
     :root {
       --bg: #060b14;
@@ -113,6 +113,18 @@
     .stats, .cards { display: grid; gap: 10px; }
     .stats { margin-top: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .cards { margin-top: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .hero-demo {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #071224;
+    }
+    .hero-demo video {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
 
     .stat, .card {
       border: 1px solid var(--line);
@@ -262,30 +274,35 @@
     <section class="hero">
       <p class="eyebrow">AI Agent Commerce</p>
       <h1>OpenAI gave agents a brain.<br>Google and Apple gave them reach.<br><span class="accent">Prmission gives us a wallet.</span></h1>
-      <p class="sub">AI agents can request data, people can approve it, and payments settle in USDC onchain on <span class="accent">Ethereum (Base L2)</span>.</p>
+      <p class="sub">AI agents can request data, people can approve it, and payments settle in USDC on-chain on <span class="accent">Ethereum (Base L2)</span>.</p>
       <div class="hero-actions">
         <button class="cta" id="connect-wallet">Launch App</button>
         <a class="cta" href="#waitlist">Get Updates</a>
       </div>
-      <div class="live">Live on Base Mainnet • 3% onchain fee on every settlement • 0x0c8B16a57524f4009581B748356E01e1a969223d</div>
+      <div class="live">Live on <span class="accent">Ethereum (Base Mainnet)</span> • 3% protocol fee (on-chain) on every settlement • 0x0c8B16a57524f4009581B748356E01e1a969223d</div>
       <div class="stats">
-        <div class="stat"><b>3%</b><span>Protocol Fee</span></div>
+        <div class="stat"><b>3%</b><span>Protocol Fee (On-Chain)</span></div>
         <div class="stat"><b>24h</b><span>Challenge Window</span></div>
         <div class="stat"><b>Live</b><span>On Base Mainnet</span></div>
+      </div>
+      <div class="hero-demo">
+        <video autoplay loop muted playsinline preload="metadata">
+          <source src="assets/prmission-demo.mp4" type="video/mp4">
+        </video>
       </div>
     </section>
 
     <section class="section">
       <h2 class="title">What Prmission Does</h2>
-      <p class="body">Prmission connects AI agents and people for paid data access. The user approves access, the agent prepays in USDC, and the payment is split automatically onchain using <span class="accent">ERC-8004</span> consent rules.</p>
+      <p class="body">Prmission connects AI agents and people for paid data access. The user approves access, the agent prepays in USDC, and the payment is split automatically on-chain using <span class="accent">ERC-8004</span> consent rules on <span class="accent">Ethereum</span>.</p>
       <div class="cards">
         <article class="card">
           <h3>Works With Existing Apps</h3>
           <p>Prmission plugs into AI apps without replacing ChatGPT, Google, Apple, or your app interface.</p>
         </article>
         <article class="card">
-          <h3>Automatic 3% Onchain Fee</h3>
-          <p>Every time a settlement happens, Prmission automatically takes a 3% fee in USDC onchain.</p>
+          <h3>Automatic 3% Fee (On-Chain)</h3>
+          <p>Every time a settlement happens, Prmission automatically takes a 3% protocol fee (on-chain) in USDC.</p>
         </article>
         <article class="card">
           <h3>Grows As Usage Grows</h3>
@@ -306,7 +323,7 @@
 
     <section class="section">
       <h2 class="title">How You Make $</h2>
-      <p class="body">You get paid when AI agents use your approved data. Payments settle in USDC onchain on <span class="accent">Ethereum</span>, and Prmission takes a 3% onchain transaction fee.</p>
+      <p class="body">You get paid when AI agents use your approved data. Payments settle in USDC on-chain on <span class="accent">Ethereum</span>, and Prmission takes a 3% protocol fee (on-chain).</p>
       <div class="cards">
         <article class="card">
           <h3>1. You Approve</h3>
@@ -327,10 +344,10 @@
       <h2 class="title">How It Works</h2>
       <div class="flow">
         <div class="row"><span>1. User Approves Access</span><strong>User chooses what data to share and sets terms</strong></div>
-        <div class="row"><span>2. Agent Prepays in USDC</span><strong>Funds are locked in escrow onchain</strong></div>
+        <div class="row"><span>2. Agent Prepays in USDC</span><strong>Funds are locked in escrow on-chain</strong></div>
         <div class="row"><span>3. Task Completes</span><strong>Outcome is submitted for settlement</strong></div>
         <div class="row"><span>4. 24-Hour Challenge Window</span><strong>If needed, a dispute can be raised</strong></div>
-        <div class="row"><span>5. Auto Settlement</span><strong>User gets paid and Prmission takes a 3% onchain fee</strong></div>
+        <div class="row"><span>5. Auto Settlement</span><strong>User gets paid and Prmission takes a 3% protocol fee (on-chain)</strong></div>
       </div>
     </section>
 
