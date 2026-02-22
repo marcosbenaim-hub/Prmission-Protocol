@@ -942,5 +942,43 @@ function enableSwipeNavigation(){
   try{const a=await window.ethereum.request({method:'eth_accounts'});if(a&&a.length)await connectWallet('injected')}catch(e){}
 })();
 </script>
+
+<!-- ON-CHAIN PROOF -->
+<style>
+.proof-section{max-width:720px;margin:32px auto;padding:0 16px}
+.proof-badge{display:inline-block;background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);color:#00e5a0;font:700 11px ui-monospace,monospace;padding:4px 10px;border-radius:999px;margin-bottom:12px;letter-spacing:.5px}
+.proof-title{color:#00e5a0;font:800 22px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;margin:0 0 6px}
+.proof-sub{color:#9ca8bf;font-size:14px;margin:0 0 14px;line-height:1.5}
+.proof-table{border:1px solid #203556;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,rgba(16,26,44,.95),rgba(11,18,32,.95))}
+.proof-row{display:grid;grid-template-columns:170px 1fr auto;align-items:center;padding:12px 14px;border-bottom:1px solid #1b2f4b;font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.proof-row:last-child{border-bottom:none}
+.proof-label{color:#e8edf8;font-weight:700}
+.proof-hash{color:#9ca8bf;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.proof-link{color:#00e5a0;text-decoration:none;font-size:13px;font-weight:600;white-space:nowrap}
+.proof-link:hover{text-decoration:underline}
+.proof-settle{margin-top:12px;border:1px solid #203556;border-radius:12px;background:linear-gradient(180deg,rgba(16,26,44,.95),rgba(11,18,32,.95));padding:16px;max-width:380px}
+.proof-settle-title{font:600 11px ui-monospace,monospace;color:#9ca8bf;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+.proof-settle-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #1b2f4b;font-size:14px}
+.proof-settle-row:last-child{border:none}
+.proof-settle-row .who{color:#9ca8bf}
+.proof-settle-row .amt{color:#00e5a0;font-weight:700;font-family:ui-monospace,monospace}
+@media(max-width:600px){.proof-row{grid-template-columns:1fr;gap:4px}.proof-row .proof-hash{display:none}}
+</style>
+<section class="proof-section">
+<div class="proof-badge">✓ VERIFIED ON BASESCAN</div>
+<h2 class="proof-title">On-Chain Proof</h2>
+<p class="proof-sub">AI agent settlement — Feb 17, 2026. Real USDC, live on Base mainnet.</p>
+<div class="proof-table">
+<div class="proof-row"><span class="proof-label">1. Grant Permission</span><span class="proof-hash">0xabaf9adb...531242</span><a class="proof-link" href="https://basescan.org/tx/0xabaf9adb1646ce900eca37790bdb872019fa90cb7eda752f5422848ebd531242" target="_blank">BaseScan ↗</a></div>
+<div class="proof-row"><span class="proof-label">2. Deposit 1 USDC</span><span class="proof-hash">0xc2c4f242...74c59b</span><a class="proof-link" href="https://basescan.org/tx/0xc2c4f2429ed074e36ff699a1ed406ab9e9d1845118e11286e9e73b09d174c59b" target="_blank">BaseScan ↗</a></div>
+<div class="proof-row"><span class="proof-label">3. Report Outcome</span><span class="proof-hash">0x3f5b2540...9e9db3</span><a class="proof-link" href="https://basescan.org/tx/0x3f5b2540d259cabb3521a75806ae67fc40b92be7a6e8ccd858eba8d3769e9db3" target="_blank">BaseScan ↗</a></div>
+</div>
+<div class="proof-settle">
+<div class="proof-settle-title">Settlement — 1 USDC Escrow, 10% User Fee</div>
+<div class="proof-settle-row"><span class="who">User (10%)</span><span class="amt">$0.10</span></div>
+<div class="proof-settle-row"><span class="who">Protocol (3%)</span><span class="amt">$0.03</span></div>
+<div class="proof-settle-row"><span class="who">Agent</span><span class="amt">$0.87</span></div>
+</div>
+</section>
 </body>
 </html>
