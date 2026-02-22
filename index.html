@@ -221,6 +221,12 @@
     .dropdown[open] summary {
       margin-bottom: 8px;
     }
+    .form-status {
+      margin-top: 8px;
+      color: var(--green);
+      font-size: 12px;
+      min-height: 16px;
+    }
 
     .form {
       display: grid;
@@ -371,6 +377,7 @@
             <input type="email" name="email" placeholder="Email" required>
             <button type="submit" id="waitlist-button">Get Updates</button>
           </form>
+          <div class="form-status" id="waitlist-status" aria-live="polite"></div>
         </details>
       </div>
     </section>
@@ -415,12 +422,14 @@
 
     const waitlistForm = document.getElementById("waitlist-form");
     const waitlistButton = document.getElementById("waitlist-button");
+    const waitlistStatus = document.getElementById("waitlist-status");
 
     waitlistForm.addEventListener("submit", async function (event) {
       event.preventDefault();
       const previous = waitlistButton.textContent;
       waitlistButton.textContent = "Submitting...";
       waitlistButton.disabled = true;
+      if (waitlistStatus) waitlistStatus.textContent = "";
 
       try {
         const payload = new FormData(waitlistForm);
@@ -432,16 +441,13 @@
 
         if (!response.ok) throw new Error("submit_failed");
 
-        waitlistButton.textContent = "Confirmed";
+        waitlistButton.textContent = "Confirmed ✓";
         waitlistForm.reset();
+        if (waitlistStatus) waitlistStatus.textContent = "Thank you — we will contact you soon.";
         fetch("https://api.countapi.xyz/hit/prmission.com/waitlist_signups");
-
-        setTimeout(() => {
-          waitlistButton.textContent = "Get Updates";
-          waitlistButton.disabled = false;
-        }, 1800);
       } catch (error) {
         waitlistButton.textContent = "Try Again";
+        if (waitlistStatus) waitlistStatus.textContent = "Something went wrong. Please try again.";
         setTimeout(() => {
           waitlistButton.textContent = previous;
           waitlistButton.disabled = false;
