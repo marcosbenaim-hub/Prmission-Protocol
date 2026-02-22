@@ -79,7 +79,6 @@ Agent receives remainder → $475.00
 - ✅ Built an AI agent that completes full settlement flows on-chain using the Prmission smart contract
 - ✅ **Hundreds of simulated settlements** processed end-to-end
 - ✅ Protocol fee capture verified at **3% on-chain**
-- ✅ **51 tests passing** across core flows and V2 improvements
 
 ---
 
@@ -223,7 +222,6 @@ npx hardhat compile
 npx hardhat test
 ```
 
-51 tests passing covering all core flows, edge cases, and V2 improvements.
 
 ### Deploy
 

@@ -408,10 +408,10 @@
 
       <section class="slide" data-id="problem">
         <p class="eyebrow">The Problem</p>
-        <h2 class="title">AI agents can act, but they still can’t natively settle permissioned data transactions.</h2>
+        <h2 class="title">AI agents can act, but they still can’t natively settle consented data transactions on-chain.</h2>
         <div class="stack">
-          <p class="line">There is no default protocol that combines permission, escrow, dispute handling, and payout in one deterministic flow.</p>
-          <p class="line">Without a neutral settlement layer, agent commerce fragments into ad hoc, platform-specific rails.</p>
+          <p class="line">There is no default protocol that combines consent gating, escrow, dispute handling, and payout in one deterministic flow.</p>
+          <p class="line">Without a neutral settlement layer, users are not paid directly in their own wallets when agents access permissioned data.</p>
         </div>
         <div class="cards">
           <article class="card">
@@ -434,13 +434,13 @@
         <h2 class="title">Prmission is the transaction layer below the agent stack.</h2>
         <div class="stack">
           <p class="line">Prmission does not compete with ChatGPT, Apple, or Google agent platforms.</p>
-          <p class="line">They provide intelligence and distribution; Prmission provides the transaction layer: permission, escrow, and settlement.</p>
-          <p class="line">As agent ecosystems scale to millions of interactions, Prmission captures the settlement layer those interactions require.</p>
-          <p class="line">We don’t need to own the interface or model. We monetize the settlement event beneath them.</p>
+          <p class="line">Prmission connects AI agents and human-verified users for consented data settlements on-chain.</p>
+          <p class="line">Users approve access, agents deposit USDC in escrow, and settlement executes on-chain.</p>
+          <p class="line">Prmission enforces consent gating, escrow, dispute handling, and auto-settlement, with a 3% transaction fee on-chain on every settlement.</p>
         </div>
         <div class="panel">
           <strong>Why Prmission wins:</strong><br>
-          1) Immutable monetization: 3% fee is protocol-enforced on every settlement.<br>
+          1) Immutable monetization: 3% transaction fee is protocol-enforced on every on-chain settlement.<br>
           2) Neutral position: we integrate under agent platforms instead of competing with them.<br>
           3) Fast compounding: as agent transactions scale, settlement events scale.
         </div>
@@ -454,7 +454,7 @@
           <article class="step"><span class="n">2</span><code>depositEscrow()</code><p>Agent locks USDC before access.</p></article>
           <article class="step"><span class="n">3</span><code>reportOutcome()</code><p>Outcome reported after task completion.</p></article>
           <article class="step"><span class="n">4</span><code>disputeSettlement()</code><p>24-hour dispute window.</p></article>
-          <article class="step"><span class="n">5</span><code>settle()</code><p>Contract auto-distributes settlement.</p></article>
+          <article class="step"><span class="n">5</span><code>settle()</code><p>Contract auto-settles on-chain, pays users to their Prmission wallets, and takes Prmission’s 3% fee.</p></article>
         </div>
         <div class="table">
           <div class="row"><span>Example: $500 outcome value (user fee 2%)</span><strong></strong></div>
@@ -470,7 +470,6 @@
         <div class="stack">
           <p class="line">Live on Base Mainnet with verified contract deployment.</p>
           <p class="line">First live end-to-end transfer recorded: February 6, 2026.</p>
-          <p class="line">51 tests passing across core flows and V2 improvements.</p>
           <p class="line">V2 fixes critical payout/dispute vulnerabilities and adds production-grade controls.</p>
         </div>
         <div class="chips">
@@ -489,7 +488,7 @@
           <p class="line">As agent-initiated transactions scale, Prmission captures settlement volume by default.</p>
         </div>
         <div class="table">
-          <div class="row"><span>Protocol Fee</span><strong>3% on each settlement. Hardcoded on-chain.</strong></div>
+          <div class="row"><span>Protocol Fee</span><strong>3% transaction fee on every on-chain settlement.</strong></div>
           <div class="row"><span>Revenue Model</span><strong>Scales with settlement-required agent actions.</strong></div>
           <div class="row"><span>Wedge</span><strong>High-intent actions where payment already exists.</strong></div>
         </div>
@@ -499,7 +498,7 @@
         <p class="eyebrow">Business Model</p>
         <h2 class="title">3% of every settlement. Hardcoded. Non-negotiable.</h2>
         <div class="stack">
-          <p class="line">If an agent settles through Prmission, fee capture is automatic at the protocol layer.</p>
+          <p class="line">If an agent settles through Prmission, 3% transaction fee capture is automatic on-chain at the protocol layer.</p>
           <p class="line">Revenue is protocol-native, not sales-team dependent.</p>
           <p class="line">We don’t need speculative capital to start. We need the right team and focused capital to scale settlement volume.</p>
           <p class="line">We’re already live; funding accelerates integrations and transaction velocity.</p>
