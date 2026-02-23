@@ -272,7 +272,8 @@ npx hardhat verify --network base <CONTRACT_ADDRESS> "<PAYMENT_TOKEN>" "<TREASUR
 
 ## License
 
-MIT
+BSL 1.1
+
 
 ---
 
