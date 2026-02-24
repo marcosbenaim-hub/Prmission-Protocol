@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prmission Admin Dashboard</title>
+  <meta name="description" content="Prmission backend dashboard for settlement and revenue tracking on Base.">
+  <style>
+    :root {
+      --bg: #090909;
+      --panel: #121212;
+      --line: #2a2a2a;
+      --line2: #3a3a3a;
+      --text: #f6f6f6;
+      --muted: #bbbbbb;
+      --green: #e10600;
+      --danger: #ff647a;
+      --warn: #f5f5f5;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --sans: "Inter", "Segoe UI", "SF Pro Display", system-ui, sans-serif;
+      --max: 1220px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(1000px 500px at 88% 2%, rgba(225,6,0,.20), transparent 60%),
+        radial-gradient(850px 360px at 8% 92%, rgba(255,255,255,.08), transparent 64%),
+        var(--bg);
+    }
+    .wrap { width: min(var(--max), 94vw); margin: 0 auto; }
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 15;
+      border-bottom: 1px solid #252525;
+      backdrop-filter: blur(8px);
+      background: rgba(9,9,9,.9);
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      min-height: 72px;
+    }
+    .brand {
+      color: var(--green);
+      font: 800 clamp(20px, 2.3vw, 30px) var(--mono);
+      letter-spacing: .08em;
+    }
+    .sub {
+      color: var(--muted);
+      font: 11px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .status {
+      border: 1px solid var(--line2);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font: 11px var(--mono);
+      color: var(--green);
+      background: rgba(0,229,160,.08);
+      white-space: nowrap;
+    }
+    main { padding: 18px 0 26px; }
+    .controls {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(24,24,24,.96), rgba(14,14,14,.95));
+      border-radius: 12px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .control {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .control label {
+      font: 10px var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+    }
+    .control input, .control select {
+      border: 1px solid #393939;
+      border-radius: 9px;
+      background: #141414;
+      color: var(--text);
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    .btns {
+      display: flex;
+      gap: 8px;
+      align-items: end;
+    }
+    button {
+      border: 1px solid #e10600;
+      background: var(--green);
+      color: #ffffff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 12px;
+      min-height: 36px;
+    }
+    .ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line2);
+    }
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0,1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(23,23,23,.95), rgba(12,12,12,.95));
+      padding: 12px;
+    }
+    .k-title {
+      color: var(--muted);
+      font: 10px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .k-val {
+      color: var(--green);
+      font: 800 clamp(18px, 2vw, 28px) var(--mono);
+      line-height: 1.1;
+    }
+    .k-sub {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 10px;
+    }
+    .title {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: var(--text);
+      letter-spacing: .01em;
+    }
+    .table-wrap {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: auto;
+      max-height: 560px;
+      background: #101010;
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 780px; }
+    th, td {
+      padding: 9px 10px;
+      border-bottom: 1px solid #1b2f4b;
+      text-align: left;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: #151515;
+      color: var(--muted);
+      font: 10px var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    td.hash a { color: var(--green); text-decoration: none; font-family: var(--mono); }
+    td.mono { font-family: var(--mono); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font: 10px var(--mono);
+      border: 1px solid;
+    }
+    .b-ok { color: var(--green); border-color: rgba(0,229,160,.45); background: rgba(0,229,160,.08); }
+    .b-warn { color: var(--warn); border-color: rgba(255,209,102,.45); background: rgba(255,209,102,.08); }
+    .b-red { color: var(--danger); border-color: rgba(255,100,122,.45); background: rgba(255,100,122,.08); }
+    .mini-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 560px;
+      overflow: auto;
+    }
+    .mini {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: #121212;
+    }
+    .mini h4 {
+      margin: 0 0 8px;
+      font-size: 12px;
+      color: var(--green);
+      font-family: var(--mono);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      padding: 4px 0;
+      color: var(--muted);
+      border-bottom: 1px dashed #1f3556;
+    }
+    .row:last-child { border-bottom: none; }
+    .row strong { color: var(--text); font-family: var(--mono); }
+    .note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    .campaign-shot {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--line2);
+      display: block;
+      margin-bottom: 8px;
+    }
+    .campaign-caption {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    .err {
+      border: 1px solid rgba(255,100,122,.45);
+      color: var(--danger);
+      border-radius: 9px;
+      padding: 8px 10px;
+      font-size: 12px;
+      margin-top: 8px;
+      background: rgba(255,100,122,.08);
+      display: none;
+    }
+    @media (max-width: 1100px) {
+      .controls { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .kpis { grid-template-columns: repeat(3,minmax(0,1fr)); }
+      .grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .btns { grid-column: 1 / -1; }
+      .status { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap topbar">
+      <div>
+        <div class="brand">PRMISSION</div>
+        <div class="sub">Admin Dashboard · Settlements + Revenue Tracking</div>
+      </div>
+      <div class="status" id="lastRefresh">Last refresh: --</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="controls">
+      <div class="control">
+        <label for="contractAddress">Contract</label>
+        <input id="contractAddress" value="0x0c8B16a57524f4009581B748356E01e1a969223d">
+      </div>
+      <div class="control">
+        <label for="treasuryAddress">Treasury</label>
+        <input id="treasuryAddress" value="0xc787aB0648DA8511C7D6CFB6Ff51079E41fEE45d">
+      </div>
+      <div class="control">
+        <label for="days">History window</label>
+        <select id="days">
+          <option value="1">Last 24h</option>
+          <option value="7" selected>Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+        </select>
+      </div>
+      <div class="control">
+        <label for="minAmount">Min USDC</label>
+        <input id="minAmount" type="number" min="0" step="0.01" value="0">
+      </div>
+      <div class="control">
+        <label for="userFeeBps">User Fee % (est.)</label>
+        <input id="userFeeBps" type="number" min="0" max="100" step="0.1" value="10">
+      </div>
+      <div class="btns">
+        <button id="refreshBtn">Refresh</button>
+        <button class="ghost" id="exportBtn">Export CSV</button>
+      </div>
+    </section>
+
+    <div class="err" id="errorBox"></div>
+
+    <section class="kpis" id="kpiGrid">
+      <article class="card"><div class="k-title">Protocol Revenue</div><div class="k-val" id="kRevenue">$0.00</div><div class="k-sub" id="kRevenueSub">USDC to treasury</div></article>
+      <article class="card"><div class="k-title">Settlement Count</div><div class="k-val" id="kSettlements">0</div><div class="k-sub" id="kSettlementsSub">Filtered window</div></article>
+      <article class="card"><div class="k-title">Avg Fee / Settlement</div><div class="k-val" id="kAvgFee">$0.00</div><div class="k-sub">Protocol fee average</div></article>
+      <article class="card"><div class="k-title">Estimated Total Volume</div><div class="k-val" id="kVolume">$0.00</div><div class="k-sub">Fee / 3% approximation</div></article>
+      <article class="card"><div class="k-title">Estimated User Earnings</div><div class="k-val" id="kUserEarnings">$0.00</div><div class="k-sub">Based on user fee %</div></article>
+      <article class="card"><div class="k-title">Estimated Agent Net</div><div class="k-val" id="kAgentNet">$0.00</div><div class="k-sub">After user + protocol split</div></article>
+      <article class="card"><div class="k-title">Unique Payers</div><div class="k-val" id="kPayers">0</div><div class="k-sub">Wallets funding settlements</div></article>
+      <article class="card"><div class="k-title">Last Settlement</div><div class="k-val" id="kLast">--</div><div class="k-sub">Most recent treasury inflow</div></article>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h3 class="title">Settlement / Fee History (Treasury Inflows)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Tx Hash</th>
+                <th>From</th>
+                <th>USDC Fee</th>
+                <th>Est. Settlement</th>
+                <th>Est. User Earn</th>
+                <th>Est. Agent Net</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <aside class="mini-list">
+        <article class="mini">
+          <h4>Campaign Direction</h4>
+          <img class="campaign-shot" src="assets/nike-campaign.png" alt="Nike campaign style reference">
+          <div class="campaign-caption">Dashboard theme aligned to the red, white, and black campaign look.</div>
+        </article>
+
+        <article class="mini">
+          <h4>Revenue Summary</h4>
+          <div class="row"><span>Total protocol fees</span><strong id="sTotalFees">$0.00</strong></div>
+          <div class="row"><span>Estimated user earnings</span><strong id="sTotalUser">$0.00</strong></div>
+          <div class="row"><span>Estimated agent net</span><strong id="sTotalAgent">$0.00</strong></div>
+          <div class="row"><span>Median fee</span><strong id="sMedianFee">$0.00</strong></div>
+          <div class="row"><span>Largest fee</span><strong id="sLargestFee">$0.00</strong></div>
+          <div class="row"><span>Smallest fee</span><strong id="sSmallestFee">$0.00</strong></div>
+        </article>
+
+        <article class="mini">
+          <h4>Top Funding Wallets</h4>
+          <div id="topPayers"></div>
+        </article>
+
+        <article class="mini">
+          <h4>Operational Notes</h4>
+          <div class="note">
+            Revenue is derived from USDC transfers into treasury from contract-driven flows.<br>
+            Estimated settlement volume uses fixed 3% protocol fee logic.<br>
+            This dashboard is optimized for daily ops and founder reporting.
+          </div>
+        </article>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    'use strict';
+
+    const BASESCAN_API = 'https://api.basescan.org/api';
+    const BASESCAN_TX = 'https://basescan.org/tx/';
+    const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'.toLowerCase();
+    const FEE_BPS = 300;
+    const BPS_DENOM = 10000;
+
+    let lastRows = [];
+
+    const $ = (id) => document.getElementById(id);
+    const fmtUSD = (n) => '$' + Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtNum = (n) => Number(n || 0).toLocaleString();
+
+    function showError(msg) {
+      const box = $('errorBox');
+      box.style.display = msg ? 'block' : 'none';
+      box.textContent = msg || '';
+    }
+
+    function short(addr) {
+      if (!addr || addr.length < 12) return addr || '--';
+      return addr.slice(0, 6) + '...' + addr.slice(-4);
+    }
+
+    function unixToDate(ts) {
+      const d = new Date(Number(ts) * 1000);
+      return d.toLocaleString();
+    }
+
+    function median(values) {
+      if (!values.length) return 0;
+      const sorted = values.slice().sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    }
+
+    async function fetchTokenInflows(contractAddress, treasuryAddress, days) {
+      const sinceTs = Math.floor(Date.now() / 1000) - (Number(days) * 86400);
+
+      const url = new URL(BASESCAN_API);
+      url.searchParams.set('module', 'account');
+      url.searchParams.set('action', 'tokentx');
+      url.searchParams.set('address', treasuryAddress);
+      url.searchParams.set('contractaddress', USDC_ADDRESS);
+      url.searchParams.set('page', '1');
+      url.searchParams.set('offset', '1000');
+      url.searchParams.set('sort', 'desc');
+
+      const res = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
+      if (!res.ok) throw new Error('BaseScan request failed');
+
+      const json = await res.json();
+      if (!json || !Array.isArray(json.result)) {
+        throw new Error('Unexpected BaseScan response');
+      }
+
+      const cAddr = contractAddress.toLowerCase();
+      const tAddr = treasuryAddress.toLowerCase();
+
+      return json.result
+        .filter(tx => Number(tx.timeStamp) >= sinceTs)
+        .filter(tx => (tx.to || '').toLowerCase() === tAddr)
+        .filter(tx => {
+          const from = (tx.from || '').toLowerCase();
+          return from === cAddr || from !== tAddr;
+        })
+        .map(tx => {
+          const decimals = Number(tx.tokenDecimal || 6);
+          const fee = Number(tx.value) / Math.pow(10, decimals);
+          const estSettlement = fee > 0 ? (fee / (FEE_BPS / BPS_DENOM)) : 0;
+          return {
+            timeStamp: Number(tx.timeStamp),
+            hash: tx.hash,
+            from: tx.from,
+            fee,
+            estSettlement,
+            status: tx.txreceipt_status === '1' ? 'Confirmed' : 'Unknown'
+          };
+        });
+    }
+
+    function applyFilters(rows) {
+      const min = Number($('minAmount').value || 0);
+      const userPct = Number($('userFeeBps').value || 0) / 100;
+      return rows
+        .filter(r => r.fee >= min)
+        .map(r => {
+          const userEarn = r.estSettlement * userPct;
+          const agentNet = Math.max(0, r.estSettlement - r.fee - userEarn);
+          return { ...r, userEarn, agentNet };
+        });
+    }
+
+    function renderHistory(rows) {
+      const body = $('historyBody');
+      body.innerHTML = '';
+
+      if (!rows.length) {
+        body.innerHTML = '<tr><td colspan="8" class="mono" style="color:var(--muted)">No settlement fee inflows found for current filters.</td></tr>';
+        return;
+      }
+
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${unixToDate(r.timeStamp)}</td>
+          <td class="hash mono"><a href="${BASESCAN_TX + r.hash}" target="_blank" rel="noreferrer">${short(r.hash)}</a></td>
+          <td class="mono">${short(r.from)}</td>
+          <td class="mono">${fmtUSD(r.fee)}</td>
+          <td class="mono">${fmtUSD(r.estSettlement)}</td>
+          <td class="mono">${fmtUSD(r.userEarn)}</td>
+          <td class="mono">${fmtUSD(r.agentNet)}</td>
+          <td><span class="badge ${r.status === 'Confirmed' ? 'b-ok' : 'b-warn'}">${r.status}</span></td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    function renderKpis(rows) {
+      const totalFees = rows.reduce((sum, r) => sum + r.fee, 0);
+      const totalVolume = rows.reduce((sum, r) => sum + r.estSettlement, 0);
+      const totalUser = rows.reduce((sum, r) => sum + r.userEarn, 0);
+      const totalAgent = rows.reduce((sum, r) => sum + r.agentNet, 0);
+      const avgFee = rows.length ? totalFees / rows.length : 0;
+      const payers = new Set(rows.map(r => (r.from || '').toLowerCase()));
+      const last = rows[0] ? unixToDate(rows[0].timeStamp) : '--';
+
+      $('kRevenue').textContent = fmtUSD(totalFees);
+      $('kSettlements').textContent = fmtNum(rows.length);
+      $('kAvgFee').textContent = fmtUSD(avgFee);
+      $('kVolume').textContent = fmtUSD(totalVolume);
+      $('kUserEarnings').textContent = fmtUSD(totalUser);
+      $('kAgentNet').textContent = fmtUSD(totalAgent);
+      $('kPayers').textContent = fmtNum(payers.size);
+      $('kLast').textContent = last;
+
+      $('sTotalFees').textContent = fmtUSD(totalFees);
+      $('sTotalUser').textContent = fmtUSD(totalUser);
+      $('sTotalAgent').textContent = fmtUSD(totalAgent);
+
+      const fees = rows.map(r => r.fee);
+      $('sMedianFee').textContent = fmtUSD(median(fees));
+      $('sLargestFee').textContent = fmtUSD(fees.length ? Math.max(...fees) : 0);
+      $('sSmallestFee').textContent = fmtUSD(fees.length ? Math.min(...fees) : 0);
+
+      const byPayer = {};
+      rows.forEach(r => {
+        const key = (r.from || '').toLowerCase();
+        byPayer[key] = (byPayer[key] || 0) + r.fee;
+      });
+
+      const top = Object.entries(byPayer)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8);
+
+      const topNode = $('topPayers');
+      if (!top.length) {
+        topNode.innerHTML = '<div class="row"><span>No payers</span><strong>--</strong></div>';
+      } else {
+        topNode.innerHTML = top
+          .map(([addr, amt]) => `<div class="row"><span class="mono">${short(addr)}</span><strong>${fmtUSD(amt)}</strong></div>`)
+          .join('');
+      }
+    }
+
+    function render(rows) {
+      renderHistory(rows);
+      renderKpis(rows);
+      $('lastRefresh').textContent = 'Last refresh: ' + new Date().toLocaleString();
+    }
+
+    async function refresh() {
+      showError('');
+      $('refreshBtn').disabled = true;
+      $('refreshBtn').textContent = 'Loading...';
+
+      try {
+        const contract = $('contractAddress').value.trim();
+        const treasury = $('treasuryAddress').value.trim();
+        const days = $('days').value;
+
+        if (!contract || !treasury) {
+          throw new Error('Contract and treasury addresses are required.');
+        }
+
+        const rows = await fetchTokenInflows(contract, treasury, days);
+        lastRows = applyFilters(rows);
+        render(lastRows);
+      } catch (err) {
+        showError(err.message || 'Failed to load dashboard data.');
+      } finally {
+        $('refreshBtn').disabled = false;
+        $('refreshBtn').textContent = 'Refresh';
+      }
+    }
+
+    function downloadCsv(rows) {
+      const header = ['time','txHash','from','protocolFeeUsdc','estimatedSettlementUsdc','estimatedUserEarningsUsdc','estimatedAgentNetUsdc','status'];
+      const lines = [header.join(',')];
+      rows.forEach(r => {
+        const line = [
+          new Date(r.timeStamp * 1000).toISOString(),
+          r.hash,
+          r.from,
+          r.fee.toFixed(6),
+          r.estSettlement.toFixed(6),
+          r.userEarn.toFixed(6),
+          r.agentNet.toFixed(6),
+          r.status
+        ];
+        lines.push(line.map(v => `"${String(v).replaceAll('"','""')}"`).join(','));
+      });
+
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `prmission_settlements_${Date.now()}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    $('refreshBtn').addEventListener('click', refresh);
+    $('minAmount').addEventListener('change', () => {
+      render(applyFilters(lastRows));
+    });
+    $('days').addEventListener('change', refresh);
+    $('userFeeBps').addEventListener('change', () => {
+      lastRows = applyFilters(lastRows);
+      render(lastRows);
+    });
+    $('exportBtn').addEventListener('click', () => downloadCsv(lastRows));
+
+    refresh();
+    setInterval(refresh, 120000);
+  </script>
+</body>
+</html>
