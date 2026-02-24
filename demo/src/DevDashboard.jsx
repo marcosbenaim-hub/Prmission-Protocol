@@ -60,7 +60,7 @@ export default function DevDashboard() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Syne:wght@800&display=swap');
         *{box-sizing:border-box;margin:0;padding:0;}
-        :root{--bg:#0a0c12;--card:#111520;--border:#1e2540;--text:#ffffff;--dim:#a0aec0;--green:#00ff88;--blue:#818cf8;--orange:#f59e0b;}
+        :root{--bg:#0d0d0d;--card:#111111;--border:#222222;--text:#ffffff;--dim:#aaaaaa;--green:#00ff88;--blue:#4488ff;--orange:#E00000;}
         body{background:var(--bg);}
         @keyframes glow{0%,100%{box-shadow:0 0 6px rgba(0,255,136,0.4)}50%{box-shadow:0 0 20px rgba(0,255,136,0.8)}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -130,7 +130,7 @@ export default function DevDashboard() {
               </div>
               <div style={{marginBottom:20}}>
                 <div style={{fontSize:"0.55rem",letterSpacing:"2px",color:"var(--text)",marginBottom:10}}>INSTALL</div>
-                <div style={{background:"#0a0d18",border:"1px solid var(--border)",padding:"13px 18px"}}>
+                <div style={{background:"#0d0d0d",border:"1px solid var(--border)",padding:"13px 18px"}}>
                   <code style={{fontSize:"0.8rem",color:"var(--text)"}}><span style={{color:"var(--text)"}}>$ </span>npm install <span style={{color:"var(--green)"}}>@prmission/sdk</span></code>
                 </div>
               </div>
@@ -139,8 +139,8 @@ export default function DevDashboard() {
                   <div style={{fontSize:"0.55rem",letterSpacing:"2px",color:"var(--text)"}}>INTEGRATION</div>
                   <button onClick={()=>{navigator.clipboard.writeText(SNIPPET);setCopied(true);setTimeout(()=>setCopied(false),2000);}} style={{background:copied?"rgba(0,255,136,0.15)":"transparent",border:`1px solid ${copied?"var(--green)":"var(--border)"}`,color:copied?"var(--green)":"var(--dim)",fontSize:"0.62rem",padding:"3px 10px",cursor:"pointer",fontFamily:"'IBM Plex Mono',monospace"}}>{copied?"✓ COPIED":"COPY"}</button>
                 </div>
-                <div style={{background:"#0a0d18",border:"1px solid var(--border)",padding:"20px"}}>
-                  <pre style={{fontSize:"0.74rem",lineHeight:1.8,color:"#e2e8f0",fontFamily:"'IBM Plex Mono',monospace",overflowX:"auto"}}>{SNIPPET}</pre>
+                <div style={{background:"#0d0d0d",border:"1px solid var(--border)",padding:"20px"}}>
+                  <pre style={{fontSize:"0.74rem",lineHeight:1.8,color:"#ffffff",fontFamily:"'IBM Plex Mono',monospace",overflowX:"auto"}}>{SNIPPET}</pre>
                 </div>
               </div>
               <div style={{background:"rgba(0,255,136,0.04)",border:"1px solid rgba(0,255,136,0.15)",padding:"18px 22px"}}>
@@ -156,7 +156,7 @@ export default function DevDashboard() {
                 <div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:7,height:7,borderRadius:"50%",background:"var(--green)",boxShadow:"0 0 8px var(--green)",animation:pulse?"glow 0.6s ease":"none"}}/><span style={{fontSize:"0.62rem",color:"var(--green)"}}>LIVE</span></div>
               </div>
               <div style={{background:"var(--card)",border:"1px solid var(--border)",overflow:"hidden"}}>
-                <div style={{display:"grid",gridTemplateColumns:"1.8fr 1.4fr 1.4fr 0.9fr 0.9fr 1fr",gap:8,padding:"10px 16px",borderBottom:"1px solid var(--border)",background:"#0d1020"}}>
+                <div style={{display:"grid",gridTemplateColumns:"1.8fr 1.4fr 1.4fr 0.9fr 0.9fr 1fr",gap:8,padding:"10px 16px",borderBottom:"1px solid var(--border)",background:"#111111"}}>
                   {["TX HASH","AGENT","CREATOR","AMOUNT","FEE","TIME"].map(h=><span key={h} style={{fontSize:"0.55rem",letterSpacing:"1.5px",color:"var(--text)"}}>{h}</span>)}
                 </div>
                 {txs.slice(0,15).map((tx,i)=>(
@@ -176,7 +176,7 @@ export default function DevDashboard() {
               <div style={{marginBottom:28}}><div style={{fontSize:"0.55rem",letterSpacing:"3px",color:"var(--text)",marginBottom:8}}>SMART CONTRACTS</div><h2 style={{fontFamily:"'Syne',sans-serif",fontSize:"1.8rem",fontWeight:800,color:"var(--text)",marginBottom:8}}>On-Chain Addresses</h2><p style={{color:"var(--text)",fontSize:"0.78rem"}}>Deployed and verified on Base Mainnet.</p></div>
               {[["PrmissionRegistry","Core Protocol",CONTRACTS.registry,"Consent-gated escrow and settlement. Hardcoded 3% fee.","Feb 6, 2026"],["USDC","Payment Token",CONTRACTS.usdc,"Circle native USDC on Base Mainnet.","Coinbase"],["Treasury","Protocol Wallet",CONTRACTS.treasury,"Receives 3% fee on every settlement.","Feb 6, 2026"]].map(([name,label,addr,desc,date],i)=>(
                 <div key={i} style={{marginBottom:16,background:"var(--card)",border:"1px solid var(--border)",overflow:"hidden"}}>
-                  <div style={{padding:"14px 18px",borderBottom:"1px solid var(--border)",background:"#0d1020",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                  <div style={{padding:"14px 18px",borderBottom:"1px solid var(--border)",background:"#111111",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                     <div style={{display:"flex",alignItems:"center",gap:10}}><span style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.88rem"}}>{name}</span><span style={{fontSize:"0.58rem",padding:"2px 7px",border:"1px solid var(--border)",color:"var(--text)"}}>{label}</span></div>
                     <span style={{fontSize:"0.62rem",color:"var(--text)"}}>{date}</span>
                   </div>
@@ -198,7 +198,7 @@ export default function DevDashboard() {
                 {m:"sdk.listSettlements()",b:"READ",d:"Fetch all settlements for this API key.",p:[["limit?","number","Max results (default 50)"],["offset?","number","Pagination offset"]],r:"Settlement[]"}
               ].map((fn,i)=>(
                 <div key={i} style={{marginBottom:20,background:"var(--card)",border:"1px solid var(--border)",overflow:"hidden"}}>
-                  <div style={{padding:"14px 18px",borderBottom:"1px solid var(--border)",background:"#0d1020",display:"flex",alignItems:"center",gap:12}}>
+                  <div style={{padding:"14px 18px",borderBottom:"1px solid var(--border)",background:"#111111",display:"flex",alignItems:"center",gap:12}}>
                     <code style={{color:"var(--green)",fontSize:"0.84rem",fontWeight:600}}>{fn.m}</code>
                     <span style={{fontSize:"0.58rem",padding:"2px 7px",border:"1px solid var(--border)",color:"var(--text)"}}>{fn.b}</span>
                   </div>

@@ -275,6 +275,7 @@ export default function App() {
       <div className="controls-row2">
         <button className="btn-start" onClick={start} disabled={status === "running"}>▶ Launch Global Nike Campaign</button>
         <button className="btn-reset" onClick={reset}>↺ Reset</button>
+        <a href="/dev" style={{marginLeft:8,background:"#00ff88",color:"#111",padding:"8px 18px",borderRadius:6,fontWeight:700,fontSize:"0.78rem",letterSpacing:"1px",textDecoration:"none",display:"inline-block"}}>⚡ Settlement Hub</a>
       </div>
 
       <div className="footer-bar">
