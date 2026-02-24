@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Prmission | The Economic Layer for AI Agent Commerce</title>
-  <meta name="description" content="Prmission is a consent-gated escrow and settlement protocol for AI agent commerce on Ethereum (Base L2). Live with a fixed 3% protocol fee on-chain.">
+  <meta name="description" content="Prmission is a consent-gated escrow and settlement protocol for AI agent commerce on Ethereum (Base L2). Live with a fixed 3% protocol fee on-chain on Ethereum.">
   <style>
     :root {
       --bg: #060b14;
@@ -287,12 +287,13 @@
     <section class="hero">
       <p class="eyebrow">AI Agent Commerce</p>
       <h1>OpenAI gave agents a brain.<br>Google and Apple gave them reach.<br><span class="accent">Prmission gives us a wallet.</span></h1>
-      <p class="sub">AI agents can request data, people can approve it, and payments settle in USDC on-chain on <span class="accent">Ethereum (Base L2)</span>.</p>
+      <p class="sub">The economic permission layer enabling AI agents to pay for data and services — securely, autonomously, and <span class="accent">on-chain</span>.</p>
       <div class="hero-actions">
-        <button class="cta" id="connect-wallet">Launch App</button>
+        <a class="cta" href="#waitlist">Join Waitlist</a>
         <a class="cta" href="#waitlist">Get Updates</a>
       </div>
-      <div class="live"><span class="accent">Live Right Now</span> • 3% protocol fee (on-chain) on every settlement • Built on Ethereum (Base network) • 0x0c8B16a57524f4009581B748356E01e1a969223d</div>
+      <p class="body" style="margin-top:8px"><span class="accent">App launching soon.</span></p>
+      <div class="live"><span class="accent">Live Right Now</span> • 3% protocol fee (<span class="accent">on-chain</span>) on every settlement • Built on <span class="accent">Ethereum</span> (Base network) • 0x0c8B16a57524f4009581B748356E01e1a969223d</div>
       <div class="stats">
         <div class="stat"><b>3%</b><span>Protocol Fee (On-Chain)</span></div>
         <div class="stat"><b>24h</b><span>Challenge Window</span></div>
@@ -306,61 +307,130 @@
     </section>
 
     <section class="section">
-      <h2 class="title">What is Prmission?</h2>
-      <p class="body">Prmission connects AI agents and people for paid data access. The user approves access, the agent prepays in USDC, and the payment is split automatically on-chain using <span class="accent">ERC-8004</span> consent rules on <span class="accent">Ethereum</span>.</p>
+      <h2 class="title" style="color:var(--green);font-size:clamp(28px,3.2vw,44px);text-transform:uppercase;letter-spacing:1px">How You Make $</h2>
+      <p class="body">You can get paid when an AI agent wants your data and you say yes, and a settlement is completed. Payment goes to your Coinbase Wallet or any supported Web3 wallet.</p>
       <div class="cards">
         <article class="card">
-          <h3>Works With Existing Apps</h3>
-          <p>Prmission plugs into AI apps without replacing ChatGPT, Google, Apple, or your app interface.</p>
+          <h3>You Approve</h3>
+          <p>You pick what data can be used.</p>
         </article>
         <article class="card">
-          <h3>Automatic 3% Fee (On-Chain)</h3>
-          <p>Every time a settlement happens, Prmission automatically takes a 3% protocol fee (on-chain) in USDC.</p>
+          <h3>Agent Pays</h3>
+          <p>In the protocol flow, the AI agent prepays in USDC before access.</p>
         </article>
         <article class="card">
-          <h3>Grows As Usage Grows</h3>
-          <p>More agent transactions means more settlements, and more settlements means more fee revenue.</p>
+          <h3>You Get Paid</h3>
+          <p>If the rules are met, money is sent to your Coinbase Wallet or any supported Web3 wallet.</p>
         </article>
       </div>
     </section>
 
     <section class="section">
-      <h2 class="title">Proof</h2>
+      <h2 class="title">What We Solve</h2>
+      <h3 class="body" style="margin:0 0 6px;color:var(--text)">The Problem We're Solving</h3>
+      <p class="body">AI agents can do work: access data, automate tasks, and trigger actions. There is no default system that verifies who authorized those actions or ensures payment.</p>
       <div class="cards">
         <article class="card">
-          <h3>Live Deployment</h3>
-          <p>Verified contract on Base mainnet, built on <span class="accent">Ethereum</span>. Settlement token is USDC on Base.</p>
+          <h3>No Explicit Consent</h3>
+          <p>Users and developers need clear, scoped permission before agent actions happen.</p>
+        </article>
+        <article class="card">
+          <h3>No Upfront Payment</h3>
+          <p>There is no built-in way to require agent prepayment before access starts.</p>
+        </article>
+        <article class="card">
+          <h3>No Accountability</h3>
+          <p>Teams lack trustworthy infrastructure for verifiable execution and settlement.</p>
         </article>
       </div>
-    </section>
-
-    <section class="section">
-      <h2 class="title">How You Make $</h2>
-      <p class="body">You get paid when AI agents use your approved data. Payments settle in USDC on-chain on <span class="accent">Ethereum</span>, and Prmission takes a 3% protocol fee (on-chain).</p>
-      <div class="cards">
-        <article class="card">
-          <h3>1. You Approve</h3>
-          <p>You choose what data you allow and under what terms.</p>
-        </article>
-        <article class="card">
-          <h3>2. Agent Prepays</h3>
-          <p>The agent deposits USDC into escrow before access.</p>
-        </article>
-        <article class="card">
-          <h3>3. You Get Paid</h3>
-          <p>After settlement, your share is sent to your wallet automatically.</p>
-        </article>
-      </div>
+      <h3 class="body" style="margin:10px 0 6px;color:var(--text)">Our Solution</h3>
+      <p class="body">Prmission gives users fine-grained permission control over AI actions and <span class="accent">on-chain</span> settlement with transparent, programmable consent, so agents can only act if explicitly permitted and payments are automatically handled.</p>
     </section>
 
     <section class="section">
       <h2 class="title">How It Works</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>✅ Approve</h3>
+          <p>User grants scoped access and terms.</p>
+        </article>
+        <article class="card">
+          <h3>💵 Prepay</h3>
+          <p>Agent prepays USDC into escrow <span class="accent">on-chain</span>.</p>
+        </article>
+        <article class="card">
+          <h3>⚙️ Execute</h3>
+          <p>Agent performs its task under those permissions.</p>
+        </article>
+        <article class="card">
+          <h3>🔒 Settle</h3>
+          <p>Funds auto-settle; earnings go to the user, protocol takes 3%.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="title">Who It's For</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>AI Agent Builders</h3>
+          <p>Teams building autonomous agents that need secure payment and consent rails.</p>
+        </article>
+        <article class="card">
+          <h3>LLM Application Developers</h3>
+          <p>Developers shipping AI apps that need trusted user data access and settlement.</p>
+        </article>
+        <article class="card">
+          <h3>Platforms Requiring Programmable Consent</h3>
+          <p>Products that need explicit user permissions and rule-based access control.</p>
+        </article>
+        <article class="card">
+          <h3>Companies Preparing for AI Regulation</h3>
+          <p>Organizations that need auditable consent, payment traceability, and accountability.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="title">Why Now?</h2>
+      <p class="body">AI agents are becoming autonomous. As they begin transacting and accessing sensitive data, regulators and users will demand:</p>
+      <div class="cards">
+        <article class="card">
+          <h3>Clear Consent</h3>
+          <p>Users must know exactly what is being requested and explicitly approve it.</p>
+        </article>
+        <article class="card">
+          <h3>Transparent Payments</h3>
+          <p>Payment terms and payout logic must be visible and enforceable.</p>
+        </article>
+        <article class="card">
+          <h3>On-Chain Accountability</h3>
+          <p>Disputes, outcomes, and settlement records need a verifiable <span class="accent">on-chain</span> system of record.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="title">Why This Matters</h2>
+      <p class="body">As AI becomes autonomous, every irreversible action — data access, automation, payment — must be explicitly authorized and auditable. Prmission provides that layer of trust and economic coordination.</p>
+    </section>
+
+    <section class="section">
+      <h2 class="title">Monetization</h2>
       <div class="flow">
-        <div class="row"><span>1. User Approves Access</span><strong>User chooses what data to share and sets terms</strong></div>
-        <div class="row"><span>2. Agent Prepays in USDC</span><strong>Funds are locked in escrow on-chain</strong></div>
-        <div class="row"><span>3. Task Completes</span><strong>Outcome is submitted for settlement</strong></div>
-        <div class="row"><span>4. 24-Hour Challenge Window</span><strong>If needed, a dispute can be raised</strong></div>
-        <div class="row"><span>5. Auto Settlement</span><strong>User gets paid and Prmission takes a 3% protocol fee (on-chain)</strong></div>
+        <div class="row"><span>Protocol Fee</span><strong>3% on each <span class="accent">on-chain</span> settlement in USDC.</strong></div>
+        <div class="row"><span>Scales With Usage</span><strong>More transactions = more revenue.</strong></div>
+        <div class="row"><span>Fair and Transparent</span><strong>Fee is encoded in the smart contract.</strong></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="title">Call to Action</h2>
+      <div class="flow">
+        <div class="row"><span>Integrate Prmission</span><strong>Connect your AI app to consent and settlement</strong></div>
+        <div class="row"><span>Read the Smart Contract</span><strong>Review contract logic and fee mechanics</strong></div>
+        <div class="row"><span>Read the Docs</span><strong>See implementation flow, escrow rules, and integration details</strong></div>
+        <div class="row"><span>Join the Early Builder Program</span><strong>Ship faster with direct support from Prmission</strong></div>
       </div>
     </section>
 
