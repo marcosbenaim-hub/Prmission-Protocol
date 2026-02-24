@@ -1,13 +1,21 @@
 {
   "name": "@prmission/sdk",
-  "version": "1.0.0",
-  "description": "The settlement layer for AI agents. Consent-gated data exchange with atomic escrow settlement on Base.",
-  "main": "src/index.js",
-  "files": ["src/", "README.md", "LICENSE"],
-  "keywords": ["prmission", "ai-agents", "data-consent", "escrow", "settlement", "base", "blockchain", "erc-8004", "web3", "usdc"],
-  "author": "Marcos Benaim",
-  "license": "BSL-1.1",
-  "repository": { "type": "git", "url": "https://github.com/marcosbenaim-hub/Prmission-Protocol.git" },
-  "dependencies": { "ethers": "^6.0.0" },
-  "engines": { "node": ">=18.0.0" }
+  "version": "0.1.0",
+  "description": "Prmission Protocol SDK — consent-gated data exchange & creator economy for AI agents",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": ["prmission", "ai-agents", "creator-economy", "base", "usdc", "web3"],
+  "license": "MIT",
+  "peerDependencies": {
+    "ethers": "^6.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "ethers": "^6.13.0"
+  }
 }
