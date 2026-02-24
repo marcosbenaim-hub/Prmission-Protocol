@@ -154,3 +154,9 @@ body { background: #f2f2f2; color: #111; font-family: -apple-system, 'Helvetica 
 .flow-addr { color: #2196F3 !important; font-weight: 700 !important; }
 .flow-sub-text { color: #00c853 !important; font-weight: 700 !important; }
 .flow-amount.muted { color: #3f51b5 !important; font-weight: 900 !important; font-size: 1.8rem !important; }
+
+@media (max-width: 860px) {
+  .flow-amount.muted { font-size: 1.1rem !important; }
+  .flow-amount.red { font-size: 1rem !important; }
+  .stat-lbl { color: #c87828 !important; }
+}
