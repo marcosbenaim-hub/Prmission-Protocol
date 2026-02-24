@@ -1,150 +1,285 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./App.css";
 
-const CREATORS = [
-  { handle: "@jordanfan92", category: "apparel", followers: "480K", engagement: "3.42%", floor: "$500", wallet: "0xCreator...abc" },
-  { handle: "@techreview99", category: "electronics", followers: "1.2M", engagement: "2.1%", floor: "$800", wallet: "0xCreator...def" },
-  { handle: "@fitnessguru", category: "wellness", followers: "320K", engagement: "5.8%", floor: "$350", wallet: "0xCreator...ghi" },
-];
+const SETTLEMENT = { escrow: 5000, creator: 3500, manager: 500, affiliate: 250, protocol: 150, refund: 600 };
 
-const STEPS = [
-  { id: 1, label: "Agent Discovers Creators", icon: "🔍" },
-  { id: 2, label: "Campaign Created & Escrow Locked", icon: "🔒" },
-  { id: 3, label: "Campaign Runs On-Chain", icon: "📡" },
-  { id: 4, label: "Outcome Reported", icon: "📊" },
-  { id: 5, label: "Atomic Settlement", icon: "✅" },
+const MARKETS = [
+  { flag: "🇺🇸", city: "New York", handle: "@jordanfan92", followers: "480K" },
+  { flag: "🇬🇧", city: "London", handle: "@uksnkrhead", followers: "1.2M" },
+  { flag: "🇯🇵", city: "Tokyo", handle: "@tokyokicks", followers: "2.1M" },
+  { flag: "🇫🇷", city: "Paris", handle: "@parisdrops", followers: "890K" },
+  { flag: "🇧🇷", city: "São Paulo", handle: "@spkickz", followers: "640K" },
+  { flag: "🇦🇪", city: "Dubai", handle: "@dubaisneaks", followers: "1.5M" },
 ];
-
-const SETTLEMENT = {
-  escrow: 1000,
-  creator: 700,
-  manager: 100,
-  affiliate: 50,
-  protocol: 30,
-  brandRefund: 120,
-};
 
 export default function App() {
-  const [step, setStep] = useState(0);
-  const [selectedCreator, setSelectedCreator] = useState(null);
-  const [running, setRunning] = useState(false);
-  const [settled, setSettled] = useState(false);
+  const [status, setStatus] = useState("idle");
+  const [flowStep, setFlowStep] = useState(0);
+  const [activeMarket, setActiveMarket] = useState(null);
+  const [earned, setEarned] = useState(0);
+  const [protocolFee, setProtocolFee] = useState(0);
+  const [settlements, setSettlements] = useState(0);
+  const [totalReach, setTotalReach] = useState(0);
+  const [log, setLog] = useState([]);
+  const intervalRef = useRef(null);
+  const mktIdx = useRef(0);
 
-  const runStep = async () => {
-    if (running) return;
-    setRunning(true);
-    await new Promise(r => setTimeout(r, 800));
-    const next = step + 1;
-    setStep(next);
-    if (next === 1) setSelectedCreator(CREATORS[0]);
-    if (next === 5) setSettled(true);
-    setRunning(false);
+  const addLog = (msg) => setLog(prev => [`${new Date().toLocaleTimeString()} — ${msg}`, ...prev].slice(0, 6));
+
+  const runCycle = () => {
+    const mkt = MARKETS[mktIdx.current % MARKETS.length];
+    mktIdx.current++;
+    setActiveMarket(mkt);
+    setFlowStep(1);
+    addLog(`${mkt.flag} ${mkt.city} — Nike AI locked $5,000 USDC escrow`);
+    setTimeout(() => { setFlowStep(2); addLog(`3% protocol fee → Prmission treasury`); }, 1000);
+    setTimeout(() => {
+      setFlowStep(3);
+      addLog(`✓ $3,500 settled to ${mkt.handle} · ${mkt.city}`);
+      setEarned(p => p + SETTLEMENT.creator);
+      setProtocolFee(p => p + SETTLEMENT.protocol);
+      setSettlements(p => p + 1);
+      setTotalReach(p => p + Math.floor(Math.random() * 900000 + 400000));
+    }, 2200);
+    setTimeout(() => { setFlowStep(0); }, 3400);
   };
 
-  const reset = () => { setStep(0); setSelectedCreator(null); setSettled(false); };
+  const start = () => {
+    if (status === "running") return;
+    setStatus("running");
+    addLog("🌍 Nike Global Campaign activated — Air Force 1 LA Drop");
+    intervalRef.current = setInterval(runCycle, 4000);
+  };
+
+  const pause = () => { setStatus("paused"); clearInterval(intervalRef.current); addLog("Campaign paused"); };
+  const stop = () => { setStatus("idle"); clearInterval(intervalRef.current); setFlowStep(0); setActiveMarket(null); addLog("Campaign stopped"); };
+  const reset = () => { stop(); setEarned(0); setProtocolFee(0); setSettlements(0); setTotalReach(0); setLog([]); mktIdx.current = 0; };
+
+  useEffect(() => () => clearInterval(intervalRef.current), []);
+
+  const fmtMoney = (n) => n >= 1000000 ? `$${(n/1000000).toFixed(2)}M` : n >= 1000 ? `$${(n/1000).toFixed(1)}K` : `$${n}`;
+  const fmtReach = (n) => n >= 1000000 ? `${(n/1000000).toFixed(1)}M` : n >= 1000 ? `${(n/1000).toFixed(0)}K` : n;
 
   return (
     <div className="app">
-      <header className="header">
-        <div className="logo">⬡ Prmission Protocol</div>
-        <div className="badge">Base Mainnet · USDC · ERC-8004</div>
-      </header>
 
+      {/* Hero */}
       <div className="hero">
-        <h1>AI Agent Creator Economy</h1>
-        <p>Nike's AI agent discovers creators, locks USDC escrow, and settles atomically — no humans required.</p>
-      </div>
-
-      <div className="stepper">
-        {STEPS.map((s, i) => (
-          <div key={s.id} className={`step ${i < step ? "done" : i === step - 1 ? "active" : ""}`}>
-            <div className="step-icon">{i < step ? "✔" : s.icon}</div>
-            <div className="step-label">{s.label}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="panels">
-        <div className="panel">
-          <h2>🤖 Nike AI Agent</h2>
-          <div className="agent-box">
-            <div className="agent-line">Budget: <strong>$1,000 USDC</strong></div>
-            <div className="agent-line">Category: <strong>Apparel</strong></div>
-            <div className="agent-line">Format: <strong>Instagram Post</strong></div>
-            <div className="agent-line">Creator Split: <strong>70%</strong></div>
-            <div className="agent-line">Manager Split: <strong>10%</strong></div>
-            {selectedCreator && (
-              <div className="selected-creator">
-                <div className="agent-line">Selected: <strong>{selectedCreator.handle}</strong></div>
-                <div className="agent-line">Followers: <strong>{selectedCreator.followers}</strong></div>
-                <div className="agent-line">Engagement: <strong>{selectedCreator.engagement}</strong></div>
-              </div>
-            )}
+        <div className="hero-left">
+          <svg className="nike-logo" viewBox="0 0 148 56" fill="#E00000"><path d="M18.4 56L148 7.2C136.5 2.5 123.2 0 109.2 0 75.4 0 46.3 16.3 28.4 40.9L0 49.2 18.4 56Z"/></svg>
+          <div>
+            <div className="hero-title">AIR FORCE 1 — LOS ANGELES</div>
+            <div className="hero-sub">Global AI Agent Campaign · Instagram · 6 Markets · Base Mainnet</div>
           </div>
         </div>
+        <div className="hero-right">
+          <div className="prmission-pill">⬡ PRMISSION PROTOCOL</div>
+          <div className="hero-badge-sub">96 Tests Passing · ERC-8004 · Hardcoded 3%</div>
+        </div>
+      </div>
 
-        <div className="panel">
-          <h2>📋 Creator Registry</h2>
-          <div className="creator-list">
-            {CREATORS.map((c, i) => (
-              <div key={i} className={`creator-card ${selectedCreator?.handle === c.handle ? "highlighted" : ""}`}>
-                <div className="creator-handle">{c.handle}</div>
-                <div className="creator-meta">{c.category} · {c.followers} · {c.engagement} eng · {c.floor} floor</div>
+      {/* Shoe Banner */}
+      <div className="shoe-banner">
+        <div className="shoe-banner-left">
+          <div className="shoe-img-container">
+            <div className="shoe-img">
+              <div className="shoe-gradient" />
+              <div className="shoe-af1">AF1</div>
+              <div className="shoe-la">LOS ANGELES</div>
+              <div className="shoe-details">
+                <span>Iridescent Copper</span>
+                <span>·</span>
+                <span>Ostrich Emboss</span>
+                <span>·</span>
+                <span>Gold Hardware</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="shoe-banner-right">
+          <div className="drop-label">GLOBAL DROP</div>
+          <div className="drop-title">JUST DO IT.</div>
+          <div className="drop-price">$185 USD</div>
+          <div className="drop-markets">
+            {MARKETS.map((m, i) => (
+              <div key={i} className={`market-pill ${activeMarket?.city === m.city ? "active" : ""}`}>
+                {m.flag} {m.city}
               </div>
             ))}
           </div>
+          <div className="drop-escrow">Campaign Escrow: <strong>$5,000 USDC per market</strong></div>
         </div>
       </div>
 
-      {step >= 2 && (
-        <div className="escrow-bar">
-          <h2>🔒 Escrow Locked: $1,000 USDC</h2>
-          <div className="tx-hash">tx: 0x4a3f...d91c → PrmissionRegistry on Base</div>
-        </div>
-      )}
+      <div className="main-layout">
 
-      {step >= 4 && (
-        <div className="outcome-bar">
-          <h2>📊 Campaign Outcome Reported</h2>
-          <div className="outcome-stats">
-            <div className="stat"><span>480K</span>Impressions</div>
-            <div className="stat"><span>3,400</span>Clicks</div>
-            <div className="stat"><span>92</span>Conversions</div>
+        {/* LEFT: Phone */}
+        <div className="phone-wrap">
+          <div className="phone">
+            <div className="phone-notch" />
+            <div className="phone-status-bar"><span>9:41</span><span>🔋</span></div>
+
+            <div className="ig-header">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="2" width="20" height="20" rx="6" stroke="url(#ig1)" strokeWidth="2"/>
+                <circle cx="12" cy="12" r="4" stroke="url(#ig1)" strokeWidth="2"/>
+                <circle cx="17.5" cy="6.5" r="1" fill="url(#ig1)"/>
+                <defs><linearGradient id="ig1" x1="2" y1="22" x2="22" y2="2"><stop offset="0%" stopColor="#f09433"/><stop offset="50%" stopColor="#dc2743"/><stop offset="100%" stopColor="#bc1888"/></linearGradient></defs>
+              </svg>
+              <span className="ig-wordmark">Instagram</span>
+              <span>🔔</span>
+            </div>
+
+            <div className="post-card">
+              <div className="post-header">
+                <div className="post-avatar">
+                  {activeMarket ? activeMarket.flag : "🇺🇸"}
+                </div>
+                <div className="post-meta">
+                  <div className="post-handle">{activeMarket ? activeMarket.handle.replace("@","") : "jordanfan92"}</div>
+                  <div className="post-sponsored">Sponsored · <span className="red">Nike ✓</span></div>
+                </div>
+                <div className="post-more">···</div>
+              </div>
+
+              <div className="post-image">
+                <div className="shoe-post-bg">
+                  <div className="shoe-post-glow" />
+                  <div className="shoe-post-inner">
+                    <div className="shoe-post-af1">AIR FORCE 1</div>
+                    <div className="shoe-post-emoji">👟✨</div>
+                    <div className="shoe-post-la">LOS ANGELES</div>
+                    <div className="shoe-post-color">Iridescent Copper · Black</div>
+                  </div>
+                  <svg className="shoe-post-swoosh" viewBox="0 0 148 56" fill="white" opacity="0.08"><path d="M18.4 56L148 7.2C136.5 2.5 123.2 0 109.2 0 75.4 0 46.3 16.3 28.4 40.9L0 49.2 18.4 56Z"/></svg>
+                  <div className={`live-pill ${status === "running" ? "on" : ""}`}>{status === "running" ? "● LIVE GLOBALLY" : "● READY"}</div>
+                  {activeMarket && <div className="market-overlay">{activeMarket.flag} {activeMarket.city}</div>}
+                </div>
+              </div>
+
+              <div className="post-actions">
+                <div className="post-al"><span>🤍</span><span>💬</span><span>📤</span></div>
+                <span>🔖</span>
+              </div>
+              <div className="post-likes"><strong>{settlements > 0 ? fmtReach(totalReach * 0.08) : "38.4K"} likes</strong></div>
+              <div className="post-caption">
+                <strong>{activeMarket ? activeMarket.handle.replace("@","") : "jordanfan92"}</strong> The new Air Force 1 Los Angeles just dropped and I'm obsessed 🔥🔥 Iridescent copper with ostrich emboss — this is insane. Link in bio. <span className="hashtag">#Nike #AirForce1 #LosAngeles #JustDoIt #Sponsored</span>
+              </div>
+            </div>
+
+            <div className="ig-stats-row">
+              <div className="ig-stat"><div className="ig-val">{totalReach > 0 ? fmtReach(totalReach) : "480K"}</div><div className="ig-lbl">Global Reach</div></div>
+              <div className="ig-divider"/>
+              <div className="ig-stat"><div className="ig-val">{settlements > 0 ? settlements : "0"}</div><div className="ig-lbl">Markets Live</div></div>
+              <div className="ig-divider"/>
+              <div className="ig-stat"><div className="ig-val">3.42%</div><div className="ig-lbl">Avg Engagement</div></div>
+            </div>
           </div>
         </div>
-      )}
 
-      {settled && (
-        <div className="settlement">
-          <h2>✅ Atomic Settlement Complete</h2>
-          <div className="settlement-grid">
-            <div className="split-row creator"><span>Creator (@jordanfan92)</span><strong>${SETTLEMENT.creator}</strong></div>
-            <div className="split-row manager"><span>Manager</span><strong>${SETTLEMENT.manager}</strong></div>
-            <div className="split-row affiliate"><span>Affiliate</span><strong>${SETTLEMENT.affiliate}</strong></div>
-            <div className="split-row protocol"><span>Protocol Fee (3%)</span><strong>${SETTLEMENT.protocol}</strong></div>
-            <div className="split-row refund"><span>Brand Refund</span><strong>${SETTLEMENT.brandRefund}</strong></div>
+        {/* RIGHT: Flow */}
+        <div className="flow-panel">
+
+          <div className="flow-header">
+            <div className="flow-title">SETTLEMENT FLOW</div>
+            <div className="flow-sub">Nike AI Agent pays creators directly on-chain · No middlemen · No delays · 6 global markets simultaneously</div>
           </div>
-          <div className="tx-hash">Settlement tx: 0x9b2e...f34a · Base Mainnet</div>
+
+          <div className={`flow-box ${flowStep >= 1 ? "active" : ""}`}>
+            <div className="flow-icon nike-bg">
+              <svg width="40" height="15" viewBox="0 0 148 56" fill="white"><path d="M18.4 56L148 7.2C136.5 2.5 123.2 0 109.2 0 75.4 0 46.3 16.3 28.4 40.9L0 49.2 18.4 56Z"/></svg>
+            </div>
+            <div className="flow-body">
+              <div className="flow-title-sm">Nike AI Agent</div>
+              <div className="flow-addr">0x4a3f...d91c · Base Mainnet</div>
+              <div className={`flow-amount ${flowStep >= 1 ? "red" : "muted"}`}>
+                {flowStep >= 1 ? `$5,000 USDC locked — ${activeMarket?.city || ""} ${activeMarket?.flag || ""}` : "Scanning global Instagram creators..."}
+              </div>
+            </div>
+            {status === "running" && <div className="pulse" />}
+          </div>
+
+          <div className={`connector ${flowStep >= 2 ? "lit" : ""}`}>
+            <div className="conn-line"/>
+            <div className="conn-badge">3% protocol fee · hardcoded · immutable</div>
+            <div className="conn-line"/>
+            <div className="conn-arrow">▼</div>
+          </div>
+
+          <div className={`flow-box ${flowStep >= 2 ? "active" : ""}`}>
+            <div className="flow-icon protocol-bg">⬡</div>
+            <div className="flow-body">
+              <div className="flow-title-sm">Prmission Treasury</div>
+              <div className="flow-addr">0x0c8B...223d · Base · Cannot be changed</div>
+              <div className={`flow-amount ${flowStep >= 2 ? "red" : "muted"}`}>{fmtMoney(protocolFee)} USDC collected</div>
+              <div className="flow-sub-text">3% of every settlement · on-chain · forever</div>
+            </div>
+            {flowStep >= 2 && <div className="recv-badge">● Receiving</div>}
+          </div>
+
+          <div className={`connector ${flowStep >= 3 ? "lit" : ""}`}>
+            <div className="conn-line"/>
+            <div className="conn-line"/>
+            <div className="conn-arrow">▼</div>
+          </div>
+
+          <div className={`flow-box creator-box ${flowStep >= 3 ? "active" : ""}`}>
+            <div className="flow-icon ig-bg">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="2" width="20" height="20" rx="6" stroke="url(#ig2)" strokeWidth="2"/>
+                <circle cx="12" cy="12" r="4" stroke="url(#ig2)" strokeWidth="2"/>
+                <circle cx="17.5" cy="6.5" r="1" fill="url(#ig2)"/>
+                <defs><linearGradient id="ig2" x1="2" y1="22" x2="22" y2="2"><stop offset="0%" stopColor="#f09433"/><stop offset="50%" stopColor="#dc2743"/><stop offset="100%" stopColor="#bc1888"/></linearGradient></defs>
+              </svg>
+            </div>
+            <div className="flow-body">
+              <div className="flow-title-sm">{activeMarket ? `${activeMarket.handle} · ${activeMarket.city} ${activeMarket.flag}` : "Global Creators · Instagram"}</div>
+              <div className="flow-addr">{activeMarket ? `${activeMarket.followers} followers · Air Force 1 LA Post` : "480K–2.1M followers per market"}</div>
+              <div className={`flow-amount big ${flowStep >= 3 ? "green-amt" : "muted"}`}>{fmtMoney(earned)} USDC</div>
+              <div className="flow-sub-text">70% of escrow · settled atomically · Base mainnet</div>
+            </div>
+            {flowStep >= 3 && <div className="settled-badge">✓ Settled!</div>}
+          </div>
+
+          {/* Breakdown */}
+          <div className="breakdown">
+            <div className="breakdown-title">$5,000 USDC BREAKDOWN PER MARKET</div>
+            <div className="brow"><span>Creator (Instagram Post)</span><span className="bval green-amt">$3,500 <em>70%</em></span></div>
+            <div className="brow"><span>Campaign Manager</span><span className="bval">$500 <em>10%</em></span></div>
+            <div className="brow"><span>Affiliate</span><span className="bval">$250 <em>5%</em></span></div>
+            <div className="brow red-row"><span>Prmission Protocol Fee</span><span className="bval red">$150 <em>3% hardcoded</em></span></div>
+            <div className="brow"><span>Nike Refund</span><span className="bval">$600 <em>12%</em></span></div>
+          </div>
+
+          {/* Stats */}
+          <div className="stats-grid">
+            <div className="stat-card"><div className="stat-val green-amt">{settlements}</div><div className="stat-lbl">Markets Settled</div></div>
+            <div className="stat-card"><div className="stat-val green-amt">{fmtMoney(earned)}</div><div className="stat-lbl">Creator Earnings</div></div>
+            <div className="stat-card"><div className="stat-val red">{fmtMoney(protocolFee)}</div><div className="stat-lbl">Protocol Revenue</div></div>
+            <div className="stat-card"><div className="stat-val">{totalReach > 0 ? fmtReach(totalReach) : "0"}</div><div className="stat-lbl">Global Reach</div></div>
+          </div>
+
+          {log.length > 0 && (
+            <div className="log-box">
+              {log.map((l, i) => <div key={i} className={`log-line ${i === 0 ? "latest" : ""}`}>{l}</div>)}
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       <div className="controls">
-        {step < 5 ? (
-          <button className="btn-primary" onClick={runStep} disabled={running}>
-            {running ? "Processing..." : step === 0 ? "▶ Start Demo" : `Step ${step + 1}: ${STEPS[step].label}`}
-          </button>
-        ) : (
-          <button className="btn-secondary" onClick={reset}>↺ Reset Demo</button>
-        )}
+        <button className="btn-pause" onClick={pause} disabled={status !== "running"}>⏸ Pause</button>
+        <div className={`btn-status ${status}`}>{status === "running" ? "● LIVE GLOBALLY" : status === "paused" ? "⏸ PAUSED" : "○ READY"}</div>
+        <button className="btn-stop" onClick={stop} disabled={status === "idle"}>⏹ Stop</button>
+      </div>
+      <div className="controls-row2">
+        <button className="btn-start" onClick={start} disabled={status === "running"}>▶ Launch Global Nike Campaign</button>
+        <button className="btn-reset" onClick={reset}>↺ Reset</button>
       </div>
 
-      <footer className="footer">
-        <a href="https://github.com/marcosbenaim-hub/Prmission-Protocol" target="_blank">GitHub</a>
-        <span>·</span>
-        <a href="https://prmission.xyz" target="_blank">prmission.xyz</a>
-        <span>·</span>
-        <span>Base Mainnet · 96 Tests Passing</span>
-      </footer>
+      <div className="footer-bar">
+        <span>prmission.xyz</span><span>·</span><span>Base Mainnet</span><span>·</span><span>ERC-8004</span><span>·</span><span>96 Tests Passing ✓</span>
+      </div>
     </div>
   );
 }
