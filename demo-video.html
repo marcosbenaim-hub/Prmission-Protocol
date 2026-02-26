@@ -57,6 +57,18 @@
       object-fit: contain;
       background: #000;
     }
+    .disclaimer {
+      position: fixed;
+      left: 10px;
+      bottom: 10px;
+      z-index: 2;
+      font-size: 11px;
+      color: #d2dbef;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      padding: 6px 10px;
+    }
     @keyframes floatBadge {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-5px); }
@@ -84,10 +96,17 @@
     </svg>
     <span id="coinbaseText">Connect to Wallet</span>
   </a>
+  <div class="disclaimer">Unofficial Mock Demo</div>
   <video id="investorVideo" controls autoplay playsinline preload="auto">
     <source src="assets/nike-demo-investor.mp4" type="video/mp4">
   </video>
   <script>
+    const TOKEN_KEY = 'prmission_demo_access';
+    const TOKEN_VALUE = 'ok';
+    if (sessionStorage.getItem(TOKEN_KEY) !== TOKEN_VALUE) {
+      window.location.href = '/demo-gate.html';
+    }
+
     const coinbaseBtn = document.getElementById('coinbaseBtn');
     const coinbaseText = document.getElementById('coinbaseText');
     const video = document.getElementById('investorVideo');
