@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prmission Demo Slideshow</title>
+  <style>
+    :root {
+      --bg: #080a0f;
+      --panel: #10141d;
+      --text: #f3f6fb;
+      --muted: #96a3b8;
+      --accent: #00e676;
+      --accent-2: #0052ff;
+      --border: rgba(150, 163, 184, 0.28);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: "Instrument Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 90% -10%, rgba(0, 230, 118, 0.16), transparent 55%),
+        radial-gradient(1000px 600px at -10% 110%, rgba(0, 82, 255, 0.2), transparent 55%),
+        var(--bg);
+      display: flex;
+      flex-direction: column;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8, 10, 15, 0.78);
+      backdrop-filter: blur(8px);
+    }
+    .title {
+      margin: 0;
+      font-size: clamp(14px, 2vw, 18px);
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .subtitle {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    button {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover { border-color: var(--accent); }
+    .wrap {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      padding: 16px;
+    }
+    .slide {
+      position: absolute;
+      inset: 16px;
+      display: none;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #000;
+    }
+    .slide.active { display: block; }
+    iframe, video {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #000;
+    }
+    .badge {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      z-index: 5;
+      background: rgba(0, 0, 0, 0.66);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .overlay-note {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      z-index: 5;
+      background: rgba(16, 20, 29, 0.88);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      max-width: 340px;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .progress {
+      display: flex;
+      gap: 6px;
+      margin-left: 8px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(150, 163, 184, 0.4);
+    }
+    .dot.active { background: var(--accent); }
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-left: 10px;
+    }
+    @media (max-width: 900px) {
+      .top { flex-wrap: wrap; }
+      .hint { width: 100%; margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1 class="title">Prmission Investor Demo Flow</h1>
+      <p class="subtitle" id="slideLabel">Slide 1 of 5</p>
+    </div>
+    <div class="controls">
+      <button id="prevBtn" type="button">Back</button>
+      <button id="nextBtn" type="button">Next</button>
+      <div class="progress" id="progress"></div>
+      <span class="hint">Use arrow keys</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="slide active" data-title="Landing Page (Campaigns Hover)">
+      <span class="badge">1. Landing Page</span>
+      <iframe id="landingFrame" src="index.html" loading="lazy"></iframe>
+      <div class="overlay-note">Campaigns button is emphasized to cue investors where the flow goes next.</div>
+    </section>
+
+    <section class="slide" data-title="Worn to be Wild (31s MOV)">
+      <span class="badge">2. Nike Demo MOV</span>
+      <video controls autoplay playsinline preload="metadata">
+        <source src="assets/nike-demo-compressed.mov" type="video/quicktime">
+      </video>
+    </section>
+
+    <section class="slide" data-title="Nike AI Agents -> User Digital Wallets">
+      <span class="badge">3. Link Page</span>
+      <div style="height:100%;display:grid;place-items:center;background:radial-gradient(900px 400px at 10% 20%, rgba(0,82,255,.25), transparent 60%),radial-gradient(900px 400px at 90% 80%, rgba(0,230,118,.2), transparent 55%),#0b0f17;">
+        <div style="width:min(1100px,94%);display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;">
+          <div style="border:1px solid rgba(255,255,255,.25);background:rgba(16,20,29,.8);border-radius:16px;padding:28px;text-align:center;">
+            <h2 style="margin:0 0 8px;font-size:clamp(20px,3vw,34px);">Nike's AI Agents</h2>
+            <p style="margin:0;color:#a7b2c4;">Requests permissioned creator data and initiates payment rails.</p>
+          </div>
+          <div style="font-size:42px;color:#00e676;font-weight:800;">-></div>
+          <div style="border:1px solid rgba(255,255,255,.25);background:rgba(16,20,29,.8);border-radius:16px;padding:28px;text-align:center;">
+            <h2 style="margin:0 0 8px;font-size:clamp(20px,3vw,34px);">User Digital Wallets</h2>
+            <p style="margin:0;color:#a7b2c4;">Creator receives settlement in supported wallets, including Coinbase wallet.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Creator Economy (Live)">
+      <span class="badge">4. Creator Economy</span>
+      <iframe src="https://prmission-demo.vercel.app/" loading="lazy"></iframe>
+      <div class="overlay-note">Live reference: prmission-demo.vercel.app</div>
+    </section>
+
+    <section class="slide" data-title="Dashboard">
+      <span class="badge">5. Dashboard</span>
+      <iframe src="dashboard/index.html" loading="lazy"></iframe>
+    </section>
+  </main>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const label = document.getElementById('slideLabel');
+    const progress = document.getElementById('progress');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    let index = 0;
+
+    slides.forEach((_, i) => {
+      const d = document.createElement('span');
+      d.className = 'dot';
+      d.dataset.i = String(i);
+      d.addEventListener('click', () => setSlide(i));
+      progress.appendChild(d);
+    });
+
+    function setSlide(i) {
+      index = Math.max(0, Math.min(slides.length - 1, i));
+      slides.forEach((s, idx) => s.classList.toggle('active', idx === index));
+      label.textContent = `Slide ${index + 1} of ${slides.length}: ${slides[index].dataset.title}`;
+      document.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === index));
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === slides.length - 1;
+    }
+
+    prevBtn.addEventListener('click', () => setSlide(index - 1));
+    nextBtn.addEventListener('click', () => setSlide(index + 1));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') setSlide(index + 1);
+      if (e.key === 'ArrowLeft') setSlide(index - 1);
+    });
+
+    // Highlight Campaigns button in landing iframe to simulate hover state.
+    const landingFrame = document.getElementById('landingFrame');
+    landingFrame.addEventListener('load', () => {
+      try {
+        const doc = landingFrame.contentDocument;
+        const btn = doc && doc.querySelector('a.cta.ghost');
+        if (btn) {
+          btn.style.background = 'rgba(0, 230, 118, 0.18)';
+          btn.style.borderColor = '#00e676';
+          btn.style.boxShadow = '0 0 0 3px rgba(0, 230, 118, 0.3)';
+          btn.style.transform = 'translateY(-1px)';
+        }
+      } catch (_) {
+        // Ignore if browser blocks frame access in deployment context.
+      }
+    });
+
+    setSlide(0);
+  </script>
+</body>
+</html>
