@@ -53,6 +53,7 @@
       opacity: 1;
       pointer-events: auto;
       transform: translateY(0);
+      animation: floatBadge 1.8s ease-in-out infinite;
     }
     .connect svg {
       display: block;
@@ -71,11 +72,15 @@
       object-fit: contain;
       background: #000;
     }
+    @keyframes floatBadge {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
   </style>
 </head>
 <body>
   <div class="badge">Investor Demo Only</div>
-  <a id="coinbaseBtn" class="connect" href="https://prmission.com/assets/nike-demo-investor.mp4" aria-label="Connect Coinbase Wallet">
+  <a id="coinbaseBtn" class="connect" href="https://prmission.com/assets/vercelVercel.mp4" aria-label="Connect Coinbase Wallet">
     <svg viewBox="0 0 64 64" aria-hidden="true">
       <circle cx="32" cy="32" r="32" fill="#ffffff"></circle>
       <circle cx="32" cy="32" r="20" fill="#0052ff"></circle>
@@ -89,7 +94,7 @@
     const coinbaseBtn = document.getElementById('coinbaseBtn');
     const coinbaseText = document.getElementById('coinbaseText');
     const video = document.getElementById('investorVideo');
-    const CAMPAIGN_VIDEO_URL = 'https://prmission.com/assets/nike-demo-investor.mp4';
+    const CAMPAIGN_VIDEO_URL = 'https://prmission.com/assets/vercelVercel.mp4';
     let linkedShown = false;
 
     video.addEventListener('timeupdate', () => {
