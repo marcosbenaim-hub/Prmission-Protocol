@@ -122,19 +122,6 @@
     .stats, .cards { display: grid; gap: 10px; }
     .stats { margin-top: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .cards { margin-top: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .hero-demo {
-      margin-top: 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      overflow: hidden;
-      background: #071224;
-    }
-    .hero-demo video {
-      display: block;
-      width: 100%;
-      height: auto;
-      object-fit: contain;
-    }
 
     .stat, .card {
       border: 1px solid var(--line);
@@ -283,9 +270,6 @@
     @media (max-width: 900px) {
       .stats, .cards, .form { grid-template-columns: 1fr; }
       .hero { padding-top: 42px; }
-      .hero-demo video {
-        max-height: 62vh;
-      }
     }
 
     @media (max-width: 600px) {
@@ -309,8 +293,6 @@
       }
       .stat, .card, .waitlist { padding: 11px; }
       .title { font-size: 26px; }
-      .hero-demo { margin-top: 12px; }
-      .hero-demo video { max-height: 56vh; }
       .row { grid-template-columns: 1fr; gap: 4px; }
     }
   </style>
@@ -338,12 +320,6 @@
         <div class="stat"><b>3%</b><span>Protocol Fee (On-Chain)</span></div>
         <div class="stat"><b>24h</b><span>Challenge Window</span></div>
         <div class="stat"><b>Live</b><span>Right Now</span></div>
-      </div>
-      <div class="hero-demo">
-        <video id="heroDemo" autoplay loop muted playsinline webkit-playsinline preload="auto">
-          <source src="assets/prmission-demo.mp4" type="video/mp4">
-          <source src="assets/prmission-demo.mov" type="video/quicktime">
-        </video>
       </div>
     </section>
 
@@ -505,28 +481,12 @@
   </main>
   <script>
     const connectBtn = document.getElementById("connect-wallet");
-    const heroDemo = document.getElementById("heroDemo");
 
     if (connectBtn) {
       connectBtn.addEventListener("click", (event) => {
         event.preventDefault();
         window.location.href = "app.html?connect=1";
       });
-    }
-
-    // Mobile-safe autoplay/loop fallback (especially iOS Safari).
-    if (heroDemo) {
-      heroDemo.muted = true;
-      const tryPlay = () => heroDemo.play().catch(() => {});
-      heroDemo.addEventListener("ended", () => {
-        heroDemo.currentTime = 0;
-        tryPlay();
-      });
-      document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) tryPlay();
-      });
-      document.addEventListener("touchstart", tryPlay, { once: true, passive: true });
-      tryPlay();
     }
 
     // Lightweight analytics without external dashboard setup.
