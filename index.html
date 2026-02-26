@@ -287,6 +287,32 @@
         max-height: 62vh;
       }
     }
+
+    @media (max-width: 600px) {
+      .wrap { width: 94vw; }
+      .nav { height: 60px; }
+      .hero { padding: 28px 0 16px; }
+      .eyebrow { letter-spacing: 2.4px; font-size: 11px; }
+      h1 { font-size: clamp(30px, 10vw, 42px); line-height: 1.08; }
+      .sub { font-size: 15px; }
+      .hero-actions { gap: 8px; }
+      .cta {
+        width: 100%;
+        text-align: center;
+        padding: 11px 12px;
+        font-size: 14px;
+      }
+      .live {
+        border-radius: 14px;
+        font-size: 11px;
+        line-height: 1.45;
+      }
+      .stat, .card, .waitlist { padding: 11px; }
+      .title { font-size: 26px; }
+      .hero-demo { margin-top: 12px; }
+      .hero-demo video { max-height: 56vh; }
+      .row { grid-template-columns: 1fr; gap: 4px; }
+    }
   </style>
 </head>
 <body>
