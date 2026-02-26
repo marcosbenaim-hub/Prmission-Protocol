@@ -27,6 +27,21 @@
       font-weight: 700;
       letter-spacing: 0.2px;
     }
+    .connect {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 2;
+      color: #00180d;
+      background: #00e676;
+      border: 1px solid #00e676;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      text-decoration: none;
+    }
     video {
       width: 100%;
       height: 100%;
@@ -38,13 +53,14 @@
 </head>
 <body>
   <div class="badge">Investor Demo Only</div>
+  <a class="connect" href="https://prmission-demo.vercel.app/livedemo.html">Connect Coinbase Wallet</a>
   <video id="investorVideo" controls autoplay playsinline preload="auto">
     <source src="assets/nike-demo-investor.mp4" type="video/mp4">
   </video>
   <script>
     const video = document.getElementById('investorVideo');
     video.addEventListener('ended', () => {
-      window.location.href = 'https://prmission-demo.vercel.app/';
+      window.location.href = 'https://prmission-demo.vercel.app/livedemo.html';
     });
   </script>
 </body>
