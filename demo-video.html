@@ -36,8 +36,8 @@
       background: #0052ff;
       border: 1px solid #0052ff;
       border-radius: 999px;
-      padding: 8px 10px;
-      font-size: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
       font-weight: 700;
       letter-spacing: 0.2px;
       text-decoration: none;
@@ -56,8 +56,8 @@
     }
     .connect svg {
       display: block;
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
     }
     .connect.linked {
       background: #00e676;
@@ -74,6 +74,18 @@
     @keyframes floatBadge {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-5px); }
+    }
+    @media (max-width: 700px) {
+      .connect {
+        top: 10px;
+        right: 10px;
+        padding: 12px 16px;
+        font-size: 16px;
+      }
+      .connect svg {
+        width: 28px;
+        height: 28px;
+      }
     }
   </style>
 </head>
