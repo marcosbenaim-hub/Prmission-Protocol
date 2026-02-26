@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prmission Campaigns Demo</title>
+  <style>
+    :root {
+      --bg: #090b10;
+      --card: #12151d;
+      --text: #f5f7fb;
+      --muted: #95a1b3;
+      --accent: #00e676;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Instrument Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 500px at 85% -10%, rgba(0, 230, 118, 0.14), transparent 60%),
+        radial-gradient(900px 500px at -20% 110%, rgba(39, 117, 202, 0.2), transparent 55%),
+        var(--bg);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .wrap {
+      width: min(1080px, 100%);
+      background: rgba(18, 21, 29, 0.88);
+      border: 1px solid rgba(149, 161, 179, 0.25);
+      border-radius: 18px;
+      padding: 20px;
+      backdrop-filter: blur(6px);
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(20px, 2.7vw, 34px);
+      letter-spacing: 0.4px;
+    }
+    .muted {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    a.back {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    video {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(149, 161, 179, 0.2);
+      background: #000;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="top">
+      <div>
+        <h1>Campaigns Investor Demo</h1>
+        <p class="muted">Nike demo playback for investor walkthroughs.</p>
+      </div>
+      <a class="back" href="/">Back to Home</a>
+    </div>
+    <video controls autoplay playsinline preload="metadata">
+      <source src="assets/nike-demo-compressed.mov" type="video/quicktime">
+      Your browser does not support the video tag.
+    </video>
+  </main>
+</body>
+</html>
