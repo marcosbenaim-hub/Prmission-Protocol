@@ -51,7 +51,6 @@
     }
     .connect.show {
       opacity: 1;
-      pointer-events: auto;
       transform: translateY(0);
       animation: floatBadge 1.8s ease-in-out infinite;
     }
@@ -85,7 +84,7 @@
       <circle cx="32" cy="32" r="32" fill="#ffffff"></circle>
       <circle cx="32" cy="32" r="20" fill="#0052ff"></circle>
     </svg>
-    <span id="coinbaseText">Coinbase</span>
+    <span id="coinbaseText">Connect to Coinbase</span>
   </a>
   <video id="investorVideo" controls autoplay playsinline preload="auto">
     <source src="assets/nike-demo-investor.mp4" type="video/mp4">
@@ -95,15 +94,23 @@
     const coinbaseText = document.getElementById('coinbaseText');
     const video = document.getElementById('investorVideo');
     const CAMPAIGN_VIDEO_URL = 'https://prmission.com/assets/vercelVercel.mp4';
+    let connectShown = false;
     let linkedShown = false;
 
     video.addEventListener('timeupdate', () => {
-      if (linkedShown) return;
       if (!Number.isFinite(video.duration)) return;
-      if (video.duration - video.currentTime <= 5) {
+      const remaining = video.duration - video.currentTime;
+
+      if (!connectShown && remaining <= 9) {
+        connectShown = true;
+        coinbaseBtn.classList.add('show');
+        coinbaseText.textContent = 'Connect to Coinbase';
+      }
+
+      if (!linkedShown && remaining <= 2) {
         linkedShown = true;
-        coinbaseBtn.classList.add('show', 'linked');
-        coinbaseText.textContent = 'Linked';
+        coinbaseBtn.classList.add('linked');
+        coinbaseText.textContent = 'Wallet Linked';
       }
     });
 
