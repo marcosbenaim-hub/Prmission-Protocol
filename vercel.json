@@ -1,5 +1,6 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/livedemo.html" }
+    { "source": "/", "destination": "/livedemo.html" },
+    { "source": "/nike-prmission-demo", "destination": "/nike-prmission-demo.html" }
   ]
 }
