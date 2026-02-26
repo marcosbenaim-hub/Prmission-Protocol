@@ -84,7 +84,7 @@
       <circle cx="32" cy="32" r="32" fill="#ffffff"></circle>
       <circle cx="32" cy="32" r="20" fill="#0052ff"></circle>
     </svg>
-    <span id="coinbaseText">Connect to Coinbase</span>
+    <span id="coinbaseText">Connect to Wallet</span>
   </a>
   <video id="investorVideo" controls autoplay playsinline preload="auto">
     <source src="assets/nike-demo-investor.mp4" type="video/mp4">
@@ -104,10 +104,10 @@
       if (!connectShown && remaining <= 9) {
         connectShown = true;
         coinbaseBtn.classList.add('show');
-        coinbaseText.textContent = 'Connect to Coinbase';
+        coinbaseText.textContent = 'Connect to Wallet';
       }
 
-      if (!linkedShown && remaining <= 2) {
+      if (!linkedShown && remaining <= 4) {
         linkedShown = true;
         coinbaseBtn.classList.add('linked');
         coinbaseText.textContent = 'Wallet Linked';
