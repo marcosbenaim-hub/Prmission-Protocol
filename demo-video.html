@@ -89,18 +89,20 @@
     const coinbaseBtn = document.getElementById('coinbaseBtn');
     const coinbaseText = document.getElementById('coinbaseText');
     const video = document.getElementById('investorVideo');
+    let linkedShown = false;
 
-    coinbaseBtn.addEventListener('click', (event) => {
-      event.preventDefault();
-      coinbaseBtn.classList.add('linked');
-      coinbaseText.textContent = 'Linked';
-      setTimeout(() => {
-        window.location.href = 'https://prmission-demo.vercel.app/';
-      }, 450);
+    video.addEventListener('timeupdate', () => {
+      if (linkedShown) return;
+      if (!Number.isFinite(video.duration)) return;
+      if (video.duration - video.currentTime <= 5) {
+        linkedShown = true;
+        coinbaseBtn.classList.add('show', 'linked');
+        coinbaseText.textContent = 'Linked';
+      }
     });
 
     video.addEventListener('ended', () => {
-      coinbaseBtn.classList.add('show');
+      window.location.href = 'https://prmission-demo.vercel.app/';
     });
   </script>
 </body>
