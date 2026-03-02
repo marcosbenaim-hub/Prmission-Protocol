@@ -77,13 +77,14 @@ body{background:var(--bg);color:var(--white);font-family:var(--sans);font-size:1
 .wl-note span{color:var(--lime)}
 .btn-start{
   width:100%;padding:14px;
-  background:var(--lime);color:#000;
+  background:#64b4ff;color:#000;
   font-family:var(--sans);font-size:13px;font-weight:800;
   text-transform:uppercase;letter-spacing:1.5px;
   border:none;border-radius:6px;cursor:pointer;
   transition:all 0.15s;
+  animation:btnFloat 1.8s ease-in-out infinite, btnPulse 2.4s ease-in-out infinite;
 }
-.btn-start:hover{background:#33ff99;box-shadow:0 0 32px rgba(0,230,118,0.25)}
+.btn-start:hover{background:#8fccff;box-shadow:0 0 32px rgba(100,180,255,0.45)}
 
 body::after{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
