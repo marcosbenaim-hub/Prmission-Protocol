@@ -233,11 +233,23 @@ body::after{
 /* Slider */
 .slider-wrap{margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
 .sl-label{font-size:18px;font-weight:700;color:var(--gray2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
-.sl-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-input[type=range]{flex:1;height:8px;cursor:pointer;border-radius:4px;-webkit-appearance:none;background:var(--border2)}
+.sl-row{position:relative;display:block;padding-top:26px;margin-bottom:10px}
+input[type=range]{width:100%;height:8px;cursor:pointer;border-radius:4px;-webkit-appearance:none;background:var(--border2)}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:32px;height:32px;border-radius:50%;background:#FFD600;cursor:pointer;box-shadow:0 0 12px rgba(255,214,0,0.5)}
 input[type=range]::-moz-range-thumb{width:32px;height:32px;border-radius:50%;background:#FFD600;cursor:pointer;border:none;box-shadow:0 0 12px rgba(255,214,0,0.5)}
-.comp-val{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--lime);min-width:48px;text-align:right}
+.comp-val{
+  position:absolute;
+  top:0;
+  left:16px;
+  transform:translateX(-50%);
+  font-family:var(--mono);
+  font-size:18px;
+  font-weight:700;
+  color:var(--lime);
+  text-align:center;
+  pointer-events:none;
+  transition:left .1s linear;
+}
 .preview{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:7px 10px}
 .prow{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
 .prow:last-child{margin-bottom:0}
@@ -584,11 +596,25 @@ var TX={
   report:'3f5b2540d259cabb3521a75806ae67fc40b92be7a6e8ccd858eba8d3769e9db3',
 };
 
+function positionSliderLabel(){
+  var slider=document.getElementById('comp-slider');
+  var label=document.getElementById('comp-disp');
+  if(!slider||!label) return;
+  var min=parseFloat(slider.min||1);
+  var max=parseFloat(slider.max||50);
+  var val=parseFloat(slider.value||10);
+  var pct=(val-min)/(max-min);
+  var thumb=32; // matches CSS thumb width
+  var x=(pct*(slider.clientWidth-thumb))+(thumb/2);
+  label.style.left=x+'px';
+}
+
 function updateSlider(v){
   compPct=parseInt(v);
   document.getElementById('comp-disp').textContent=v+'%';
   document.getElementById('prev-u').textContent='$'+(100*compPct/100).toFixed(2)+' USDC';
   document.getElementById('prev-ag').textContent='$'+(100-compPct-3).toFixed(2)+' USDC';
+  positionSliderLabel();
 }
 
 function addLine(html,cls,delay){
@@ -811,6 +837,9 @@ function resetDemo(){
   setStatus('');
   setTimeout(function(){activateBtn('btn-req')},300);
 }
+
+window.addEventListener('resize',positionSliderLabel);
+setTimeout(positionSliderLabel,0);
 </script>
 </body>
 </html>
