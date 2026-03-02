@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prmission x Creator Marketplace Mock</title>
+  <meta name="description" content="Mock influencer marketplace built on Prmission Protocol escrow and consent-gated settlement." />
+  <style>
+    :root {
+      --bg: #070b14;
+      --panel: #0e1628;
+      --panel2: #121e35;
+      --line: #233553;
+      --text: #eaf0ff;
+      --muted: #9fb0d0;
+      --brand: #00e5a0;
+      --warn: #ffd166;
+      --pink: #ff4ea3;
+      --blue: #52a7ff;
+      --ok: #20e38c;
+      --danger: #ff5d6e;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(900px 520px at 90% -4%, rgba(0,229,160,.16), transparent 62%),
+        radial-gradient(700px 420px at 12% 104%, rgba(82,167,255,.16), transparent 65%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap { width: min(var(--max), 94vw); margin: 0 auto; }
+
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 9;
+      backdrop-filter: blur(8px);
+      background: rgba(7, 11, 20, .72);
+      border-bottom: 1px solid #12233d;
+    }
+
+    .nav {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: .4px;
+      font-size: 20px;
+    }
+
+    .brand-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: var(--brand);
+      box-shadow: 0 0 20px rgba(0,229,160,.8);
+    }
+
+    .pill {
+      border: 1px solid #21553f;
+      color: var(--brand);
+      background: rgba(0,229,160,.12);
+      border-radius: 999px;
+      font-size: 12px;
+      padding: 6px 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .hero { padding: 38px 0 18px; }
+    .eyebrow {
+      margin: 0;
+      font-size: 12px;
+      letter-spacing: 2.8px;
+      text-transform: uppercase;
+      color: var(--brand);
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 8px 0 10px;
+      font-size: clamp(34px, 6vw, 72px);
+      line-height: .98;
+      letter-spacing: -1px;
+    }
+
+    .sub {
+      margin: 0;
+      color: #d8e4ff;
+      max-width: 960px;
+      font-size: clamp(15px, 1.8vw, 23px);
+      line-height: 1.35;
+    }
+
+    .hero-grid {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.25);
+    }
+
+    .kpi {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .kpi-item {
+      border: 1px solid #2a3e61;
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(0,0,0,.2);
+    }
+
+    .kpi-item strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+      color: var(--brand);
+      margin-bottom: 6px;
+    }
+
+    .kpi-item span { color: var(--muted); font-size: 12px; }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .badge {
+      border: 1px solid #2a3e61;
+      border-radius: 999px;
+      font-size: 11px;
+      padding: 6px 10px;
+      color: #c8d7f7;
+      background: rgba(18,30,53,.65);
+      font-weight: 700;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: .2px;
+    }
+
+    h3 { margin: 0 0 8px; font-size: 14px; }
+
+    .row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .stack { display: grid; gap: 10px; }
+
+    .field { display: grid; gap: 6px; }
+    .field label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #b6c6e6;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+    }
+
+    .field input, .field select, .field textarea {
+      width: 100%;
+      border: 1px solid #2f4670;
+      border-radius: 10px;
+      background: #0a1220;
+      color: var(--text);
+      padding: 10px;
+      font: inherit;
+      outline: none;
+    }
+
+    .field textarea { min-height: 88px; resize: vertical; }
+
+    .btn {
+      border: 1px solid #355586;
+      background: #13213a;
+      color: #edf3ff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 13px;
+      transition: .18s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); border-color: #6aaeff; }
+    .btn.primary {
+      border-color: #179e72;
+      background: linear-gradient(180deg, #00e5a0, #00be85);
+      color: #022016;
+    }
+
+    .btn.warn {
+      border-color: #9b7a1d;
+      background: linear-gradient(180deg, #ffd166, #f1bc3d);
+      color: #1d1400;
+    }
+
+    .btn.pink {
+      border-color: #8a2058;
+      background: linear-gradient(180deg, #ff4ea3, #d63d84);
+      color: #230014;
+    }
+
+    .flow {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .node {
+      border: 1px solid #2a3e61;
+      border-radius: 12px;
+      background: rgba(17,27,45,.7);
+      padding: 10px;
+    }
+
+    .node .s {
+      color: #82a0d3;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .node strong { font-size: 13px; display: block; margin-top: 2px; }
+    .node p { margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.4; }
+
+    .market {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+    }
+
+    .table {
+      border: 1px solid #274166;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .thead, .tr {
+      display: grid;
+      grid-template-columns: 1.3fr .7fr .8fr .8fr;
+      gap: 8px;
+      padding: 10px;
+      align-items: center;
+    }
+
+    .thead {
+      background: #0b1527;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #9cb4de;
+      font-weight: 700;
+    }
+
+    .tr { border-top: 1px solid #1d3253; font-size: 13px; }
+
+    .state {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      border: 1px solid;
+    }
+
+    .s-open { color: #cbe2ff; background: #142945; border-color: #33527f; }
+    .s-review { color: #ffe8ae; background: #3b2f11; border-color: #7d6320; }
+    .s-paid { color: #b8ffd8; background: #123629; border-color: #1d7e57; }
+
+    .log {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .log li {
+      border: 1px solid #28446f;
+      border-radius: 10px;
+      padding: 9px;
+      color: #d9e6ff;
+      background: rgba(8,16,30,.7);
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      color: #90b9ff;
+      word-break: break-all;
+    }
+
+    .footer-note {
+      margin: 16px 0 26px;
+      color: #9db1d7;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid, .market { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: 1fr 1fr; }
+      .kpi { grid-template-columns: 1fr; }
+      .thead, .tr { grid-template-columns: 1fr; gap: 4px; }
+      .nav { height: auto; padding: 10px 0; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap nav">
+      <div class="brand"><span class="brand-dot"></span>Prmission Marketplace Mock</div>
+      <div class="pill">Unofficial Mock Demo</div>
+    </div>
+  </header>
+
+  <main class="wrap hero">
+    <p class="eyebrow">HashtagPaid-Inspired Onchain Creator Deals</p>
+    <h1>Brand-to-Creator Campaigns.<br>Escrowed and Settled <span style="color:var(--brand)">Onchain</span>.</h1>
+    <p class="sub">Mock version of a creator marketplace where brands launch campaigns, creators submit Instagram deliverables, and Prmission smart contracts release USDC once delivery is approved.</p>
+
+    <section class="hero-grid">
+      <article class="card">
+        <h2>Campaign Escrow Console</h2>
+        <div class="stack">
+          <div class="field"><label>Brand</label><input id="brand" value="Nike" /></div>
+          <div class="field"><label>Campaign Name</label><input id="campaign" value="Worn To Be Wild - Spring Drop" /></div>
+          <div class="row">
+            <div class="field" style="flex:1"><label>Payout / Creator (USDC)</label><input id="payout" type="number" value="500" /></div>
+            <div class="field" style="flex:1"><label>Creator Slots</label><input id="slots" type="number" value="24" /></div>
+          </div>
+          <div class="field"><label>Deliverable Rules</label><textarea id="rules">1 Instagram Reel + 1 Story mention, hashtag #WornToBeWild, post live for 7 days.</textarea></div>
+          <div class="row">
+            <button class="btn primary" id="fundBtn">1) Fund Escrow</button>
+            <button class="btn" id="openBtn" disabled>2) Open Campaign</button>
+            <button class="btn warn" id="approveBtn" disabled>3) Approve Submission</button>
+            <button class="btn pink" id="settleBtn" disabled>4) Settle Onchain</button>
+          </div>
+          <div id="tx" class="mono">Awaiting escrow funding...</div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Protocol Snapshot</h2>
+        <div class="kpi">
+          <div class="kpi-item"><strong id="escrowVal">0</strong><span>USDC in Escrow</span></div>
+          <div class="kpi-item"><strong>3%</strong><span>Protocol Fee</span></div>
+          <div class="kpi-item"><strong id="creatorPayout">0</strong><span>Creator Receives</span></div>
+        </div>
+        <div class="badge-row">
+          <span class="badge">Base Mainnet</span>
+          <span class="badge">USDC Settlement</span>
+          <span class="badge">Consent-Gated Delivery</span>
+          <span class="badge">Influencer Vertical</span>
+        </div>
+        <div style="margin-top:10px;color:#cfe0ff;font-size:13px;line-height:1.45">
+          This mock uses your Prmission protocol model: brand deposits escrow, creator delivers, brand approves, contract settles payout + fee atomically.
+        </div>
+      </article>
+    </section>
+
+    <section class="flow">
+      <article class="node"><span class="s">Step 1</span><strong>Create Campaign</strong><p>Brand defines deliverables and USDC payout terms.</p></article>
+      <article class="node"><span class="s">Step 2</span><strong>Lock Escrow</strong><p>Funds are held by Prmission smart contracts.</p></article>
+      <article class="node"><span class="s">Step 3</span><strong>Verify Submission</strong><p>Creator post gets reviewed against campaign rules.</p></article>
+      <article class="node"><span class="s">Step 4</span><strong>Settle Onchain</strong><p>Creator paid, protocol fee retained, immutable record created.</p></article>
+    </section>
+
+    <section class="market">
+      <article class="card">
+        <h2>Active Creator Submissions</h2>
+        <div class="table">
+          <div class="thead"><span>Creator</span><span>Reach</span><span>Rate</span><span>Status</span></div>
+          <div class="tr"><span>@cityrunclub</span><span>82K</span><span>$500</span><span class="state s-open" id="s1">Open</span></div>
+          <div class="tr"><span>@sneakerfieldnotes</span><span>140K</span><span>$650</span><span class="state s-review" id="s2">In Review</span></div>
+          <div class="tr"><span>@culturehoops</span><span>201K</span><span>$500</span><span class="state s-open" id="s3">Open</span></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Settlement Log</h2>
+        <ul class="log" id="log">
+          <li>Campaign draft created for Nike.</li>
+          <li>Waiting for escrow deposit...</li>
+        </ul>
+      </article>
+    </section>
+
+    <p class="footer-note">Mock only for product demonstration. Next step after approval: wire this UI directly to your deployed Prmission contracts + wallet auth.</p>
+  </main>
+
+  <script>
+    const fundBtn = document.getElementById('fundBtn');
+    const openBtn = document.getElementById('openBtn');
+    const approveBtn = document.getElementById('approveBtn');
+    const settleBtn = document.getElementById('settleBtn');
+
+    const payoutEl = document.getElementById('payout');
+    const slotsEl = document.getElementById('slots');
+    const escrowVal = document.getElementById('escrowVal');
+    const creatorPayout = document.getElementById('creatorPayout');
+    const tx = document.getElementById('tx');
+    const log = document.getElementById('log');
+
+    const addLog = (text) => {
+      const li = document.createElement('li');
+      li.textContent = text;
+      log.prepend(li);
+    };
+
+    const fakeTx = () => '0x' + Array.from({length:64}, () => Math.floor(Math.random()*16).toString(16)).join('');
+
+    let escrow = 0;
+
+    fundBtn.addEventListener('click', () => {
+      const payout = Number(payoutEl.value) || 0;
+      const slots = Number(slotsEl.value) || 0;
+      escrow = payout * slots;
+      const fee = Math.round(escrow * 0.03);
+      const creator = escrow - fee;
+      escrowVal.textContent = escrow.toLocaleString();
+      creatorPayout.textContent = creator.toLocaleString();
+      const hash = fakeTx();
+      tx.textContent = `Escrow funded on Base: ${hash}`;
+      addLog(`Escrow funded: ${escrow.toLocaleString()} USDC. Tx ${hash.slice(0, 12)}...`);
+      fundBtn.disabled = true;
+      openBtn.disabled = false;
+    });
+
+    openBtn.addEventListener('click', () => {
+      addLog('Campaign opened to creators. Submission intake started.');
+      document.getElementById('s1').textContent = 'In Review';
+      document.getElementById('s1').className = 'state s-review';
+      openBtn.disabled = true;
+      approveBtn.disabled = false;
+    });
+
+    approveBtn.addEventListener('click', () => {
+      addLog('Brand approved @cityrunclub submission against deliverable rules.');
+      approveBtn.disabled = true;
+      settleBtn.disabled = false;
+    });
+
+    settleBtn.addEventListener('click', () => {
+      const payout = Number(payoutEl.value) || 0;
+      const fee = Math.round(payout * 0.03);
+      const creator = payout - fee;
+      const hash = fakeTx();
+      tx.textContent = `Settlement tx: ${hash}`;
+      addLog(`Settled onchain: ${creator} USDC to creator, ${fee} USDC protocol fee.`);
+      document.getElementById('s1').textContent = 'Paid';
+      document.getElementById('s1').className = 'state s-paid';
+      settleBtn.disabled = true;
+    });
+  </script>
+</body>
+</html>
