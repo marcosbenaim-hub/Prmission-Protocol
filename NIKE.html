@@ -63,6 +63,8 @@
     .btn:disabled{opacity:.4;cursor:not-allowed}
     .btn.primary{background:linear-gradient(180deg,#00e68f,#00cc80);border-color:#1b8f69;color:#052418}
     .btn.blue{background:linear-gradient(180deg,#64b4ff,#4e9be4);border-color:#6cb6ff;color:#041a31;animation:blueFloat 1.8s ease-in-out infinite,bluePulse 2.3s ease-in-out infinite}
+    .btn.active{box-shadow:0 0 0 1px rgba(100,180,255,.65),0 0 26px rgba(100,180,255,.48);transform:translateY(-1px)}
+    .btn.done{border-color:#2a8a62;background:linear-gradient(180deg,#12d684,#08b872);color:#062517}
     @keyframes blueFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
     @keyframes bluePulse{0%,100%{box-shadow:0 0 8px rgba(100,180,255,.25)}50%{box-shadow:0 0 22px rgba(100,180,255,.55)}}
 
@@ -98,6 +100,7 @@
     .ok{background:#133629;color:#9bf6ca;border-color:#2a8a62}
     .bl{background:#3a1d23;color:#ff9aa6;border-color:#8a3340}
     .hidden{display:none}
+    .hint{margin-top:10px;border:1px solid #2d4d79;background:rgba(14,26,44,.75);border-radius:10px;padding:8px 10px;font-size:12px;color:#d5e5ff}
     .intro-wrap{padding:18px 0 12px}
     .intro-card{position:relative;overflow:hidden}
     .intro-video{width:100%;display:block;border-radius:12px;border:1px solid #2d4d78;background:#000;max-height:74vh;object-fit:contain}
@@ -201,6 +204,7 @@
           <button class="btn primary" id="b5">Auto-Settle + Verify</button>
           <button class="btn" id="reset">Reset Demo</button>
         </div>
+        <div class="hint" id="hint">Click "AI Agent Sends Request" to start the walkthrough.</div>
 
         <div class="metrics">
           <div class="metric"><div class="k">Creator Receives</div><div class="v" id="mCreator">$10.00</div></div>
@@ -235,7 +239,8 @@
       mCreator: document.getElementById('mCreator'), mFee: document.getElementById('mFee'), mAgent: document.getElementById('mAgent'), mEscrow: document.getElementById('mEscrow'),
       log: document.getElementById('log'), states: document.getElementById('states'),
       nikeVideo: document.getElementById('nikeVideo'), connectBtn: document.getElementById('connectBtn'),
-      introWrap: document.getElementById('introWrap'), campaignApp: document.getElementById('campaignApp'), introNote: document.getElementById('introNote')
+      introWrap: document.getElementById('introWrap'), campaignApp: document.getElementById('campaignApp'), introNote: document.getElementById('introNote'),
+      hint: document.getElementById('hint')
     };
 
     function money(n){ return Number(n).toFixed(2); }
@@ -298,47 +303,66 @@
       ids.b3.disabled = !(state.consent==='COMPLETE');
       ids.b4.disabled = !(state.escrow==='COMPLETE');
       ids.b5.disabled = !(state.report==='COMPLETE');
+      if(state.report==='COMPLETE'){
+        ids.hint.textContent = 'Ready: click "Auto-Settle + Verify".';
+      } else if(state.escrow==='COMPLETE'){
+        ids.hint.textContent = 'Now report campaign outcome onchain.';
+      } else if(state.consent==='COMPLETE'){
+        ids.hint.textContent = 'Now lock escrow to secure USDC upfront.';
+      } else if(state.request==='COMPLETE'){
+        ids.hint.textContent = 'Now grant consent and lock creator pricing.';
+      }
+    }
+
+    function pulse(btn, stateKey){
+      btn.classList.add('active');
+      state[stateKey] = 'ACTIVE';
+      renderStates();
+      setTimeout(()=>{ btn.classList.remove('active'); btn.classList.add('done'); }, 520);
+      setTimeout(()=>{ state[stateKey] = 'COMPLETE'; renderStates(); gate(); }, 560);
     }
 
     ids.b1.onclick=()=>{
-      state.request='ACTIVE';renderStates();
+      pulse(ids.b1,'request');
       addLog(`Nike AI agent sent campaign request for ${ids.creator.value}.`,'ok');
-      state.request='COMPLETE';renderStates();gate();
+      addLog(`Awaiting creator consent signature...`,'warn');
     };
 
     ids.b2.onclick=()=>{
       const m = metrics();
-      state.consent='ACTIVE';renderStates();
+      pulse(ids.b2,'consent');
       addLog(`Creator consent granted at ${m.r}% payout rate.`,'ok');
-      state.consent='COMPLETE';renderStates();gate();
+      addLog(`Rate locked: ${m.r}% of escrow to creator.`,'warn');
     };
 
     ids.b3.onclick=()=>{
       const m=metrics();
-      state.escrow='ACTIVE';renderStates();
+      pulse(ids.b3,'escrow');
       const h=tx();
       addLog(`Escrow locked: $${money(m.e)} USDC. <a href="https://basescan.org/tx/${h}" target="_blank">BaseScan ↗</a>`,'warn');
-      state.escrow='COMPLETE';renderStates();gate();
+      addLog(`Funds secured before distribution.`,'ok');
     };
 
     ids.b4.onclick=()=>{
-      state.report='ACTIVE';renderStates();
+      pulse(ids.b4,'report');
       const h=tx();
       addLog(`Outcome reported onchain for ${ids.creator.value}. <a href="https://basescan.org/tx/${h}" target="_blank">BaseScan ↗</a>`,'warn');
-      state.report='COMPLETE';renderStates();gate();
+      addLog(`Settlement condition met.`,'ok');
     };
 
     ids.b5.onclick=()=>{
       const m=metrics();
-      state.settle='ACTIVE';renderStates();
+      pulse(ids.b5,'settle');
       const h=tx();
       addLog(`Settlement complete: creator $${money(m.creator)} · protocol $${money(m.fee)} · agent return $${money(m.agent)}. <a href="https://basescan.org/tx/${h}" target="_blank">BaseScan ↗</a>`,'ok');
-      state.settle='COMPLETE';renderStates();gate();
+      ids.hint.textContent = 'Flow complete. Adjust rate or escrow and rerun with Reset Demo.';
     };
 
     ids.reset.onclick=()=>{
       state.request='NOT_STARTED';state.consent='NOT_STARTED';state.escrow='NOT_STARTED';state.report='NOT_STARTED';state.settle='NOT_STARTED';
+      [ids.b1,ids.b2,ids.b3,ids.b4,ids.b5].forEach((b)=>b.classList.remove('done','active'));
       addLog('Demo reset. Ready for next investor walkthrough.','err');
+      ids.hint.textContent = 'Click "AI Agent Sends Request" to start the walkthrough.';
       renderStates();gate();metrics();
     };
 
