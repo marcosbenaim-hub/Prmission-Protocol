@@ -6,11 +6,11 @@ body { background: #f2f2f2; color: #111; font-family: -apple-system, 'Helvetica 
 .hero { background: white; border-radius: 16px; padding: 22px 32px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-left: 6px solid #E00000; }
 .hero-left { display: flex; align-items: center; gap: 20px; }
 .nike-logo { width: 88px; height: 33px; }
-.hero-title { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px; }
-.hero-sub { font-size: 0.75rem; color: #c87828; margin-top: 3px; }
+.hero-title { font-size: clamp(2.5rem, 8vw, 5rem); font-weight: 900; letter-spacing: -0.5px; }
+.hero-sub { font-size: clamp(1rem, 2.5vw, 1.3rem); color: #c87828; margin-top: 3px; }
 .hero-right { text-align: right; }
-.prmission-pill { background: #111; color: white; padding: 7px 16px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; display: inline-block; }
-.hero-badge-sub { font-size: 0.62rem; color: #aaa; margin-top: 5px; }
+.prmission-pill { background: #111; color: white; padding: 9px 20px; border-radius: 20px; font-size: 0.9rem; font-weight: 700; letter-spacing: 1px; display: inline-block; }
+.hero-badge-sub { font-size: 0.85rem; color: #aaa; margin-top: 5px; }
 
 /* ── Shoe Banner ── */
 .shoe-banner { background: #111; border-radius: 16px; padding: 28px 32px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
@@ -20,12 +20,12 @@ body { background: #f2f2f2; color: #111; font-family: -apple-system, 'Helvetica 
 .shoe-la { font-size: 0.7rem; color: rgba(255,255,255,0.6); letter-spacing: 6px; z-index: 1; margin-top: 4px; }
 .shoe-details { display: flex; gap: 8px; font-size: 0.6rem; color: rgba(200,120,42,0.8); z-index: 1; margin-top: 10px; }
 .drop-label { font-size: 0.65rem; color: #E00000; letter-spacing: 3px; font-weight: 700; margin-bottom: 6px; }
-.drop-title { font-size: 2.8rem; font-weight: 900; color: white; letter-spacing: -1px; line-height: 1; margin-bottom: 8px; }
-.drop-price { font-size: 1rem; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+.drop-title { font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 900; color: white; letter-spacing: -1px; line-height: 1; margin-bottom: 8px; }
+.drop-price { font-size: 1.2rem; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
 .drop-markets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 .market-pill { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; transition: all 0.3s; }
 .market-pill.active { background: #E00000; border-color: #E00000; color: white; font-weight: 700; transform: scale(1.05); }
-.drop-escrow { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
+.drop-escrow { font-size: 0.9rem; color: rgba(255,255,255,0.4); }
 .drop-escrow strong { color: rgba(255,255,255,0.7); }
 
 /* ── Layout ── */
@@ -42,7 +42,7 @@ body { background: #f2f2f2; color: #111; font-family: -apple-system, 'Helvetica 
 .post-card { padding: 0 4px; }
 .post-header { display: flex; align-items: center; gap: 8px; padding: 4px 0 8px; }
 .post-avatar { width: 34px; height: 34px; background: linear-gradient(135deg, #f09433, #dc2743, #bc1888); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; border: 2px solid transparent; background-clip: padding-box; }
-.post-handle { font-size: 0.82rem; font-weight: 700; color: #111; }
+.post-handle { font-size: 1rem; font-weight: 700; color: #111; }
 .post-sponsored { font-size: 0.67rem; color: #999; }
 .red { color: #E00000; font-weight: 600; }
 .post-more { margin-left: auto; color: #999; font-size: 1.1rem; letter-spacing: 1px; }
@@ -58,13 +58,13 @@ body { background: #f2f2f2; color: #111; font-family: -apple-system, 'Helvetica 
 .shoe-post-swoosh { position: absolute; width: 200px; bottom: 10px; right: -20px; }
 .live-pill { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #c87828; font-size: 0.6rem; padding: 3px 8px; border-radius: 10px; font-weight: 700; z-index: 2; }
 .live-pill.on { background: #E00000; color: white; animation: blink 1.2s infinite; }
-.market-overlay { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 8px; z-index: 2; }
+.market-overlay { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; font-size: 0.9rem; font-weight: 700; padding: 4px 10px; border-radius: 8px; z-index: 2; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
 .post-actions { display: flex; justify-content: space-between; padding: 8px 2px 4px; font-size: 1.1rem; }
 .post-al { display: flex; gap: 10px; }
-.post-likes { font-size: 0.78rem; font-weight: 700; padding: 0 2px 4px; }
-.post-caption { font-size: 0.73rem; line-height: 1.5; color: #333; padding: 0 2px 10px; }
+.post-likes { font-size: 0.95rem; font-weight: 700; padding: 0 2px 4px; }
+.post-caption { font-size: 0.9rem; line-height: 1.5; color: #333; padding: 0 2px 10px; }
 .hashtag { color: #0095f6; }
 
 .ig-stats-row { display: flex; align-items: center; padding: 10px 6px; border-top: 1px solid #f0f0f0; }
@@ -76,7 +76,7 @@ body { background: #f2f2f2; color: #111; font-family: -apple-system, 'Helvetica 
 /* ── Flow Panel ── */
 .flow-panel { display: flex; flex-direction: column; gap: 14px; }
 .flow-header { background: white; border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #E00000; }
-.flow-title { font-size: 0.68rem; font-weight: 800; letter-spacing: 3px; color: #E00000; margin-bottom: 4px; }
+.flow-title { font-size: 0.9rem; font-weight: 800; letter-spacing: 3px; color: #E00000; margin-bottom: 4px; }
 .flow-sub { font-size: 0.78rem; color: #c87828; line-height: 1.4; }
 
 .flow-box { background: white; border: 2px solid #e8e8e8; border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.3s; }
