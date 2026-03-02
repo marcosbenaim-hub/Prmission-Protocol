@@ -30,7 +30,7 @@
       min-height:100vh;
       overflow-x:hidden;
     }
-    .wrap{width:min(var(--max),94vw);margin:0 auto}
+    .wrap{width:min(var(--max),94vw);margin:0 auto;padding:0 2px}
     .top{position:sticky;top:0;z-index:20;background:rgba(6,11,20,.74);backdrop-filter:blur(8px);border-bottom:1px solid #12243f}
     .nav{height:72px;display:flex;align-items:center;justify-content:space-between}
     .brand{font-size:22px;font-weight:900;letter-spacing:-.3px}
@@ -100,7 +100,7 @@
     .hidden{display:none}
     .intro-wrap{padding:18px 0 12px}
     .intro-card{position:relative;overflow:hidden}
-    .intro-video{width:100%;display:block;border-radius:12px;border:1px solid #2d4d78;background:#000;max-height:74vh;object-fit:cover}
+    .intro-video{width:100%;display:block;border-radius:12px;border:1px solid #2d4d78;background:#000;max-height:74vh;object-fit:contain}
     .intro-overlay{position:absolute;left:16px;right:16px;bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
     .intro-note{padding:8px 12px;border-radius:999px;background:rgba(6,13,22,.72);border:1px solid #33567d;color:#d6e6ff;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:800}
     .cb-btn{border:1px solid #6fb2ff;background:linear-gradient(180deg,#6cb6ff,#4e9be4);color:#041a31;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;display:none;animation:blueFloat 1.6s ease-in-out infinite,bluePulse 2s ease-in-out infinite}
@@ -111,6 +111,26 @@
       .controls{grid-template-columns:1fr}
       .orb{display:none}
       .nav{height:auto;padding:10px 0}
+    }
+    @media (max-width:680px){
+      .wrap{width:96vw;padding:0}
+      .pill{font-size:10px;padding:5px 8px}
+      .hero{padding:20px 0 12px}
+      .hero h1{font-size:clamp(24px,9vw,34px);line-height:1.04}
+      .hero p{font-size:14px}
+      .card{padding:10px;border-radius:12px}
+      .card h2{font-size:16px}
+      .intro-wrap{padding:10px 0 6px}
+      .intro-video{max-height:56vh}
+      .intro-overlay{left:10px;right:10px;bottom:10px;gap:8px}
+      .intro-note{font-size:10px;padding:7px 10px}
+      .cb-btn{font-size:11px;padding:9px 12px}
+      .btn{padding:10px 10px;font-size:11px}
+      .metric .v{font-size:19px}
+      .log{height:240px;font-size:11px}
+      .row{padding-top:20px}
+      .pct{font-size:12px}
+      .field input,.field select{padding:8px}
     }
   </style>
 </head>
@@ -125,7 +145,7 @@
   <main class="wrap intro-wrap" id="introWrap">
     <section class="card intro-card">
       <video id="nikeVideo" class="intro-video" playsinline muted preload="auto" autoplay controls>
-        <source src="assets/nike-demo-investor.mp4" type="video/mp4" />
+        <source src="../assets/nike-demo-investor.mp4" type="video/mp4" />
       </video>
       <div class="intro-overlay">
         <div class="intro-note" id="introNote">Nike Campaign Intro Playing</div>
