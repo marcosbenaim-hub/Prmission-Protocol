@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nike Global Campaign | Prmission Investor Demo</title>
+  <style>
+    :root{
+      --bg:#060b14;
+      --bg2:#0d1628;
+      --bg3:#13213b;
+      --line:#274064;
+      --text:#e9f0ff;
+      --muted:#9eb0ce;
+      --green:#00e68f;
+      --blue:#64b4ff;
+      --gold:#d7b86a;
+      --red:#ff5f6d;
+      --max:1180px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family:"Space Grotesk","Avenir Next","Segoe UI",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 460px at 92% -6%,rgba(0,230,143,.14),transparent 60%),
+        radial-gradient(760px 380px at 8% 104%,rgba(100,180,255,.12),transparent 64%),
+        var(--bg);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+    .wrap{width:min(var(--max),94vw);margin:0 auto;padding:0 2px}
+    .top{position:sticky;top:0;z-index:20;background:rgba(6,11,20,.74);backdrop-filter:blur(8px);border-bottom:1px solid #12243f}
+    .nav{height:72px;display:flex;align-items:center;justify-content:space-between}
+    .brand{font-size:22px;font-weight:900;letter-spacing:-.3px}
+    .brand em{color:var(--green);font-style:normal}
+    .pill{border:1px solid #1c5f46;background:rgba(0,230,143,.12);color:var(--green);padding:6px 10px;border-radius:999px;font-size:11px;letter-spacing:1.4px;font-weight:800;text-transform:uppercase}
+
+    .hero{padding:42px 0 20px;position:relative}
+    .hero h1{margin:10px 0 10px;font-size:clamp(32px,6vw,68px);line-height:1;max-width:980px;letter-spacing:-1px}
+    .hero p{margin:0;max-width:920px;color:#d4e2ff;font-size:clamp(15px,2vw,22px);line-height:1.35}
+    .eyebrow{color:var(--green);font-size:12px;letter-spacing:2.4px;text-transform:uppercase;font-weight:800}
+
+    .orb{position:absolute;right:2%;top:8%;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(100,180,255,.65),rgba(100,180,255,.05) 65%,transparent 70%);filter:blur(1px);animation:floaty 4s ease-in-out infinite}
+    @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+
+    .main{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-top:12px}
+    .card{background:linear-gradient(180deg,var(--bg2),var(--bg3));border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 14px 36px rgba(0,0,0,.25)}
+    .card h2{margin:0 0 8px;font-size:18px}
+
+    .timeline{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
+    .step{border:1px solid #2b4973;border-radius:10px;padding:10px;background:rgba(255,255,255,.02);transition:.2s ease}
+    .step .n{font-size:11px;letter-spacing:1.2px;color:var(--green);font-weight:800;text-transform:uppercase}
+    .step strong{display:block;font-size:13px;margin:5px 0}
+    .step p{margin:0;color:var(--muted);font-size:12px;line-height:1.35}
+    .step.active{border-color:var(--blue);box-shadow:0 0 0 1px rgba(100,180,255,.5),0 0 22px rgba(100,180,255,.22);transform:translateY(-2px)}
+    .step.done{border-color:#1d7f5b;background:rgba(0,230,143,.08)}
+
+    .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .btn{border:1px solid #365a8f;background:#15233f;color:#eaf2ff;border-radius:10px;padding:10px 12px;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:.2s ease}
+    .btn:hover:not(:disabled){transform:translateY(-1px)}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .btn.primary{background:linear-gradient(180deg,#00e68f,#00cc80);border-color:#1b8f69;color:#052418}
+    .btn.blue{background:linear-gradient(180deg,#64b4ff,#4e9be4);border-color:#6cb6ff;color:#041a31;animation:blueFloat 1.8s ease-in-out infinite,bluePulse 2.3s ease-in-out infinite}
+    @keyframes blueFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    @keyframes bluePulse{0%,100%{box-shadow:0 0 8px rgba(100,180,255,.25)}50%{box-shadow:0 0 22px rgba(100,180,255,.55)}}
+
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .field label{display:block;font-size:11px;color:#b9cae6;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+    .field input,.field select{width:100%;border:1px solid #355684;background:#0a1322;color:var(--text);border-radius:8px;padding:9px}
+
+    .slider-wrap{margin-top:10px}
+    .slider-wrap label{display:block;font-size:11px;color:#b9cae6;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+    .row{position:relative;padding-top:24px}
+    .row input[type=range]{width:100%}
+    .pct{position:absolute;top:0;left:16px;transform:translateX(-50%);font-weight:900;color:var(--green);font-family:ui-monospace,Menlo,Consolas,monospace;transition:left .08s linear}
+
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+    .metric{border:1px solid #2c4b75;border-radius:10px;padding:10px;background:rgba(10,20,36,.7)}
+    .metric .k{font-size:10px;letter-spacing:1px;color:#a7bddf;text-transform:uppercase;font-weight:800}
+    .metric .v{font-size:22px;color:var(--green);font-weight:900;margin-top:4px}
+
+    .log{height:312px;overflow:auto;border:1px solid #2b4972;border-radius:10px;padding:10px;background:#09121f;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.45}
+    .line{display:block;color:#d6e4ff}
+    .line .t{color:#87a9da}
+    .line .ok{color:#41e79d}
+    .line .warn{color:#ffd166}
+    .line .err{color:#ff6f7b}
+    .line a{color:#7bc0ff;text-decoration:none}
+
+    .state-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .state{border:1px solid #2a476f;border-radius:10px;padding:8px;background:rgba(12,22,38,.72)}
+    .state b{font-size:11px;color:#b5c8e9;text-transform:uppercase;letter-spacing:1px}
+    .status{display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;border:1px solid}
+    .ns{background:#1a2942;color:#cfe2ff;border-color:#385782}
+    .ac{background:#163249;color:#9fd2ff;border-color:#356f99}
+    .ok{background:#133629;color:#9bf6ca;border-color:#2a8a62}
+    .bl{background:#3a1d23;color:#ff9aa6;border-color:#8a3340}
+    .hidden{display:none}
+    .intro-wrap{padding:18px 0 12px}
+    .intro-card{position:relative;overflow:hidden}
+    .intro-video{width:100%;display:block;border-radius:12px;border:1px solid #2d4d78;background:#000;max-height:74vh;object-fit:contain}
+    .intro-overlay{position:absolute;left:16px;right:16px;bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .intro-note{padding:8px 12px;border-radius:999px;background:rgba(6,13,22,.72);border:1px solid #33567d;color:#d6e6ff;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:800}
+    .cb-btn{border:1px solid #6fb2ff;background:linear-gradient(180deg,#6cb6ff,#4e9be4);color:#041a31;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;display:none;animation:blueFloat 1.6s ease-in-out infinite,bluePulse 2s ease-in-out infinite}
+    .cb-btn.linked{background:linear-gradient(180deg,#00e68f,#00cb7e);border-color:#1e8e66;color:#052418;animation:none}
+
+    @media (max-width:980px){
+      .main,.grid,.metrics,.timeline,.state-grid{grid-template-columns:1fr}
+      .controls{grid-template-columns:1fr}
+      .orb{display:none}
+      .nav{height:auto;padding:10px 0}
+    }
+    @media (max-width:680px){
+      .wrap{width:96vw;padding:0}
+      .pill{font-size:10px;padding:5px 8px}
+      .hero{padding:20px 0 12px}
+      .hero h1{font-size:clamp(24px,9vw,34px);line-height:1.04}
+      .hero p{font-size:14px}
+      .card{padding:10px;border-radius:12px}
+      .card h2{font-size:16px}
+      .intro-wrap{padding:10px 0 6px}
+      .intro-video{max-height:56vh}
+      .intro-overlay{left:10px;right:10px;bottom:10px;gap:8px}
+      .intro-note{font-size:10px;padding:7px 10px}
+      .cb-btn{font-size:11px;padding:9px 12px}
+      .btn{padding:10px 10px;font-size:11px}
+      .metric .v{font-size:19px}
+      .log{height:240px;font-size:11px}
+      .row{padding-top:20px}
+      .pct{font-size:12px}
+      .field input,.field select{padding:8px}
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap nav">
+      <div class="brand">Pr<em>mission</em> × Nike</div>
+      <div class="pill">Investor Walkthrough</div>
+    </div>
+  </header>
+
+  <main class="wrap intro-wrap" id="introWrap">
+    <section class="card intro-card">
+      <video id="nikeVideo" class="intro-video" playsinline muted preload="auto" autoplay controls>
+        <source src="assets/nike-demo-investor.mp4" type="video/mp4" />
+      </video>
+      <div class="intro-overlay">
+        <div class="intro-note" id="introNote">Nike Campaign Intro Playing</div>
+        <button id="connectBtn" class="cb-btn">Connect to Wallet</button>
+      </div>
+    </section>
+  </main>
+
+  <main class="wrap hero hidden" id="campaignApp">
+    <div class="orb"></div>
+    <div class="eyebrow">Global Campaign Demo</div>
+    <h1>Nike Autonomous AI Agents Pay Joe Rogan, MrBeast, and creators worldwide onchain.</h1>
+    <p>USDC funds lock in escrow upfront. Campaign outcomes are reported, then settlements execute automatically through the Prmission Protocol with a fixed 3% fee.</p>
+
+    <section class="main">
+      <article class="card">
+        <h2>Protocol Steps</h2>
+        <div class="timeline" id="timeline">
+          <div class="step" data-step="1"><span class="n">Step 1</span><strong>Agent Request</strong><p>Nike AI agent creates campaign + request.</p></div>
+          <div class="step" data-step="2"><span class="n">Step 2</span><strong>Creator Consent</strong><p>Creator grants permission + sets rate.</p></div>
+          <div class="step" data-step="3"><span class="n">Step 3</span><strong>Escrow Lock</strong><p>USDC deposited before value transfer.</p></div>
+          <div class="step" data-step="4"><span class="n">Step 4</span><strong>Outcome Report</strong><p>Agent reports delivery onchain.</p></div>
+          <div class="step" data-step="5"><span class="n">Step 5</span><strong>Auto Settlement</strong><p>Creator + protocol split executes.</p></div>
+        </div>
+
+        <div class="grid">
+          <div class="field"><label>Campaign</label><input id="campaign" value="Nike Global Hype 2026" /></div>
+          <div class="field"><label>Creator</label>
+            <select id="creator">
+              <option>Joe Rogan</option>
+              <option>MrBeast</option>
+              <option>Drake</option>
+              <option>Global Creator Pool</option>
+            </select>
+          </div>
+          <div class="field"><label>Escrow USDC</label><input id="escrowInput" type="number" min="10" value="100" /></div>
+          <div class="field"><label>Protocol Fee %</label><input id="feeInput" type="number" min="0" max="10" value="3" /></div>
+        </div>
+
+        <div class="slider-wrap">
+          <label>Creator Rate (1-50%)</label>
+          <div class="row">
+            <input id="rate" type="range" min="1" max="50" value="10" />
+            <div class="pct" id="pct">10%</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="btn blue" id="b1">AI Agent Sends Request</button>
+          <button class="btn" id="b2">Creator Grants Consent</button>
+          <button class="btn" id="b3">Lock Escrow</button>
+          <button class="btn" id="b4">Report Outcome</button>
+          <button class="btn primary" id="b5">Auto-Settle + Verify</button>
+          <button class="btn" id="reset">Reset Demo</button>
+        </div>
+
+        <div class="metrics">
+          <div class="metric"><div class="k">Creator Receives</div><div class="v" id="mCreator">$10.00</div></div>
+          <div class="metric"><div class="k">Protocol Fee</div><div class="v" id="mFee">$3.00</div></div>
+          <div class="metric"><div class="k">Agent Return</div><div class="v" id="mAgent">$87.00</div></div>
+          <div class="metric"><div class="k">Escrow Total</div><div class="v" id="mEscrow">$100.00</div></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>State + Transaction Log</h2>
+        <div class="state-grid" id="states"></div>
+        <div class="log" id="log" style="margin-top:10px"></div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      request: 'NOT_STARTED',
+      consent: 'NOT_STARTED',
+      escrow: 'NOT_STARTED',
+      report: 'NOT_STARTED',
+      settle: 'NOT_STARTED'
+    };
+
+    const ids = {
+      b1: document.getElementById('b1'), b2: document.getElementById('b2'), b3: document.getElementById('b3'),
+      b4: document.getElementById('b4'), b5: document.getElementById('b5'), reset: document.getElementById('reset'),
+      escrowInput: document.getElementById('escrowInput'), feeInput: document.getElementById('feeInput'),
+      rate: document.getElementById('rate'), pct: document.getElementById('pct'), creator: document.getElementById('creator'),
+      mCreator: document.getElementById('mCreator'), mFee: document.getElementById('mFee'), mAgent: document.getElementById('mAgent'), mEscrow: document.getElementById('mEscrow'),
+      log: document.getElementById('log'), states: document.getElementById('states'),
+      nikeVideo: document.getElementById('nikeVideo'), connectBtn: document.getElementById('connectBtn'),
+      introWrap: document.getElementById('introWrap'), campaignApp: document.getElementById('campaignApp'), introNote: document.getElementById('introNote')
+    };
+
+    function money(n){ return Number(n).toFixed(2); }
+    function now(){ return new Date().toLocaleTimeString(); }
+    function tx(){ return '0x'+Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join(''); }
+
+    function addLog(msg,type=''){ 
+      const l = document.createElement('span');
+      l.className='line';
+      l.innerHTML = `<span class="t">[${now()}]</span> <span class="${type}">${msg}</span>`;
+      ids.log.prepend(l);
+    }
+
+    function metrics(){
+      const e = Math.max(10, Number(ids.escrowInput.value)||100);
+      const f = Math.max(0, Math.min(10, Number(ids.feeInput.value)||3));
+      const r = Math.max(1, Math.min(50, Number(ids.rate.value)||10));
+      const creator = e*(r/100);
+      const fee = e*(f/100);
+      const agent = e-creator-fee;
+      ids.mCreator.textContent = `$${money(creator)}`;
+      ids.mFee.textContent = `$${money(fee)}`;
+      ids.mAgent.textContent = `$${money(agent)}`;
+      ids.mEscrow.textContent = `$${money(e)}`;
+      ids.pct.textContent = `${r}%`;
+
+      const min=1,max=50,val=r,pct=(val-min)/(max-min),thumb=16;
+      const x=(pct*(ids.rate.clientWidth-thumb))+thumb/2;
+      ids.pct.style.left=x+'px';
+      return {e,f,r,creator,fee,agent};
+    }
+
+    function statusClass(s){ return s==='NOT_STARTED'?'ns':s==='ACTIVE'?'ac':s==='COMPLETE'?'ok':'bl'; }
+
+    function renderStates(){
+      const map = [
+        ['Request',state.request],['Consent',state.consent],['Escrow',state.escrow],['Report',state.report],['Settlement',state.settle]
+      ];
+      ids.states.innerHTML = map.map(([k,v]) => `<div class="state"><b>${k}</b><br><span class="status ${statusClass(v)}">${v}</span></div>`).join('');
+      renderSteps();
+    }
+
+    function renderSteps(){
+      const steps = document.querySelectorAll('.step');
+      steps.forEach((el)=>{el.classList.remove('active','done')});
+      if(state.request==='ACTIVE') steps[0].classList.add('active');
+      if(state.request==='COMPLETE') steps[0].classList.add('done');
+      if(state.consent==='ACTIVE') steps[1].classList.add('active');
+      if(state.consent==='COMPLETE') steps[1].classList.add('done');
+      if(state.escrow==='ACTIVE') steps[2].classList.add('active');
+      if(state.escrow==='COMPLETE') steps[2].classList.add('done');
+      if(state.report==='ACTIVE') steps[3].classList.add('active');
+      if(state.report==='COMPLETE') steps[3].classList.add('done');
+      if(state.settle==='ACTIVE') steps[4].classList.add('active');
+      if(state.settle==='COMPLETE') steps[4].classList.add('done');
+    }
+
+    function gate(){
+      ids.b2.disabled = !(state.request==='COMPLETE');
+      ids.b3.disabled = !(state.consent==='COMPLETE');
+      ids.b4.disabled = !(state.escrow==='COMPLETE');
+      ids.b5.disabled = !(state.report==='COMPLETE');
+    }
+
+    ids.b1.onclick=()=>{
+      state.request='ACTIVE';renderStates();
+      addLog(`Nike AI agent sent campaign request for ${ids.creator.value}.`,'ok');
+      state.request='COMPLETE';renderStates();gate();
+    };
+
+    ids.b2.onclick=()=>{
+      const m = metrics();
+      state.consent='ACTIVE';renderStates();
+      addLog(`Creator consent granted at ${m.r}% payout rate.`,'ok');
+      state.consent='COMPLETE';renderStates();gate();
+    };
+
+    ids.b3.onclick=()=>{
+      const m=metrics();
+      state.escrow='ACTIVE';renderStates();
+      const h=tx();
+      addLog(`Escrow locked: $${money(m.e)} USDC. <a href="https://basescan.org/tx/${h}" target="_blank">BaseScan ↗</a>`,'warn');
+      state.escrow='COMPLETE';renderStates();gate();
+    };
+
+    ids.b4.onclick=()=>{
+      state.report='ACTIVE';renderStates();
+      const h=tx();
+      addLog(`Outcome reported onchain for ${ids.creator.value}. <a href="https://basescan.org/tx/${h}" target="_blank">BaseScan ↗</a>`,'warn');
+      state.report='COMPLETE';renderStates();gate();
+    };
+
+    ids.b5.onclick=()=>{
+      const m=metrics();
+      state.settle='ACTIVE';renderStates();
+      const h=tx();
+      addLog(`Settlement complete: creator $${money(m.creator)} · protocol $${money(m.fee)} · agent return $${money(m.agent)}. <a href="https://basescan.org/tx/${h}" target="_blank">BaseScan ↗</a>`,'ok');
+      state.settle='COMPLETE';renderStates();gate();
+    };
+
+    ids.reset.onclick=()=>{
+      state.request='NOT_STARTED';state.consent='NOT_STARTED';state.escrow='NOT_STARTED';state.report='NOT_STARTED';state.settle='NOT_STARTED';
+      addLog('Demo reset. Ready for next investor walkthrough.','err');
+      renderStates();gate();metrics();
+    };
+
+    let connectShown = false;
+    function showConnect(){
+      if(connectShown) return;
+      connectShown = true;
+      ids.introNote.textContent = 'Mock Coinbase Connect Ready';
+      ids.connectBtn.style.display = 'inline-flex';
+    }
+
+    ids.nikeVideo.addEventListener('timeupdate',()=>{
+      const d = ids.nikeVideo.duration || 0;
+      if(d && ids.nikeVideo.currentTime >= Math.max(0, d - 6)) showConnect();
+    });
+    ids.nikeVideo.addEventListener('ended',showConnect);
+
+    ids.connectBtn.onclick=()=>{
+      ids.connectBtn.textContent = 'Wallet Linked';
+      ids.connectBtn.classList.add('linked');
+      ids.connectBtn.disabled = true;
+      ids.introNote.textContent = 'Connected. Loading Global Campaign...';
+      setTimeout(()=>{
+        ids.introWrap.classList.add('hidden');
+        ids.campaignApp.classList.remove('hidden');
+      }, 900);
+    };
+
+    ['input','change'].forEach(evt=>{
+      ids.rate.addEventListener(evt,metrics);
+      ids.escrowInput.addEventListener(evt,metrics);
+      ids.feeInput.addEventListener(evt,metrics);
+    });
+
+    window.addEventListener('resize',metrics);
+    metrics();renderStates();gate();
+    addLog('Investor demo ready. Click "AI Agent Sends Request" to begin.','ok');
+  </script>
+</body>
+</html>
