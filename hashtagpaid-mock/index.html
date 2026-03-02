@@ -446,9 +446,9 @@ input[type=range]::-moz-range-thumb{width:32px;height:32px;border-radius:50%;bac
         <div><div class="fl">Wallet Balance</div><div class="fv white" id="ag-bal">103.97 USDC</div></div>
         <div><div class="fl">ERC-8004 Identity</div><div class="fv lime">✓ Verified · Rep Score 94/100</div></div>
         <div><div class="fl">Status</div><div class="fv" id="ag-status">Ready to request data access</div></div>
-        <button class="btn btn-lime" id="btn-req" onclick="sendRequest()">AI Agent Sends Data Request →</button>
-        <button class="btn btn-outline" id="btn-esc" onclick="depositEscrow()" disabled>AI Agent Deposits $100 Escrow</button>
-        <button class="btn btn-outline" id="btn-rep" onclick="reportOutcome()" disabled>Report Outcome On-Chain</button>
+        <button class="btn btn-lime" id="btn-req" onclick="sendRequest()">AI Agent Sends Data Request</button>
+        <button class="btn btn-outline" id="btn-esc" onclick="depositEscrow()" disabled>Lock Escrow ($100 USDC)</button>
+        <button class="btn btn-outline" id="btn-rep" onclick="reportOutcome()" disabled>Auto-Settle + Verify BaseScan</button>
         <div id="settle-wrap" style="display:none;margin-top:12px">
           <div class="fl" style="margin:8px 0 6px">On-Chain Settlement</div>
           <div class="settle-grid">
@@ -467,7 +467,7 @@ input[type=range]::-moz-range-thumb{width:32px;height:32px;border-radius:50%;bac
         <div class="req-card" id="req-card">
           <div class="req-title">⚡ Incoming Data Request</div>
           <div class="btn-row2">
-            <button class="btn-accept" id="btn-acc" onclick="grantPermission()">✓ Grant Access</button>
+            <button class="btn-accept" id="btn-acc" onclick="grantPermission()">Set Your Price + Grant Access</button>
             <button class="btn-deny" id="btn-den" onclick="denyPermission()">✗ Deny</button>
           </div>
           <div class="slider-wrap">
