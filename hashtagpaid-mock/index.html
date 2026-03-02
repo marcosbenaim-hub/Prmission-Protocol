@@ -298,6 +298,7 @@
 
     .s-open { color: #cbe2ff; background: #142945; border-color: #33527f; }
     .s-review { color: #ffe8ae; background: #3b2f11; border-color: #7d6320; }
+    .s-approved { color: #d4f1ff; background: #113548; border-color: #2d6e8f; }
     .s-paid { color: #b8ffd8; background: #123629; border-color: #1d7e57; }
 
     .log {
@@ -379,8 +380,11 @@
         <h2>Protocol Snapshot</h2>
         <div class="kpi">
           <div class="kpi-item"><strong id="escrowVal">0</strong><span>USDC in Escrow</span></div>
-          <div class="kpi-item"><strong>3%</strong><span>Protocol Fee</span></div>
-          <div class="kpi-item"><strong id="creatorPayout">0</strong><span>Creator Receives</span></div>
+          <div class="kpi-item"><strong id="feeVal">0</strong><span>Protocol Fee Accrued</span></div>
+          <div class="kpi-item"><strong id="creatorPayout">0</strong><span>Creators Paid (Net)</span></div>
+        </div>
+        <div class="badge-row">
+          <span class="badge" id="remainingVal">Escrow Remaining: 0 USDC</span>
         </div>
         <div class="badge-row">
           <span class="badge">Base Mainnet</span>
@@ -389,7 +393,7 @@
           <span class="badge">Influencer Vertical</span>
         </div>
         <div style="margin-top:10px;color:#cfe0ff;font-size:13px;line-height:1.45">
-          This mock uses your Prmission protocol model: autonomous brand agent deposits escrow, creator delivers, agent approves, and contract settles payout + fee atomically.
+          This mock uses your Prmission protocol model: autonomous brand agent deposits escrow, creator delivers, agent approves, and contract settles payout + fee atomically with tracked balances.
         </div>
       </article>
     </section>
@@ -425,11 +429,19 @@
     <section class="market">
       <article class="card">
         <h2>Active Creator Submissions</h2>
+        <div class="field" style="margin-bottom:10px">
+          <label>Submission Target</label>
+          <select id="submissionSelect">
+            <option value="s1">@cityrunclub</option>
+            <option value="s2">@sneakerfieldnotes</option>
+            <option value="s3">@culturehoops</option>
+          </select>
+        </div>
         <div class="table">
           <div class="thead"><span>Creator</span><span>Reach</span><span>Rate</span><span>Status</span></div>
-          <div class="tr"><span>@cityrunclub</span><span>82K</span><span>$500</span><span class="state s-open" id="s1">Open</span></div>
-          <div class="tr"><span>@sneakerfieldnotes</span><span>140K</span><span>$650</span><span class="state s-review" id="s2">In Review</span></div>
-          <div class="tr"><span>@culturehoops</span><span>201K</span><span>$500</span><span class="state s-open" id="s3">Open</span></div>
+          <div class="tr"><span>@cityrunclub</span><span>82K</span><span>$500</span><span class="state s-open" id="s1" data-rate="500">Open</span></div>
+          <div class="tr"><span>@sneakerfieldnotes</span><span>140K</span><span>$650</span><span class="state s-review" id="s2" data-rate="650">In Review</span></div>
+          <div class="tr"><span>@culturehoops</span><span>201K</span><span>$500</span><span class="state s-open" id="s3" data-rate="500">Open</span></div>
         </div>
       </article>
 
@@ -454,8 +466,11 @@
     const payoutEl = document.getElementById('payout');
     const agentIdEl = document.getElementById('agentId');
     const slotsEl = document.getElementById('slots');
+    const submissionSelect = document.getElementById('submissionSelect');
     const escrowVal = document.getElementById('escrowVal');
+    const feeVal = document.getElementById('feeVal');
     const creatorPayout = document.getElementById('creatorPayout');
+    const remainingVal = document.getElementById('remainingVal');
     const tx = document.getElementById('tx');
     const log = document.getElementById('log');
 
@@ -467,48 +482,90 @@
 
     const fakeTx = () => '0x' + Array.from({length:64}, () => Math.floor(Math.random()*16).toString(16)).join('');
 
+    const money = (v) => Number(v.toFixed(2));
+    const fmt = (v) => money(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
     let escrow = 0;
+    let creatorPaidTotal = 0;
+    let feeTotal = 0;
+
+    const refreshBalances = () => {
+      const remaining = money(escrow - creatorPaidTotal - feeTotal);
+      escrowVal.textContent = fmt(escrow);
+      creatorPayout.textContent = fmt(creatorPaidTotal);
+      feeVal.textContent = fmt(feeTotal);
+      remainingVal.textContent = `Escrow Remaining: ${fmt(remaining)} USDC`;
+    };
 
     fundBtn.addEventListener('click', () => {
       const payout = Number(payoutEl.value) || 0;
       const slots = Number(slotsEl.value) || 0;
       escrow = payout * slots;
-      const fee = Math.round(escrow * 0.03);
-      const creator = escrow - fee;
-      escrowVal.textContent = escrow.toLocaleString();
-      creatorPayout.textContent = creator.toLocaleString();
+      creatorPaidTotal = 0;
+      feeTotal = 0;
+      refreshBalances();
       const hash = fakeTx();
       tx.textContent = `Agent escrow funded on Base: ${hash}`;
-      addLog(`${agentIdEl.value} funded escrow: ${escrow.toLocaleString()} USDC. Tx ${hash.slice(0, 12)}...`);
+      addLog(`${agentIdEl.value} funded escrow: ${fmt(escrow)} USDC. Tx ${hash.slice(0, 12)}...`);
       fundBtn.disabled = true;
       openBtn.disabled = false;
+      approveBtn.disabled = true;
+      settleBtn.disabled = true;
     });
 
     openBtn.addEventListener('click', () => {
       addLog(`${agentIdEl.value} opened campaign to creators. Submission intake started.`);
-      document.getElementById('s1').textContent = 'In Review';
-      document.getElementById('s1').className = 'state s-review';
+      ['s1', 's3'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el.textContent === 'Open') {
+          el.textContent = 'In Review';
+          el.className = 'state s-review';
+        }
+      });
       openBtn.disabled = true;
       approveBtn.disabled = false;
     });
 
     approveBtn.addEventListener('click', () => {
-      addLog(`${agentIdEl.value} approved @cityrunclub submission against deliverable rules.`);
-      approveBtn.disabled = true;
+      const id = submissionSelect.value;
+      const target = document.getElementById(id);
+      if (target.textContent === 'Paid') {
+        addLog(`${id} already settled. Choose another creator.`);
+        return;
+      }
+      target.textContent = 'Approved';
+      target.className = 'state s-approved';
+      addLog(`${agentIdEl.value} approved ${target.parentElement.firstChild.textContent} submission against deliverable rules.`);
       settleBtn.disabled = false;
     });
 
     settleBtn.addEventListener('click', () => {
-      const payout = Number(payoutEl.value) || 0;
-      const fee = Math.round(payout * 0.03);
-      const creator = payout - fee;
+      const id = submissionSelect.value;
+      const target = document.getElementById(id);
+      const handle = target.parentElement.firstChild.textContent;
+      if (target.textContent !== 'Approved') {
+        addLog(`Cannot settle ${handle}. It must be Approved first.`);
+        return;
+      }
+      const payout = Number(target.dataset.rate || payoutEl.value) || 0;
+      const fee = money(payout * 0.03);
+      const creator = money(payout - fee);
+      const remaining = money(escrow - creatorPaidTotal - feeTotal);
+      if (money(creator + fee) > remaining) {
+        addLog(`Settlement blocked: insufficient escrow remaining for ${handle}.`);
+        return;
+      }
+      creatorPaidTotal = money(creatorPaidTotal + creator);
+      feeTotal = money(feeTotal + fee);
+      refreshBalances();
       const hash = fakeTx();
       tx.textContent = `Agent settlement tx: ${hash}`;
-      addLog(`${agentIdEl.value} settled onchain: ${creator} USDC to creator, ${fee} USDC protocol fee.`);
-      document.getElementById('s1').textContent = 'Paid';
-      document.getElementById('s1').className = 'state s-paid';
-      settleBtn.disabled = true;
+      addLog(`${agentIdEl.value} settled ${handle}: ${fmt(creator)} USDC to creator, ${fmt(fee)} USDC protocol fee.`);
+      target.textContent = 'Paid';
+      target.className = 'state s-paid';
     });
+
+    refreshBalances();
   </script>
 </body>
 </html>
