@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Prmission x Creator Marketplace Mock</title>
-  <meta name="description" content="Mock influencer marketplace built on Prmission Protocol escrow and consent-gated settlement." />
+  <title>Prmission x Autonomous Agent Marketplace Mock</title>
+  <meta name="description" content="Mock influencer marketplace where brand autonomous AI agents fund escrow and settle creator payouts via Prmission Protocol." />
   <style>
     :root {
       --bg: #070b14;
@@ -349,15 +349,16 @@
   </header>
 
   <main class="wrap hero">
-    <p class="eyebrow">HashtagPaid-Inspired Onchain Creator Deals</p>
-    <h1>Brand-to-Creator Campaigns.<br>Escrowed and Settled <span style="color:var(--brand)">Onchain</span>.</h1>
-    <p class="sub">Mock version of a creator marketplace where brands launch campaigns, creators submit Instagram deliverables, and Prmission smart contracts release USDC once delivery is approved.</p>
+    <p class="eyebrow">HashtagPaid-Inspired Autonomous Agent Creator Deals</p>
+    <h1>Brand AI Agent-to-Creator Campaigns.<br>Escrowed and Settled <span style="color:var(--brand)">Onchain</span>.</h1>
+    <p class="sub">Mock version of a creator marketplace where brand autonomous AI agents launch campaigns, fund escrow, review creator deliverables, and Prmission smart contracts release USDC after approval.</p>
 
     <section class="hero-grid">
       <article class="card">
-        <h2>Campaign Escrow Console</h2>
+        <h2>Autonomous Agent Escrow Console</h2>
         <div class="stack">
           <div class="field"><label>Brand</label><input id="brand" value="Nike" /></div>
+          <div class="field"><label>Agent ID</label><input id="agentId" value="nike-agent-01" /></div>
           <div class="field"><label>Campaign Name</label><input id="campaign" value="Worn To Be Wild - Spring Drop" /></div>
           <div class="row">
             <div class="field" style="flex:1"><label>Payout / Creator (USDC)</label><input id="payout" type="number" value="500" /></div>
@@ -365,12 +366,12 @@
           </div>
           <div class="field"><label>Deliverable Rules</label><textarea id="rules">1 Instagram Reel + 1 Story mention, hashtag #WornToBeWild, post live for 7 days.</textarea></div>
           <div class="row">
-            <button class="btn primary" id="fundBtn">1) Fund Escrow</button>
+            <button class="btn primary" id="fundBtn">1) Agent Funds Escrow</button>
             <button class="btn" id="openBtn" disabled>2) Open Campaign</button>
-            <button class="btn warn" id="approveBtn" disabled>3) Approve Submission</button>
+            <button class="btn warn" id="approveBtn" disabled>3) Agent Approves</button>
             <button class="btn pink" id="settleBtn" disabled>4) Settle Onchain</button>
           </div>
-          <div id="tx" class="mono">Awaiting escrow funding...</div>
+          <div id="tx" class="mono">Awaiting autonomous agent escrow funding...</div>
         </div>
       </article>
 
@@ -388,16 +389,37 @@
           <span class="badge">Influencer Vertical</span>
         </div>
         <div style="margin-top:10px;color:#cfe0ff;font-size:13px;line-height:1.45">
-          This mock uses your Prmission protocol model: brand deposits escrow, creator delivers, brand approves, contract settles payout + fee atomically.
+          This mock uses your Prmission protocol model: autonomous brand agent deposits escrow, creator delivers, agent approves, and contract settles payout + fee atomically.
         </div>
       </article>
     </section>
 
     <section class="flow">
-      <article class="node"><span class="s">Step 1</span><strong>Create Campaign</strong><p>Brand defines deliverables and USDC payout terms.</p></article>
-      <article class="node"><span class="s">Step 2</span><strong>Lock Escrow</strong><p>Funds are held by Prmission smart contracts.</p></article>
+      <article class="node"><span class="s">Step 1</span><strong>Agent Creates Campaign</strong><p>Brand autonomous AI agent defines deliverables and payout terms.</p></article>
+      <article class="node"><span class="s">Step 2</span><strong>Agent Locks Escrow</strong><p>Agent treasury funds are held by Prmission smart contracts.</p></article>
       <article class="node"><span class="s">Step 3</span><strong>Verify Submission</strong><p>Creator post gets reviewed against campaign rules.</p></article>
-      <article class="node"><span class="s">Step 4</span><strong>Settle Onchain</strong><p>Creator paid, protocol fee retained, immutable record created.</p></article>
+      <article class="node"><span class="s">Step 4</span><strong>Agent Settles Onchain</strong><p>Creator paid, protocol fee retained, immutable record created.</p></article>
+    </section>
+
+    <section class="market">
+      <article class="card">
+        <h2>Autonomous Agent Operations</h2>
+        <div class="table">
+          <div class="thead"><span>Agent</span><span>Role</span><span>Policy</span><span>Status</span></div>
+          <div class="tr"><span>nike-agent-01</span><span>Campaign Treasury</span><span>Fund if budget OK</span><span class="state s-paid">Online</span></div>
+          <div class="tr"><span>nike-agent-02</span><span>Submission QA</span><span>Hashtag + URL checks</span><span class="state s-review">Monitoring</span></div>
+          <div class="tr"><span>nike-agent-03</span><span>Settlement Bot</span><span>Release when approved</span><span class="state s-open">Ready</span></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Agent Treasury Rules</h2>
+        <ul class="log">
+          <li>Only approved campaign IDs can trigger escrow deposits.</li>
+          <li>Max per-post payout threshold enforced by policy engine.</li>
+          <li>Agent emits onchain event for every approval and settlement.</li>
+        </ul>
+      </article>
     </section>
 
     <section class="market">
@@ -414,8 +436,8 @@
       <article class="card">
         <h2>Settlement Log</h2>
         <ul class="log" id="log">
-          <li>Campaign draft created for Nike.</li>
-          <li>Waiting for escrow deposit...</li>
+          <li>Campaign draft created for Nike autonomous agents.</li>
+          <li>Waiting for agent treasury escrow deposit...</li>
         </ul>
       </article>
     </section>
@@ -430,6 +452,7 @@
     const settleBtn = document.getElementById('settleBtn');
 
     const payoutEl = document.getElementById('payout');
+    const agentIdEl = document.getElementById('agentId');
     const slotsEl = document.getElementById('slots');
     const escrowVal = document.getElementById('escrowVal');
     const creatorPayout = document.getElementById('creatorPayout');
@@ -455,14 +478,14 @@
       escrowVal.textContent = escrow.toLocaleString();
       creatorPayout.textContent = creator.toLocaleString();
       const hash = fakeTx();
-      tx.textContent = `Escrow funded on Base: ${hash}`;
-      addLog(`Escrow funded: ${escrow.toLocaleString()} USDC. Tx ${hash.slice(0, 12)}...`);
+      tx.textContent = `Agent escrow funded on Base: ${hash}`;
+      addLog(`${agentIdEl.value} funded escrow: ${escrow.toLocaleString()} USDC. Tx ${hash.slice(0, 12)}...`);
       fundBtn.disabled = true;
       openBtn.disabled = false;
     });
 
     openBtn.addEventListener('click', () => {
-      addLog('Campaign opened to creators. Submission intake started.');
+      addLog(`${agentIdEl.value} opened campaign to creators. Submission intake started.`);
       document.getElementById('s1').textContent = 'In Review';
       document.getElementById('s1').className = 'state s-review';
       openBtn.disabled = true;
@@ -470,7 +493,7 @@
     });
 
     approveBtn.addEventListener('click', () => {
-      addLog('Brand approved @cityrunclub submission against deliverable rules.');
+      addLog(`${agentIdEl.value} approved @cityrunclub submission against deliverable rules.`);
       approveBtn.disabled = true;
       settleBtn.disabled = false;
     });
@@ -480,8 +503,8 @@
       const fee = Math.round(payout * 0.03);
       const creator = payout - fee;
       const hash = fakeTx();
-      tx.textContent = `Settlement tx: ${hash}`;
-      addLog(`Settled onchain: ${creator} USDC to creator, ${fee} USDC protocol fee.`);
+      tx.textContent = `Agent settlement tx: ${hash}`;
+      addLog(`${agentIdEl.value} settled onchain: ${creator} USDC to creator, ${fee} USDC protocol fee.`);
       document.getElementById('s1').textContent = 'Paid';
       document.getElementById('s1').className = 'state s-paid';
       settleBtn.disabled = true;
