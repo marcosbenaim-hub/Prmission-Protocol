@@ -17,6 +17,14 @@ const STARTING_CREATORS = [
   { id: "c3", handle: "@courtvision.creator", wallet: "0xb812...77aa", consented: false },
 ];
 
+const FLOW_STEPS = [
+  { id: 1, title: "Brand Creates Campaign", body: "Nike defines creator terms and payout per verified Instagram post.", tone: "pink" },
+  { id: 2, title: "Funds Locked in Escrow", body: "USDC is deposited into Prmission smart contracts on Base.", tone: "blue" },
+  { id: 3, title: "Creator Submits Post", body: "Creator provides a valid Instagram post or reel proof URL.", tone: "purple" },
+  { id: 4, title: "Conditions Verified", body: "Consent, URL format, and campaign requirements are confirmed.", tone: "green" },
+  { id: 5, title: "Instant Settlement", body: "Payout releases to creator and protocol fee settles atomically.", tone: "teal" },
+];
+
 function isInstagramUrl(url) {
   try {
     const u = new URL(url.trim());
@@ -152,6 +160,22 @@ export default function App() {
         </div>
         <div className="status-chip">{campaign.status}</div>
       </header>
+
+      <section className="flow-guide">
+        <div className="flow-head">
+          <p className="flow-kicker">GUIDED FLOW</p>
+          <h2>One Settlement Layer. Influencer Payments Vertical.</h2>
+        </div>
+        <div className="flow-grid">
+          {FLOW_STEPS.map((step) => (
+            <article key={step.id} className={`flow-card ${step.tone}`}>
+              <p className="flow-step">STEP {step.id} OF 5</p>
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <section className="grid">
         <article className="card">
