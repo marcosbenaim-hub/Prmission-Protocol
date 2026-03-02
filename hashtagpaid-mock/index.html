@@ -415,6 +415,39 @@
       cursor: pointer;
     }
 
+    .action-panel {
+      margin-top: 12px;
+      display: none;
+      gap: 8px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .action-btn {
+      border: 1px solid #2f4670;
+      border-radius: 10px;
+      background: #0f1d34;
+      color: #e7efff;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .action-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .action-btn.primary {
+      background: linear-gradient(180deg, #00e68f, #00cf7d);
+      border-color: #1d8f69;
+      color: #042117;
+    }
+    .action-note {
+      margin-top: 8px;
+      color: #8eb4f0;
+      font-size: 12px;
+      text-align: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
     @media (max-width: 980px) {
       .hero-grid, .market, .verbiage { grid-template-columns: 1fr; }
       .flow { grid-template-columns: 1fr 1fr; }
@@ -423,6 +456,7 @@
       .nav { height: auto; padding: 10px 0; align-items: flex-start; }
       .intro-grid { grid-template-columns: 1fr; }
       .start-btn { width: 60%; font-size: 13px; }
+      .action-panel { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -464,16 +498,54 @@
         </article>
       </div>
       <button class="start-btn" id="startDemoBtn">START DEMO →</button>
+      <div class="action-panel" id="actionPanel">
+        <button class="action-btn primary" id="agentReqBtn">AI Agent Sends Data Request</button>
+        <button class="action-btn" id="setPriceBtn" disabled>Set Your Price</button>
+        <button class="action-btn" id="lockEscrowBtn" disabled>Lock Escrow ($100 USDC)</button>
+        <button class="action-btn" id="settleBtn" disabled>Auto-Settle + Verify BaseScan</button>
+      </div>
+      <div class="action-note" id="actionNote"></div>
     </section>
 
   </main>
 
   <script>
     const startDemoBtn = document.getElementById('startDemoBtn');
+    const actionPanel = document.getElementById('actionPanel');
+    const actionNote = document.getElementById('actionNote');
+    const agentReqBtn = document.getElementById('agentReqBtn');
+    const setPriceBtn = document.getElementById('setPriceBtn');
+    const lockEscrowBtn = document.getElementById('lockEscrowBtn');
+    const settleBtn = document.getElementById('settleBtn');
 
     startDemoBtn.addEventListener('click', () => {
       startDemoBtn.disabled = true;
-      startDemoBtn.textContent = 'REBUILDING DEMO';
+      startDemoBtn.textContent = 'DEMO STARTED';
+      actionPanel.style.display = 'grid';
+      actionNote.textContent = 'Waiting for AI agent request...';
+    });
+
+    agentReqBtn.addEventListener('click', () => {
+      agentReqBtn.disabled = true;
+      setPriceBtn.disabled = false;
+      actionNote.textContent = 'Request received. Set your price.';
+    });
+
+    setPriceBtn.addEventListener('click', () => {
+      setPriceBtn.disabled = true;
+      lockEscrowBtn.disabled = false;
+      actionNote.textContent = 'Price confirmed. Ready to lock escrow.';
+    });
+
+    lockEscrowBtn.addEventListener('click', () => {
+      lockEscrowBtn.disabled = true;
+      settleBtn.disabled = false;
+      actionNote.textContent = 'Escrow locked onchain. Settlement available.';
+    });
+
+    settleBtn.addEventListener('click', () => {
+      settleBtn.disabled = true;
+      actionNote.textContent = 'Settled onchain. Open BaseScan from your tx panel in full app.';
     });
   </script>
 </body>
