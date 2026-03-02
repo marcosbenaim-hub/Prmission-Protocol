@@ -101,6 +101,16 @@
     .bl{background:#3a1d23;color:#ff9aa6;border-color:#8a3340}
     .hidden{display:none}
     .hint{margin-top:10px;border:1px solid #2d4d79;background:rgba(14,26,44,.75);border-radius:10px;padding:8px 10px;font-size:12px;color:#d5e5ff}
+    .terminal{height:170px;overflow:auto;border:1px solid #2b4972;border-radius:10px;padding:10px;background:#050c17;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.4}
+    .cmd{color:#7bc0ff}
+    .res{color:#40e09a}
+    .dim{color:#8aa3c8}
+    .cursor{display:inline-block;width:8px;height:14px;background:#7bc0ff;vertical-align:middle;animation:blink 1s steps(1) infinite}
+    @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+    .codebox{margin-top:8px;height:170px;overflow:auto;border:1px solid #2b4972;border-radius:10px;padding:10px;background:#081120;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.45}
+    .cl{display:block;color:#b8cae7;white-space:pre}
+    .ln{display:inline-block;width:28px;color:#6f89b1}
+    .exec{background:rgba(100,180,255,.18);box-shadow:inset 3px 0 0 #64b4ff}
     .intro-wrap{padding:18px 0 12px}
     .intro-card{position:relative;overflow:hidden}
     .intro-video{width:100%;display:block;border-radius:12px;border:1px solid #2d4d78;background:#000;max-height:74vh;object-fit:contain}
@@ -216,6 +226,8 @@
 
       <article class="card">
         <h2>State + Transaction Log</h2>
+        <div class="terminal" id="term"></div>
+        <div class="codebox" id="codeBox"></div>
         <div class="state-grid" id="states"></div>
         <div class="log" id="log" style="margin-top:10px"></div>
       </article>
@@ -240,8 +252,25 @@
       log: document.getElementById('log'), states: document.getElementById('states'),
       nikeVideo: document.getElementById('nikeVideo'), connectBtn: document.getElementById('connectBtn'),
       introWrap: document.getElementById('introWrap'), campaignApp: document.getElementById('campaignApp'), introNote: document.getElementById('introNote'),
-      hint: document.getElementById('hint')
+      hint: document.getElementById('hint'), term: document.getElementById('term'), codeBox: document.getElementById('codeBox')
     };
+    const demoCode = [
+      'function sendRequest(campaign, creator) {',
+      '  return agent.createCampaign({ campaign, creator });',
+      '}',
+      'function grantConsent(ratePct) {',
+      '  return creator.signConsent({ ratePct });',
+      '}',
+      'function lockEscrow(amountUSDC) {',
+      '  return escrow.lock({ token: "USDC", amountUSDC });',
+      '}',
+      'function reportOutcome(creator, status) {',
+      '  return oracle.report({ creator, status });',
+      '}',
+      'function settle(creator, fee, agentReturn) {',
+      '  return protocol.settle({ creator, fee, agentReturn });',
+      '}'
+    ];
 
     function money(n){ return Number(n).toFixed(2); }
     function now(){ return new Date().toLocaleTimeString(); }
@@ -252,6 +281,37 @@
       l.className='line';
       l.innerHTML = `<span class="t">[${now()}]</span> <span class="${type}">${msg}</span>`;
       ids.log.prepend(l);
+    }
+    let typingQueue = Promise.resolve();
+    function typeTerminal(text, cls='cmd'){
+      typingQueue = typingQueue.then(() => new Promise((resolve)=>{
+        const row = document.createElement('div');
+        row.className = cls;
+        ids.term.appendChild(row);
+        let i = 0;
+        const tick = () => {
+          row.textContent = text.slice(0, i++);
+          ids.term.scrollTop = ids.term.scrollHeight;
+          if(i <= text.length) setTimeout(tick, 9);
+          else resolve();
+        };
+        tick();
+      }));
+    }
+    function renderCode(activeLines=[]){
+      const set = new Set(activeLines);
+      ids.codeBox.innerHTML = demoCode.map((line, idx)=>{
+        const n = idx + 1;
+        return `<span class="cl ${set.has(n) ? 'exec' : ''}"><span class="ln">${n}</span>${line}</span>`;
+      }).join('');
+      if(activeLines.length){
+        const first = ids.codeBox.querySelector('.exec');
+        if(first) first.scrollIntoView({block:'center',behavior:'smooth'});
+      }
+    }
+    function runCode(lines){
+      renderCode(lines);
+      setTimeout(()=>renderCode([]), 900);
     }
 
     function metrics(){
@@ -324,6 +384,9 @@
 
     ids.b1.onclick=()=>{
       pulse(ids.b1,'request');
+      runCode([1,2]);
+      typeTerminal(`$ agent.request --campaign "${ids.campaign.value}" --creator "${ids.creator.value}"`);
+      typeTerminal(`request_status=ACCEPTED`, 'res');
       addLog(`Nike AI agent sent campaign request for ${ids.creator.value}.`,'ok');
       addLog(`Awaiting creator consent signature...`,'warn');
     };
@@ -331,6 +394,9 @@
     ids.b2.onclick=()=>{
       const m = metrics();
       pulse(ids.b2,'consent');
+      runCode([4,5]);
+      typeTerminal(`$ creator.consent --rate ${m.r}%`);
+      typeTerminal(`consent=SIGNED · payout_rate=${m.r}%`, 'res');
       addLog(`Creator consent granted at ${m.r}% payout rate.`,'ok');
       addLog(`Rate locked: ${m.r}% of escrow to creator.`,'warn');
     };
@@ -338,14 +404,20 @@
     ids.b3.onclick=()=>{
       const m=metrics();
       pulse(ids.b3,'escrow');
+      runCode([7,8]);
       const h=tx();
+      typeTerminal(`$ escrow.lock --amount ${money(m.e)} --token USDC`);
+      typeTerminal(`tx_hash=${h.slice(0,16)}...`, 'res');
       addLog(`Escrow locked: $${money(m.e)} USDC. <a href="https://basescan.org/tx/${h}" target="_blank">BaseScan ↗</a>`,'warn');
       addLog(`Funds secured before distribution.`,'ok');
     };
 
     ids.b4.onclick=()=>{
       pulse(ids.b4,'report');
+      runCode([10,11]);
       const h=tx();
+      typeTerminal(`$ outcome.report --creator "${ids.creator.value}" --status delivered`);
+      typeTerminal(`oracle_proof=submitted · tx=${h.slice(0,16)}...`, 'res');
       addLog(`Outcome reported onchain for ${ids.creator.value}. <a href="https://basescan.org/tx/${h}" target="_blank">BaseScan ↗</a>`,'warn');
       addLog(`Settlement condition met.`,'ok');
     };
@@ -353,7 +425,10 @@
     ids.b5.onclick=()=>{
       const m=metrics();
       pulse(ids.b5,'settle');
+      runCode([13,14]);
       const h=tx();
+      typeTerminal(`$ settlement.execute --creator ${money(m.creator)} --fee ${money(m.fee)} --return ${money(m.agent)}`);
+      typeTerminal(`settlement=SUCCESS · tx=${h.slice(0,16)}...`, 'res');
       addLog(`Settlement complete: creator $${money(m.creator)} · protocol $${money(m.fee)} · agent return $${money(m.agent)}. <a href="https://basescan.org/tx/${h}" target="_blank">BaseScan ↗</a>`,'ok');
       ids.hint.textContent = 'Flow complete. Adjust rate or escrow and rerun with Reset Demo.';
     };
@@ -362,6 +437,9 @@
       state.request='NOT_STARTED';state.consent='NOT_STARTED';state.escrow='NOT_STARTED';state.report='NOT_STARTED';state.settle='NOT_STARTED';
       [ids.b1,ids.b2,ids.b3,ids.b4,ids.b5].forEach((b)=>b.classList.remove('done','active'));
       addLog('Demo reset. Ready for next investor walkthrough.','err');
+      ids.term.innerHTML = '';
+      typeTerminal('$ prmission.demo --boot', 'cmd');
+      typeTerminal('protocol=ready · network=Base Mainnet', 'dim');
       ids.hint.textContent = 'Click "AI Agent Sends Request" to start the walkthrough.';
       renderStates();gate();metrics();
     };
@@ -399,6 +477,11 @@
 
     window.addEventListener('resize',metrics);
     metrics();renderStates();gate();
+    renderCode([]);
+    ids.term.innerHTML = '';
+    typeTerminal('$ prmission.demo --boot', 'cmd');
+    typeTerminal('protocol=ready · network=Base Mainnet', 'dim');
+    typeTerminal('tip: run the 5-step flow to settle campaign funds', 'dim');
     addLog('Investor demo ready. Click "AI Agent Sends Request" to begin.','ok');
   </script>
 </body>
