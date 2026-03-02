@@ -136,18 +136,6 @@ if(b.tp===0){const ang=Math.atan2(b.vy,b.vx);ctx.save();ctx.translate(b.x,b.y);c
 for(let i=0;i<3;i++){const sx=Math.random()*W,sy=Math.random()*H,ss=1+Math.random()*2;const sg=ctx.createRadialGradient(sx,sy,0,sx,sy,ss*8);sg.addColorStop(0,'rgba(0,230,118,'+(Math.random()*.15)+')');sg.addColorStop(1,'rgba(0,230,118,0)');ctx.fillStyle=sg;ctx.beginPath();ctx.arc(sx,sy,ss*8,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(sx,sy,ss,0,Math.PI*2);ctx.fillStyle='rgba(0,230,118,'+(Math.random()*.4)+')';ctx.fill()}
 requestAnimationFrame(draw)}draw();
 const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:.15});document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
-
-const track=document.querySelector('.scroll-track');
-if(track){
-  const speed=0.6;
-  const items=[...track.children];
-  items.forEach(el=>track.appendChild(el.cloneNode(true)));
-  track.style.animation='none';
-  let x=0;
-  const loopWidth=track.scrollWidth/2;
-  const step=()=>{x-=speed;if(Math.abs(x)>=loopWidth)x=0;track.style.transform=`translateX(${x}px)`;requestAnimationFrame(step)};
-  requestAnimationFrame(step);
-}
 </script>
 </body>
 </html>
