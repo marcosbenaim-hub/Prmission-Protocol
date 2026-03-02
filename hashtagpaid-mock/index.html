@@ -259,6 +259,13 @@
       gap: 14px;
     }
 
+    .verbiage {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
     .table {
       border: 1px solid #274166;
       border-radius: 12px;
@@ -405,7 +412,7 @@
     }
 
     @media (max-width: 980px) {
-      .hero-grid, .market { grid-template-columns: 1fr; }
+      .hero-grid, .market, .verbiage { grid-template-columns: 1fr; }
       .flow { grid-template-columns: 1fr 1fr; }
       .kpi { grid-template-columns: 1fr; }
       .thead, .tr { grid-template-columns: 1fr; gap: 4px; }
@@ -504,6 +511,27 @@
       <article class="node"><span class="s">Step 2</span><strong>Agent Locks Escrow</strong><p>Agent treasury funds are held by Prmission smart contracts.</p></article>
       <article class="node"><span class="s">Step 3</span><strong>Verify Submission</strong><p>Creator post gets reviewed against campaign rules.</p></article>
       <article class="node"><span class="s">Step 4</span><strong>Agent Settles Onchain</strong><p>Creator paid, protocol fee retained, immutable record created.</p></article>
+    </section>
+
+    <section class="verbiage">
+      <article class="card">
+        <h2>Value Proposition</h2>
+        <ul class="log">
+          <li><strong>For Brands:</strong> Launch and scale creator campaigns using autonomous AI agent workflows.</li>
+          <li><strong>For Creators:</strong> Get paid automatically when deliverables are approved onchain.</li>
+          <li><strong>For Both:</strong> Transparent escrow, wallet-native onboarding, and verifiable settlement.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h2>How It Works</h2>
+        <ul class="log">
+          <li>Agent publishes campaign terms and payout rules.</li>
+          <li>Brand treasury funds escrow in USDC.</li>
+          <li>Global creators submit deliverables with wallet-linked identity.</li>
+          <li>Agent validates requirements and triggers settlement.</li>
+          <li>Payout split executes onchain: creator net + protocol fee.</li>
+        </ul>
+      </article>
     </section>
 
     <section class="market">
