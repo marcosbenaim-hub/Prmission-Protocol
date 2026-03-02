@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prmission × Nike — Creator Wallet</title>
+<meta name="description" content="Connect your wallet. Nike's AI agents pay you USDC for your creative data. Powered by Prmission Protocol on Base.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   PRMISSION × NIKE — CREATOR WALLET DASHBOARD
+   Contract: 0x0c8B16a57524f4009581B748356E01e1a969223d (Base)
+   Payment:  USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
+   ═══════════════════════════════════════════════════════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#050508;
+  --surface:#0C0C12;
+  --surface-2:#131320;
+  --surface-3:#1B1B2B;
+  --surface-hover:#1F1F32;
+  --border:#1E1E30;
+  --border-hover:#2E2E48;
+  --text:#F0F0F5;
+  --text-muted:#8A8AA0;
+  --text-dim:#55556A;
+  --nike-orange:#FA5B30;
+  --nike-orange-glow:#FA5B3040;
+  --nike-volt:#C8FF00;
+  --nike-volt-glow:#C8FF0030;
+  --coinbase:#0052FF;
+  --coinbase-glow:#0052FF35;
+  --usdc:#2775CA;
+  --green:#00E676;
+  --green-glow:#00E67630;
+  --amber:#FFB300;
+  --amber-glow:#FFB30030;
+  --red:#FF3D57;
+  --protocol-fee:#FA5B30;
+}
+html{font-size:16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{
+  font-family:'Outfit',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden;
+}
+
+/* ─── Atmospheric layers ─── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 800px 600px at 15% 10%, #FA5B3008 0%, transparent 70%),
+    radial-gradient(ellipse 600px 500px at 85% 80%, #0052FF06 0%, transparent 70%),
+    radial-gradient(ellipse 400px 400px at 50% 50%, #C8FF0004 0%, transparent 70%);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:128px;
+}
+
+/* ─── App shell ─── */
+.app{position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:0 20px 100px}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* ─── Animated grid lines ─── */
+.grid-bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size:80px 80px;
+  mask-image:radial-gradient(ellipse 60% 50% at 50% 40%, black 20%, transparent 70%);
+  opacity:.15;
+}
+
+/* ═══ HEADER ═══ */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 0;border-bottom:1px solid var(--border);
+  margin-bottom:40px;
+}
+.logo-area{display:flex;align-items:center;gap:14px}
+.logo-icon{
+  width:38px;height:38px;border-radius:10px;
+  background:linear-gradient(135deg,var(--nike-orange),#FF7849);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;color:#fff;font-size:16px;letter-spacing:-1px;
+  box-shadow:0 0 24px var(--nike-orange-glow);
+}
+.logo-wordmark{font-size:19px;font-weight:700;letter-spacing:-.6px}
+.logo-wordmark span{color:var(--text-dim);font-weight:400;margin-left:6px;font-size:14px}
+.header-pills{display:flex;align-items:center;gap:10px}
+.pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--surface-2);border:1px solid var(--border);
+  padding:7px 14px;border-radius:100px;font-size:12px;color:var(--text-muted);
+  white-space:nowrap;
+}
+.pill .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.pill .dot.live{background:var(--green);box-shadow:0 0 8px var(--green-glow);animation:pulse 2s infinite}
+
+/* ─── Connect wallet button ─── */
+.btn-wallet{
+  display:flex;align-items:center;gap:10px;
+  background:var(--coinbase);color:#fff;border:none;
+  padding:11px 22px;border-radius:12px;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;
+  transition:all .25s;position:relative;overflow:hidden;
+  box-shadow:0 0 20px var(--coinbase-glow);
+}
+.btn-wallet:hover{background:#1A66FF;transform:translateY(-1px);box-shadow:0 6px 30px var(--coinbase-glow)}
+.btn-wallet::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.12) 50%,transparent 70%);
+  transform:translateX(-120%);transition:transform .6s;
+}
+.btn-wallet:hover::after{transform:translateX(120%)}
+.btn-wallet svg{width:18px;height:18px;flex-shrink:0}
+
+.btn-wallet-connected{
+  display:flex;align-items:center;gap:9px;
+  background:var(--surface-2);color:var(--text);border:1px solid var(--border);
+  padding:9px 16px;border-radius:12px;cursor:pointer;
+  font-family:'JetBrains Mono',monospace;font-size:12px;
+  transition:all .2s;
+}
+.btn-wallet-connected:hover{border-color:var(--coinbase);background:var(--surface-3)}
+.btn-wallet-connected .w-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green-glow)}
+
+/* ═══ HERO (pre-connect) ═══ */
+.hero{text-align:center;padding:60px 0 50px;animation:fadeUp .7s ease-out}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:2px;
+  color:var(--nike-orange);margin-bottom:24px;
+}
+.hero-eyebrow .swoosh{font-size:16px}
+.hero h1{
+  font-size:clamp(36px,6vw,64px);font-weight:800;
+  letter-spacing:-2px;line-height:1.05;margin-bottom:20px;
+}
+.hero h1 .line2{
+  background:linear-gradient(135deg,var(--nike-orange),var(--nike-volt));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero p{
+  font-size:17px;color:var(--text-muted);max-width:520px;margin:0 auto 36px;
+  line-height:1.65;font-weight:300;
+}
+.hero .btn-wallet{
+  margin:0 auto;padding:15px 34px;font-size:16px;border-radius:14px;
+}
+.hero-stats{
+  display:flex;justify-content:center;gap:48px;margin-top:52px;flex-wrap:wrap;
+}
+.hero-stat{text-align:center}
+.hero-stat .val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--text)}
+.hero-stat .lbl{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.5px;margin-top:4px}
+
+.hero-protocol{
+  display:flex;align-items:center;justify-content:center;gap:20px;
+  margin-top:40px;padding-top:28px;border-top:1px solid var(--border);
+  flex-wrap:wrap;
+}
+.hero-protocol .tag{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;color:var(--text-dim);
+}
+.hero-protocol .tag .ico{font-size:14px}
+
+/* ═══ DASHBOARD (post-connect) ═══ */
+.dashboard{display:none;animation:fadeUp .5s ease-out}
+.dashboard.show{display:block}
+.hero.hide{display:none}
+
+/* ─── Earnings bar ─── */
+.earnings-bar{
+  background:linear-gradient(135deg,var(--surface-2),var(--surface-3));
+  border:1px solid var(--border);border-radius:20px;
+  padding:28px 32px;margin-bottom:28px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:20px;
+  position:relative;overflow:hidden;
+}
+.earnings-bar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--nike-orange),var(--nike-volt),var(--coinbase));
+}
+.earnings-main{display:flex;align-items:baseline;gap:10px}
+.earnings-label{font-size:13px;color:var(--text-muted);font-weight:500}
+.earnings-amount{
+  font-family:'JetBrains Mono',monospace;font-size:38px;font-weight:800;
+  background:linear-gradient(135deg,var(--green),var(--nike-volt));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.earnings-usdc{font-size:16px;color:var(--text-muted);font-weight:500}
+.earnings-right{display:flex;gap:12px;flex-wrap:wrap}
+.earnings-mini{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:14px 20px;min-width:140px;
+}
+.earnings-mini .em-label{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px}
+.earnings-mini .em-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;margin-top:2px}
+.earnings-mini .em-val.orange{color:var(--nike-orange)}
+.earnings-mini .em-val.blue{color:var(--coinbase)}
+.earnings-mini .em-val.green{color:var(--green)}
+
+/* ─── Section headings ─── */
+.sec-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:32px 0 16px;
+}
+.sec-title{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.sec-badge{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  padding:4px 12px;border-radius:100px;
+}
+.sec-badge.orange{color:var(--nike-orange);background:var(--nike-orange-glow)}
+.sec-badge.green{color:var(--green);background:var(--green-glow)}
+
+/* ─── Agent request cards ─── */
+.agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.agent-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:18px;padding:22px;position:relative;
+  transition:all .3s ease;overflow:hidden;
+}
+.agent-card:hover{border-color:var(--border-hover);background:var(--surface-hover);transform:translateY(-2px)}
+.agent-card::after{
+  content:'';position:absolute;inset:0;opacity:0;
+  background:radial-gradient(ellipse at var(--mx,50%) var(--my,50%), rgba(250,91,48,.06) 0%, transparent 60%);
+  transition:opacity .3s;pointer-events:none;
+}
+.agent-card:hover::after{opacity:1}
+
+.agent-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;position:relative;z-index:1}
+.agent-left{display:flex;align-items:center;gap:12px}
+.agent-avi{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;color:#fff;font-weight:800;flex-shrink:0;
+}
+.avi-brand{background:linear-gradient(135deg,var(--nike-orange),#FF7849)}
+.avi-style{background:linear-gradient(135deg,#6C5CE7,#A29BFE)}
+.avi-perf{background:linear-gradient(135deg,var(--green),#00B894)}
+.avi-content{background:linear-gradient(135deg,var(--coinbase),#5B8DEF)}
+.avi-local{background:linear-gradient(135deg,var(--amber),#FF8F00)}
+.agent-name{font-weight:600;font-size:14px;position:relative;z-index:1}
+.agent-sub{font-size:11px;color:var(--text-dim);margin-top:2px}
+.agent-status{
+  font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;
+  padding:4px 10px;border-radius:100px;white-space:nowrap;
+}
+.status-requesting{color:var(--amber);background:var(--amber-glow)}
+.status-active{color:var(--green);background:var(--green-glow)}
+.status-settled{color:var(--coinbase);background:var(--coinbase-glow)}
+
+.agent-data{
+  display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;position:relative;z-index:1
+}
+.data-tag{
+  font-size:11px;color:var(--text-muted);
+  background:var(--surface-3);border:1px solid var(--border);
+  padding:3px 10px;border-radius:100px;
+}
+
+.agent-offer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:12px;margin-bottom:14px;position:relative;z-index:1;
+}
+.offer-left{font-size:12px;color:var(--text-muted)}
+.offer-amount{
+  font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;
+  color:var(--nike-volt);
+}
+.offer-split{font-size:11px;color:var(--text-dim);margin-top:2px}
+
+.agent-actions{display:flex;gap:8px;position:relative;z-index:1}
+.btn-approve{
+  flex:1;padding:11px 0;border:none;border-radius:10px;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
+  background:var(--nike-orange);color:#fff;
+  transition:all .2s;
+}
+.btn-approve:hover{background:#FF6B40;transform:translateY(-1px);box-shadow:0 4px 16px var(--nike-orange-glow)}
+.btn-approve:active{transform:translateY(0)}
+.btn-decline{
+  padding:11px 18px;border:1px solid var(--border);border-radius:10px;
+  background:transparent;color:var(--text-muted);cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;
+  transition:all .2s;
+}
+.btn-decline:hover{border-color:var(--red);color:var(--red)}
+
+/* ─── Permission / Active deals ─── */
+.active-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.active-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:18px;padding:22px;transition:all .3s;
+}
+.active-card:hover{border-color:var(--green);box-shadow:0 0 24px var(--green-glow)}
+.active-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.active-agent{font-weight:600;font-size:14px}
+.active-badge{
+  display:flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;
+  color:var(--green);
+}
+.active-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.active-progress{
+  background:var(--surface-3);border-radius:8px;height:6px;margin:12px 0;overflow:hidden;
+}
+.active-progress .fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--nike-orange),var(--nike-volt));transition:width 1s ease}
+.active-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim)}
+.active-earned{font-family:'JetBrains Mono',monospace;color:var(--green);font-weight:600}
+
+/* ─── Settlement log ─── */
+.log-wrap{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:18px;overflow:hidden;margin-top:14px;
+}
+.log-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 22px;border-bottom:1px solid var(--border);
+}
+.log-title{font-size:14px;font-weight:600}
+.log-live{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;color:var(--green);font-weight:500;
+}
+.log-live .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.log-body{max-height:260px;overflow-y:auto;padding:8px 0}
+.log-body::-webkit-scrollbar{width:4px}
+.log-body::-webkit-scrollbar-track{background:transparent}
+.log-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.log-entry{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 22px;transition:background .15s;
+}
+.log-entry:hover{background:var(--surface-2)}
+.log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.log-dot.perm{background:var(--coinbase)}
+.log-dot.escrow{background:var(--amber)}
+.log-dot.settle{background:var(--green)}
+.log-dot.fee{background:var(--nike-orange)}
+.log-text{font-size:13px;color:var(--text-muted);flex:1}
+.log-text strong{color:var(--text);font-weight:600}
+.log-amount{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;white-space:nowrap}
+.log-amount.green{color:var(--green)}
+.log-amount.orange{color:var(--nike-orange)}
+.log-time{font-size:11px;color:var(--text-dim);white-space:nowrap}
+
+/* ─── Contract footer ─── */
+.contract-footer{
+  display:flex;align-items:center;justify-content:center;gap:24px;
+  margin-top:48px;padding-top:24px;border-top:1px solid var(--border);
+  flex-wrap:wrap;
+}
+.cf-link{
+  font-size:12px;color:var(--text-dim);text-decoration:none;
+  display:flex;align-items:center;gap:6px;transition:color .2s;
+}
+.cf-link:hover{color:var(--text-muted)}
+.cf-link .ico{font-size:14px}
+
+/* ─── Animations ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+.stagger-1{animation-delay:.05s}
+.stagger-2{animation-delay:.1s}
+.stagger-3{animation-delay:.15s}
+.stagger-4{animation-delay:.2s}
+.stagger-5{animation-delay:.25s}
+
+/* ─── Responsive ─── */
+@media(max-width:768px){
+  .header{flex-wrap:wrap;gap:12px}
+  .header-pills{order:3;width:100%;justify-content:flex-start}
+  .hero h1{font-size:32px;letter-spacing:-1px}
+  .hero-stats{gap:28px}
+  .hero-protocol{gap:12px}
+  .earnings-bar{flex-direction:column;align-items:stretch;padding:20px}
+  .earnings-amount{font-size:28px}
+  .earnings-right{flex-direction:row}
+  .earnings-mini{flex:1;min-width:100px}
+  .agent-grid,.active-grid{grid-template-columns:1fr}
+  .sec-head{flex-wrap:wrap;gap:8px}
+}
+
+/* ─── Toast notifications ─── */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:1000;
+  background:var(--surface-3);border:1px solid var(--border);
+  border-radius:14px;padding:14px 20px;min-width:280px;
+  display:flex;align-items:center;gap:10px;
+  transform:translateY(100px);opacity:0;
+  transition:all .4s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast .t-ico{font-size:18px;flex-shrink:0}
+.toast .t-msg{font-size:13px;font-weight:500}
+.toast .t-msg span{color:var(--green);font-family:'JetBrains Mono',monospace;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<div class="app">
+
+<!-- ═══ HEADER ═══ -->
+<header class="header">
+  <div class="logo-area">
+    <div class="logo-icon">P</div>
+    <div class="logo-wordmark">Prmission <span>× Nike</span></div>
+  </div>
+  <div class="header-pills">
+    <div class="pill"><div class="dot live"></div> Base Mainnet</div>
+    <div class="pill">3% Protocol Fee</div>
+  </div>
+  <div id="walletArea">
+    <button class="btn-wallet" id="connectBtn" onclick="connectWallet()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M16 12h.01"/></svg>
+      Connect Coinbase Wallet
+    </button>
+  </div>
+</header>
+
+<!-- ═══ HERO (pre-connect) ═══ -->
+<section class="hero" id="heroSection">
+  <div class="hero-eyebrow"><span class="swoosh">✦</span> Nike AI Creator Economy — Live on Base</div>
+  <h1>
+    Nike's AI Agents<br>
+    <span class="line2">Pay You Directly.</span>
+  </h1>
+  <p>Connect your wallet. Grant permission. Nike's autonomous AI agents pay creators USDC for content data, style insights, and audience reach. Everything settles on-chain.</p>
+  <button class="btn-wallet" onclick="connectWallet()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M16 12h.01"/></svg>
+    Connect Wallet & Start Earning
+  </button>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="val mono">$2.4M</div><div class="lbl">Creator Payouts</div></div>
+    <div class="hero-stat"><div class="val mono">12,847</div><div class="lbl">Permissions Granted</div></div>
+    <div class="hero-stat"><div class="val mono">6</div><div class="lbl">Global Markets</div></div>
+    <div class="hero-stat"><div class="val mono">3%</div><div class="lbl">Protocol Fee</div></div>
+  </div>
+  <div class="hero-protocol">
+    <div class="tag"><span class="ico">◈</span> PrmissionV2 on Base</div>
+    <div class="tag"><span class="ico">◎</span> USDC Settlement</div>
+    <div class="tag"><span class="ico">◇</span> ERC-8004 Trust Verified</div>
+    <div class="tag"><span class="ico">⬡</span> 24h Dispute Window</div>
+  </div>
+</section>
+
+<!-- ═══ DASHBOARD (post-connect) ═══ -->
+<section class="dashboard" id="dashboard">
+
+  <!-- Earnings bar -->
+  <div class="earnings-bar">
+    <div>
+      <div class="earnings-label">Your Creator Earnings</div>
+      <div class="earnings-main">
+        <div class="earnings-amount" id="totalEarnings">$0.00</div>
+        <div class="earnings-usdc">USDC</div>
+      </div>
+    </div>
+    <div class="earnings-right">
+      <div class="earnings-mini">
+        <div class="em-label">Active Deals</div>
+        <div class="em-val orange" id="activeDeals">0</div>
+      </div>
+      <div class="earnings-mini">
+        <div class="em-label">Permissions</div>
+        <div class="em-val blue" id="totalPerms">0</div>
+      </div>
+      <div class="earnings-mini">
+        <div class="em-label">Settled</div>
+        <div class="em-val green" id="settledCount">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent Requests -->
+  <div class="sec-head">
+    <div class="sec-title">🔔 Nike AI Agent Requests</div>
+    <div class="sec-badge orange" id="reqCount">5 PENDING</div>
+  </div>
+  <div class="agent-grid" id="agentGrid"></div>
+
+  <!-- Active Permissions -->
+  <div class="sec-head">
+    <div class="sec-title">✅ Active Permissions</div>
+    <div class="sec-badge green" id="activeCount">0 ACTIVE</div>
+  </div>
+  <div class="active-grid" id="activeGrid"></div>
+
+  <!-- Settlement Log -->
+  <div class="log-wrap">
+    <div class="log-header">
+      <div class="log-title">Settlement Log</div>
+      <div class="log-live"><div class="dot"></div> Live on Base</div>
+    </div>
+    <div class="log-body" id="logBody"></div>
+  </div>
+
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="contract-footer">
+  <a class="cf-link" href="https://basescan.org/address/0x0c8B16a57524f4009581B748356E01e1a969223d#code" target="_blank">
+    <span class="ico">◈</span> View Contract on BaseScan
+  </a>
+  <a class="cf-link" href="https://github.com/marcosbenaim-hub/Prmission-Protocol" target="_blank">
+    <span class="ico">⬡</span> GitHub
+  </a>
+  <a class="cf-link" href="https://prmission.com" target="_blank">
+    <span class="ico">◎</span> prmission.com
+  </a>
+</div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><span class="t-ico"></span><span class="t-msg"></span></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// PRMISSION × NIKE CREATOR WALLET — APP LOGIC
+// Contract: 0x0c8B16a57524f4009581B748356E01e1a969223d
+// Chain:    Base (8453)
+// ═══════════════════════════════════════════════════════════════
+
+const CONTRACT_ADDRESS = '0x0c8B16a57524f4009581B748356E01e1a969223d';
+const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+const BASE_CHAIN_ID = '0x2105'; // 8453
+const BASE_RPC = 'https://mainnet.base.org';
+
+// Minimal ABI for PrmissionV2 (view + write functions we need)
+const PRMISSION_ABI = [
+  'function grantPermission(address merchant, string dataCategory, string purpose, uint256 compensationBps, uint256 upfrontFee, uint256 validityPeriod) external returns (uint256)',
+  'function revokePermission(uint256 permissionId) external',
+  'function checkAccess(uint256 permissionId, address agent) external view returns (bool permitted, uint256 compensationBps, uint256 upfrontFee, uint256 validUntil)',
+  'function getUserPermissions(address user, uint256 offset, uint256 limit) external view returns (uint256[])',
+  'function getUserPermissionCount(address user) external view returns (uint256)',
+  'function previewSettlement(uint256 escrowId) external view returns (uint256 userShare, uint256 protocolFee, uint256 agentRefund, uint256 disputeWindowEnd)',
+  'function permissions(uint256) external view returns (address user, address merchant, string dataCategory, string purpose, uint256 compensationBps, uint256 upfrontFee, uint256 validUntil, uint8 status, uint256 createdAt, uint256 revokedAt)',
+  'function totalSettledVolume() external view returns (uint256)',
+  'function totalProtocolFees() external view returns (uint256)',
+  'event PermissionGranted(uint256 indexed permissionId, address indexed user, address indexed merchant, string dataCategory, string purpose, uint256 compensationBps, uint256 upfrontFee, uint256 validUntil)',
+  'event SettlementCompleted(uint256 indexed escrowId, uint256 userShare, uint256 protocolFee, uint256 agentRefund)',
+];
+
+const USDC_ABI = [
+  'function approve(address spender, uint256 amount) external returns (bool)',
+  'function balanceOf(address account) external view returns (uint256)',
+  'function allowance(address owner, address spender) external view returns (uint256)',
+];
+
+// ─── Nike AI Agents (simulated for demo, real contract calls underneath) ───
+const NIKE_AGENTS = [
+  {
+    id: 'nike-af1-la',
+    name: 'Nike AF1 LA Campaign',
+    sub: 'Global Brand Intelligence',
+    avatar: 'avi-brand',
+    icon: '👟',
+    status: 'requesting',
+    dataCategories: ['Style Preferences', 'Sneaker History', 'Social Reach'],
+    purpose: 'AF1 LA global campaign targeting — 6 markets',
+    offerUSDC: 25.00,
+    compensationBps: 3000, // 30%
+    validity: 30,
+  },
+  {
+    id: 'nike-style-ai',
+    name: 'Nike Style Recommender',
+    sub: 'AI Personalization Engine',
+    avatar: 'avi-style',
+    icon: '🎨',
+    status: 'requesting',
+    dataCategories: ['Outfit Photos', 'Color Preferences', 'Size Data'],
+    purpose: 'Personalized product recommendations & creator collabs',
+    offerUSDC: 15.00,
+    compensationBps: 2500, // 25%
+    validity: 14,
+  },
+  {
+    id: 'nike-performance',
+    name: 'Nike Run Club AI',
+    sub: 'Performance Analytics',
+    avatar: 'avi-perf',
+    icon: '🏃',
+    status: 'requesting',
+    dataCategories: ['Running Data', 'Heart Rate', 'Route History'],
+    purpose: 'Training program optimization & product development',
+    offerUSDC: 40.00,
+    compensationBps: 3500, // 35%
+    validity: 60,
+  },
+  {
+    id: 'nike-content',
+    name: 'Nike Creator Studio',
+    sub: 'Content Licensing Agent',
+    avatar: 'avi-content',
+    icon: '📸',
+    status: 'requesting',
+    dataCategories: ['UGC Content', 'Instagram Posts', 'TikTok Videos'],
+    purpose: 'Licensed creator content for global Nike campaigns',
+    offerUSDC: 75.00,
+    compensationBps: 4500, // 45%
+    validity: 90,
+  },
+  {
+    id: 'nike-local',
+    name: 'Nike Geo Agent',
+    sub: 'Local Market Intelligence',
+    avatar: 'avi-local',
+    icon: '📍',
+    status: 'requesting',
+    dataCategories: ['Location Trends', 'Store Visits', 'Local Events'],
+    purpose: 'Hyperlocal campaign targeting — Toronto, LA, Tokyo, London',
+    offerUSDC: 18.00,
+    compensationBps: 2000, // 20%
+    validity: 21,
+  },
+];
+
+let walletAddress = null;
+let provider = null;
+let signer = null;
+let contract = null;
+let activePermissions = [];
+let simulatedEarnings = 0;
+let simulatedSettled = 0;
+
+// ─── Wallet Connection ───
+async function connectWallet() { window.location.href="https://prmission-demo.vercel.app/livedemo.html"; return; // DEMO REDIRECT
+  try {
+    if (!window.ethereum) {
+      showToast('🦊', 'Install <span>Coinbase Wallet</span> or MetaMask to continue');
+      window.open('https://www.coinbase.com/wallet', '_blank');
+      return;
+    }
+
+    // Request accounts
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    walletAddress = accounts[0];
+
+    // Check chain
+    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+    if (chainId !== BASE_CHAIN_ID) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: BASE_CHAIN_ID }],
+        });
+      } catch (switchError) {
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: BASE_CHAIN_ID,
+              chainName: 'Base',
+              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+              rpcUrls: [BASE_RPC],
+              blockExplorerUrls: ['https://basescan.org'],
+            }],
+          });
+        }
+      }
+    }
+
+    // Setup ethers
+    provider = new ethers.BrowserProvider(window.ethereum);
+    signer = await provider.getSigner();
+    contract = new ethers.Contract(CONTRACT_ADDRESS, PRMISSION_ABI, signer);
+
+    // Update UI
+    const short = walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4);
+    document.getElementById('walletArea').innerHTML = `
+      <button class="btn-wallet-connected" onclick="disconnect()">
+        <div class="w-dot"></div>${short}
+      </button>
+    `;
+
+    document.getElementById('heroSection').classList.add('hide');
+    document.getElementById('dashboard').classList.add('show');
+
+    showToast('✅', 'Connected to <span>Base Mainnet</span>');
+
+    // Load data
+    await loadDashboard();
+
+  } catch (err) {
+    console.error('Connect error:', err);
+    showToast('❌', 'Connection failed — try again');
+  }
+}
+
+function disconnect() {
+  walletAddress = null;
+  provider = null;
+  signer = null;
+  contract = null;
+  document.getElementById('walletArea').innerHTML = `
+    <button class="btn-wallet" onclick="connectWallet()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M16 12h.01"/></svg>
+      Connect Coinbase Wallet
+    </button>
+  `;
+  document.getElementById('heroSection').classList.remove('hide');
+  document.getElementById('dashboard').classList.remove('show');
+}
+
+// ─── Dashboard Loading ───
+async function loadDashboard() {
+  renderAgentRequests();
+  renderActivePermissions();
+  renderSettlementLog();
+
+  // Try to read on-chain data
+  try {
+    const permCount = await contract.getUserPermissionCount(walletAddress);
+    document.getElementById('totalPerms').textContent = permCount.toString();
+  } catch (e) {
+    // New user — no permissions yet, that's fine
+    document.getElementById('totalPerms').textContent = '0';
+  }
+
+  // Animate earnings counter
+  animateEarnings();
+}
+
+// ─── Render Agent Request Cards ───
+function renderAgentRequests() {
+  const grid = document.getElementById('agentGrid');
+  grid.innerHTML = NIKE_AGENTS.filter(a => a.status === 'requesting').map((agent, i) => `
+    <div class="agent-card stagger-${i + 1}" style="animation:fadeUp .5s ease-out both"
+         onmousemove="trackMouse(event,this)" onmouseleave="resetMouse(this)">
+      <div class="agent-top">
+        <div class="agent-left">
+          <div class="agent-avi ${agent.avatar}">${agent.icon}</div>
+          <div>
+            <div class="agent-name">${agent.name}</div>
+            <div class="agent-sub">${agent.sub}</div>
+          </div>
+        </div>
+        <div class="agent-status status-requesting">Requesting</div>
+      </div>
+      <div class="agent-data">
+        ${agent.dataCategories.map(d => `<div class="data-tag">${d}</div>`).join('')}
+      </div>
+      <div class="agent-offer">
+        <div>
+          <div class="offer-left">Escrow Offer</div>
+          <div class="offer-split">You earn ${agent.compensationBps / 100}% · 3% protocol fee</div>
+        </div>
+        <div style="text-align:right">
+          <div class="offer-amount">$${agent.offerUSDC.toFixed(2)}</div>
+          <div style="font-size:11px;color:var(--text-dim)">USDC</div>
+        </div>
+      </div>
+      <div class="agent-actions">
+        <button class="btn-approve" onclick="approveAgent('${agent.id}')">
+          Grant Permission — Earn $${(agent.offerUSDC * agent.compensationBps / 10000).toFixed(2)}
+        </button>
+        <button class="btn-decline" onclick="declineAgent('${agent.id}')">✕</button>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('reqCount').textContent = `${NIKE_AGENTS.filter(a => a.status === 'requesting').length} PENDING`;
+}
+
+// ─── Approve Agent (calls grantPermission on-chain) ───
+async function approveAgent(agentId) {
+  const agent = NIKE_AGENTS.find(a => a.id === agentId);
+  if (!agent) return;
+
+  const btn = event.target;
+  const origText = btn.textContent;
+  btn.textContent = 'Signing transaction...';
+  btn.disabled = true;
+
+  try {
+    // Call grantPermission on the live contract
+    const validitySeconds = agent.validity * 24 * 60 * 60;
+    const upfrontFeeWei = ethers.parseUnits(agent.offerUSDC.toFixed(2), 6); // USDC has 6 decimals
+
+    const tx = await contract.grantPermission(
+      ethers.ZeroAddress,       // merchant: open access (any Nike agent)
+      agent.dataCategories[0],  // dataCategory
+      agent.purpose,            // purpose
+      agent.compensationBps,    // compensationBps
+      upfrontFeeWei,            // upfrontFee
+      validitySeconds           // validityPeriod
+    );
+
+    btn.textContent = 'Confirming on Base...';
+    showToast('⏳', `Tx submitted — waiting for <span>confirmation</span>`);
+
+    const receipt = await tx.wait();
+
+    // Update agent status
+    agent.status = 'active';
+    const earned = agent.offerUSDC * agent.compensationBps / 10000;
+    simulatedEarnings += earned;
+    simulatedSettled++;
+
+    activePermissions.push({
+      ...agent,
+      permissionId: receipt.logs?.[0]?.topics?.[1] || '0x' + Math.random().toString(16).slice(2, 10),
+      approvedAt: new Date(),
+      earned,
+    });
+
+    showToast('✅', `Permission granted — earning <span>$${earned.toFixed(2)} USDC</span>`);
+    addLogEntry('perm', `Permission granted to <strong>${agent.name}</strong>`, `+$${earned.toFixed(2)}`, 'green');
+    addLogEntry('fee', `Protocol fee (3%)`, `$${(agent.offerUSDC * 0.03).toFixed(2)}`, 'orange');
+
+    renderAgentRequests();
+    renderActivePermissions();
+    animateEarnings();
+    updateCounts();
+
+  } catch (err) {
+    console.error('Approve error:', err);
+    btn.textContent = origText;
+    btn.disabled = false;
+
+    if (err.code === 'ACTION_REJECTED' || err.code === 4001) {
+      showToast('↩️', 'Transaction cancelled');
+    } else {
+      // Fallback: simulate approval for demo purposes
+      agent.status = 'active';
+      const earned = agent.offerUSDC * agent.compensationBps / 10000;
+      simulatedEarnings += earned;
+      simulatedSettled++;
+
+      activePermissions.push({
+        ...agent,
+        permissionId: '0x' + Math.random().toString(16).slice(2, 10),
+        approvedAt: new Date(),
+        earned,
+      });
+
+      showToast('✅', `Permission granted (demo) — <span>$${earned.toFixed(2)} USDC</span>`);
+      addLogEntry('perm', `Permission granted to <strong>${agent.name}</strong>`, `+$${earned.toFixed(2)}`, 'green');
+      addLogEntry('fee', `Protocol fee (3%)`, `$${(agent.offerUSDC * 0.03).toFixed(2)}`, 'orange');
+
+      renderAgentRequests();
+      renderActivePermissions();
+      animateEarnings();
+      updateCounts();
+    }
+  }
+}
+
+function declineAgent(agentId) {
+  const idx = NIKE_AGENTS.findIndex(a => a.id === agentId);
+  if (idx >= 0) {
+    NIKE_AGENTS.splice(idx, 1);
+    renderAgentRequests();
+    showToast('✕', 'Request declined');
+  }
+}
+
+// ─── Render Active Permissions ───
+function renderActivePermissions() {
+  const grid = document.getElementById('activeGrid');
+  if (activePermissions.length === 0) {
+    grid.innerHTML = `<div style="color:var(--text-dim);font-size:14px;padding:20px 0">No active permissions yet — approve an agent request above to start earning.</div>`;
+    return;
+  }
+
+  grid.innerHTML = activePermissions.map((perm, i) => {
+    const elapsed = (Date.now() - perm.approvedAt.getTime()) / 1000;
+    const total = perm.validity * 86400;
+    const progress = Math.min((elapsed / total) * 100, 100);
+
+    return `
+      <div class="active-card" style="animation:fadeUp .4s ease-out both;animation-delay:${i * .05}s">
+        <div class="active-header">
+          <div class="active-agent">${perm.icon} ${perm.name}</div>
+          <div class="active-badge"><div class="dot"></div> Earning</div>
+        </div>
+        <div class="agent-data">
+          ${perm.dataCategories.map(d => `<div class="data-tag">${d}</div>`).join('')}
+        </div>
+        <div class="active-progress"><div class="fill" style="width:${Math.max(progress, 3)}%"></div></div>
+        <div class="active-meta">
+          <span>${perm.validity}d permission · ${perm.compensationBps / 100}% share</span>
+          <span class="active-earned">+$${perm.earned.toFixed(2)} USDC</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('activeCount').textContent = `${activePermissions.length} ACTIVE`;
+}
+
+// ─── Settlement Log ───
+function renderSettlementLog() {
+  const log = document.getElementById('logBody');
+  log.innerHTML = `
+    <div class="log-entry" style="animation:slideIn .3s ease-out"><div class="log-dot settle"></div><div class="log-text">Wallet connected to <strong>Base Mainnet</strong></div><div class="log-time">just now</div></div>
+    <div class="log-entry" style="animation:slideIn .3s ease-out .05s both"><div class="log-dot perm"></div><div class="log-text">Listening for <strong>Nike AI Agent</strong> requests</div><div class="log-time">just now</div></div>
+  `;
+}
+
+function addLogEntry(type, text, amount, amountClass) {
+  const log = document.getElementById('logBody');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.style.animation = 'slideIn .3s ease-out';
+  entry.innerHTML = `
+    <div class="log-dot ${type}"></div>
+    <div class="log-text">${text}</div>
+    ${amount ? `<div class="log-amount ${amountClass || ''}">${amount}</div>` : ''}
+    <div class="log-time">just now</div>
+  `;
+  log.insertBefore(entry, log.firstChild);
+}
+
+// ─── Animate Earnings ───
+function animateEarnings() {
+  const el = document.getElementById('totalEarnings');
+  const target = simulatedEarnings;
+  const start = parseFloat(el.textContent.replace('$', '')) || 0;
+  const duration = 800;
+  const startTime = performance.now();
+
+  function tick(now) {
+    const t = Math.min((now - startTime) / duration, 1);
+    const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    el.textContent = '$' + (start + (target - start) * ease).toFixed(2);
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function updateCounts() {
+  document.getElementById('activeDeals').textContent = activePermissions.length;
+  document.getElementById('settledCount').textContent = simulatedSettled;
+  document.getElementById('totalPerms').textContent = activePermissions.length;
+}
+
+// ─── Card hover glow effect ───
+function trackMouse(e, card) {
+  const rect = card.getBoundingClientRect();
+  card.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width * 100) + '%');
+  card.style.setProperty('--my', ((e.clientY - rect.top) / rect.height * 100) + '%');
+}
+function resetMouse(card) {
+  card.style.setProperty('--mx', '50%');
+  card.style.setProperty('--my', '50%');
+}
+
+// ─── Toast ───
+function showToast(icon, msg) {
+  const toast = document.getElementById('toast');
+  toast.querySelector('.t-ico').textContent = icon;
+  toast.querySelector('.t-msg').innerHTML = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// ─── Listen for account/chain changes ───
+if (window.ethereum) {
+  window.ethereum.on('accountsChanged', (accounts) => {
+    if (accounts.length === 0) disconnect();
+    else { walletAddress = accounts[0]; connectWallet(); }
+  });
+  window.ethereum.on('chainChanged', () => window.location.reload());
+}
+</script>
+</body>
+</html>

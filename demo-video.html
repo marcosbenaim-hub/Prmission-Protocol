@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prmission Investor Demo</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .connect {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 2;
+      color: #fff;
+      background: #0052ff;
+      border: 1px solid #0052ff;
+      border-radius: 999px;
+      padding: 6px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px);
+      transition: opacity .22s ease, transform .22s ease;
+    }
+    .connect.show {
+      opacity: 1;
+      transform: translateY(0);
+      animation: floatBadge 1.8s ease-in-out infinite;
+    }
+    .connect svg {
+      display: block;
+      width: 18px;
+      height: 18px;
+    }
+    .connect.linked {
+      background: #00e676;
+      border-color: #00e676;
+      color: #001b10;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      background: #000;
+    }
+    @keyframes floatBadge {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    @media (max-width: 700px) {
+      .connect {
+        top: 10px;
+        right: 10px;
+        padding: 11px 14px;
+        font-size: 28px;
+        border-width: 2px;
+      }
+      .connect svg {
+        width: 26px;
+        height: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a id="coinbaseBtn" class="connect" href="https://prmission.com/assets/vercelVercel.mp4" aria-label="Connect Coinbase Wallet">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="32" fill="#ffffff"></circle>
+      <circle cx="32" cy="32" r="20" fill="#0052ff"></circle>
+    </svg>
+    <span id="coinbaseText">Connect to Wallet</span>
+  </a>
+  <video id="investorVideo" controls autoplay playsinline preload="auto">
+    <source src="assets/nike-demo-investor.mp4" type="video/mp4">
+  </video>
+  <script>
+    const TOKEN_KEY = 'prmission_demo_access';
+    const TOKEN_VALUE = 'ok';
+    if (sessionStorage.getItem(TOKEN_KEY) !== TOKEN_VALUE) {
+      window.location.href = '/demo-gate.html';
+    }
+
+    const coinbaseBtn = document.getElementById('coinbaseBtn');
+    const coinbaseText = document.getElementById('coinbaseText');
+    const video = document.getElementById('investorVideo');
+    const CAMPAIGN_VIDEO_URL = 'https://prmission.com/assets/vercelVercel.mp4';
+    let connectShown = false;
+    let linkedShown = false;
+
+    video.addEventListener('timeupdate', () => {
+      if (!Number.isFinite(video.duration)) return;
+      const remaining = video.duration - video.currentTime;
+
+      if (!connectShown && remaining <= 9) {
+        connectShown = true;
+        coinbaseBtn.classList.add('show');
+        coinbaseText.textContent = 'Connect to Wallet';
+      }
+
+      if (!linkedShown && remaining <= 4) {
+        linkedShown = true;
+        coinbaseBtn.classList.add('linked');
+        coinbaseText.textContent = 'Wallet Linked';
+      }
+    });
+
+    video.addEventListener('ended', () => {
+      window.location.href = CAMPAIGN_VIDEO_URL;
+    });
+  </script>
+</body>
+</html>

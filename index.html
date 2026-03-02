@@ -98,6 +98,15 @@
       text-decoration: none;
       font-size: 13px;
     }
+    .cta.ghost {
+      background: transparent;
+      color: var(--text);
+      border-color: #2b4468;
+    }
+    .cta.ghost:hover {
+      border-color: #1ad09a;
+      color: var(--green);
+    }
 
     .live {
       margin-top: 14px;
@@ -113,18 +122,6 @@
     .stats, .cards { display: grid; gap: 10px; }
     .stats { margin-top: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .cards { margin-top: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .hero-demo {
-      margin-top: 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      overflow: hidden;
-      background: #071224;
-    }
-    .hero-demo video {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
 
     .stat, .card {
       border: 1px solid var(--line);
@@ -274,6 +271,30 @@
       .stats, .cards, .form { grid-template-columns: 1fr; }
       .hero { padding-top: 42px; }
     }
+
+    @media (max-width: 600px) {
+      .wrap { width: 94vw; }
+      .nav { height: 60px; }
+      .hero { padding: 28px 0 16px; }
+      .eyebrow { letter-spacing: 2.4px; font-size: 11px; }
+      h1 { font-size: clamp(30px, 10vw, 42px); line-height: 1.08; }
+      .sub { font-size: 15px; }
+      .hero-actions { gap: 8px; }
+      .cta {
+        width: 100%;
+        text-align: center;
+        padding: 11px 12px;
+        font-size: 14px;
+      }
+      .live {
+        border-radius: 14px;
+        font-size: 11px;
+        line-height: 1.45;
+      }
+      .stat, .card, .waitlist { padding: 11px; }
+      .title { font-size: 26px; }
+      .row { grid-template-columns: 1fr; gap: 4px; }
+    }
   </style>
 </head>
 <body>
@@ -289,6 +310,7 @@
       <h1>OpenAI gave agents a brain.<br>Google and Apple gave them reach.<br><span class="accent">Prmission gives us a wallet.</span></h1>
       <p class="sub">The economic permission layer enabling AI agents to pay for data and services — securely, autonomously, and <span class="accent">on-chain</span>.</p>
       <div class="hero-actions">
+        <a class="cta ghost" href="/demo-gate.html">Demo</a>
         <a class="cta" href="#waitlist">Join Waitlist</a>
         <a class="cta" href="#waitlist">Get Updates</a>
       </div>
@@ -298,11 +320,6 @@
         <div class="stat"><b>3%</b><span>Protocol Fee (On-Chain)</span></div>
         <div class="stat"><b>24h</b><span>Challenge Window</span></div>
         <div class="stat"><b>Live</b><span>Right Now</span></div>
-      </div>
-      <div class="hero-demo">
-        <video id="heroDemo" autoplay loop muted playsinline webkit-playsinline preload="auto">
-          <source src="assets/prmission-demo.mp4" type="video/mp4">
-        </video>
       </div>
     </section>
 
@@ -464,28 +481,12 @@
   </main>
   <script>
     const connectBtn = document.getElementById("connect-wallet");
-    const heroDemo = document.getElementById("heroDemo");
 
     if (connectBtn) {
       connectBtn.addEventListener("click", (event) => {
         event.preventDefault();
         window.location.href = "app.html?connect=1";
       });
-    }
-
-    // Mobile-safe autoplay/loop fallback (especially iOS Safari).
-    if (heroDemo) {
-      heroDemo.muted = true;
-      const tryPlay = () => heroDemo.play().catch(() => {});
-      heroDemo.addEventListener("ended", () => {
-        heroDemo.currentTime = 0;
-        tryPlay();
-      });
-      document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) tryPlay();
-      });
-      document.addEventListener("touchstart", tryPlay, { once: true, passive: true });
-      tryPlay();
     }
 
     // Lightweight analytics without external dashboard setup.

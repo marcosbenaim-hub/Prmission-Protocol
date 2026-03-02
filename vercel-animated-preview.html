@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Prmission Animated Preview</title>
+  <style>
+    :root {
+      --bg: #050505;
+      --text: #f6f7fb;
+      --muted: #b5bfd6;
+      --coinbase: #0052ff;
+      --line: rgba(255,255,255,.16);
+      --accent: #00e676;
+      --gold: #e0c069;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+    .frame {
+      position: relative;
+      min-height: 100dvh;
+      overflow: hidden;
+      background: #000;
+    }
+    .bg-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.03);
+      filter: saturate(1.08) contrast(1.04);
+    }
+    .veil {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(1000px 480px at 12% 8%, rgba(0,82,255,.24), transparent 58%),
+        radial-gradient(900px 460px at 90% 88%, rgba(0,230,118,.18), transparent 56%),
+        linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.74));
+    }
+    .noise {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(#fff 0.45px, transparent 0.45px);
+      background-size: 3px 3px;
+    }
+
+    .topbar {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      z-index: 3;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .chip {
+      border: 1px solid #2f7d58;
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: #8fffc5;
+      background: rgba(0,0,0,.42);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .coinbase {
+      text-decoration: none;
+      color: #fff;
+      background: var(--coinbase);
+      border: 1px solid var(--coinbase);
+      border-radius: 999px;
+      padding: 9px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 10px 28px rgba(0,82,255,.38);
+    }
+    .coinbase svg { width: 22px; height: 22px; display: block; }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      min-height: 100dvh;
+      display: grid;
+      align-content: end;
+      padding: 86px 20px 26px;
+    }
+    .panel {
+      width: min(1060px, 100%);
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(8, 11, 18, .52);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      animation: rise .9s cubic-bezier(.2,.8,.2,1);
+    }
+    .headline {
+      margin: 0;
+      font-size: clamp(32px, 6vw, 74px);
+      line-height: .92;
+      letter-spacing: -1.6px;
+    }
+    .headline .gold {
+      color: var(--gold);
+      text-shadow: 0 0 34px rgba(224,192,105,.35);
+    }
+    .sub {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: clamp(15px, 2vw, 26px);
+      max-width: 980px;
+    }
+    .stats {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(0,0,0,.40);
+      transform: translateY(8px);
+      opacity: 0;
+      animation: fadeUp .6s ease forwards;
+    }
+    .stat:nth-child(1) { animation-delay: .16s; }
+    .stat:nth-child(2) { animation-delay: .28s; }
+    .stat:nth-child(3) { animation-delay: .40s; }
+    .stat b {
+      display: block;
+      color: var(--accent);
+      font-size: clamp(24px, 3.5vw, 44px);
+      line-height: 1;
+    }
+    .stat span {
+      display: block;
+      margin-top: 4px;
+      color: #d4dbec;
+      font-size: 12px;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+    .actions {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      color: #fff;
+      background: rgba(0,0,0,.45);
+    }
+    .btn.primary {
+      border-color: var(--accent);
+      background: rgba(0,230,118,.18);
+      color: #dcffe9;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 760px) {
+      .panel { padding: 14px; border-radius: 16px; }
+      .stats { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .btn { width: 100%; text-align: center; }
+      .coinbase { padding: 8px 10px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="frame">
+    <video class="bg-video" autoplay muted loop playsinline preload="auto">
+      <source src="assets/nike-demo-investor.mp4" type="video/mp4">
+    </video>
+    <div class="veil"></div>
+    <div class="noise"></div>
+
+    <div class="topbar">
+      <div class="chip">Investor Demo Preview</div>
+      <a class="coinbase" href="https://prmission-demo.vercel.app/" aria-label="Connect Coinbase Wallet">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="32" fill="#ffffff"></circle>
+          <circle cx="32" cy="32" r="20" fill="#0052ff"></circle>
+        </svg>
+        Coinbase
+      </a>
+    </div>
+
+    <section class="content">
+      <div class="panel">
+        <h1 class="headline">Worn To Be <span class="gold">Wild</span></h1>
+        <p class="sub">Hybrid demo concept: cinematic video layer + animated UI overlays + direct wallet CTA.</p>
+        <div class="stats">
+          <article class="stat"><b>3%</b><span>Protocol Fee</span></article>
+          <article class="stat"><b>$0.10</b><span>USDC Escrow</span></article>
+          <article class="stat"><b>Base</b><span>Network</span></article>
+        </div>
+        <div class="actions">
+          <a class="btn primary" href="https://prmission-demo.vercel.app/">Open Wallet Flow</a>
+          <a class="btn" href="https://prmission.com/demo-video.html">Back to Current Demo</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
