@@ -1,6 +1,11 @@
 {
   "rewrites": [
     { "source": "/", "destination": "/livedemo.html" },
-    { "source": "/nike-prmission-demo", "destination": "/nike-prmission-demo.html" }
+    { "source": "/nike-prmission-demo", "destination": "/nike-prmission-demo.html" },
+    { "source": "/nike", "destination": "/demo/index.html" },
+    { "source": "/nike/", "destination": "/demo/index.html" },
+    { "source": "/demo", "destination": "/demo/index.html" },
+    { "source": "/demo/", "destination": "/demo/index.html" },
+    { "source": "/NIKE.html", "destination": "/demo/index.html" }
   ]
 }
