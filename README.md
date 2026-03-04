@@ -267,7 +267,7 @@ npx hardhat verify --network base <CONTRACT_ADDRESS> "<PAYMENT_TOKEN>" "<TREASUR
 - **BaseScan (Verified):** [View Contract](https://basescan.org/address/0x0c8B16a57524f4009581B748356E01e1a969223d#code)
 - **Ethereum ERC-8004 Specification:** [EIP-8004](https://eips.ethereum.org/EIPS/eip-8004)
 - **Base Network:** [base.org](https://base.org)
-
+* **TypeScript SDK:** [prmission-ts-sdk](https://github.com/marcosbenaim-hub/prmission-ts-sdk)
 ---
 
 ## License
