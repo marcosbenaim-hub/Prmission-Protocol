@@ -257,7 +257,7 @@ npx hardhat verify --network base <CONTRACT_ADDRESS> "<PAYMENT_TOKEN>" "<TREASUR
 
 ## Pitch Deck
 
-📄 [View YC S26 Pitch Deck](docs/1.1Prmission_YC_S26_Deck.pdf)
+https://docsend.com/view/8ywvgdyd9uekk9qy
 
 ---
 
